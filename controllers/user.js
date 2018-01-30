@@ -1,0 +1,634 @@
+'use strict'
+
+// modulos
+var bcrypt = require('bcrypt-nodejs');
+var nodemailer = require('nodemailer');
+var https = require('http');
+var request = require('request');
+
+var models = require('../models');
+
+// modelos
+var User = require('../models/user');
+//var Student = require('../models/student');
+var Client = require('../models/client');
+var Profile = require('../models/profile');
+//var Sms = require('../models/sms');
+//var ListSms = require('../models/listSms')
+//var Template = require('../models/template');
+//var Settings = require('../models/setting');
+var Util     = require('../util/function')
+var UtilPrueba     = require('../util/functionPrueba')
+// services
+var jwt = require('../services/jwt');
+
+function saveUser(req, res) {
+  // crear objeto usuario
+  var user = new User();
+
+  // recogemos parametros de petición
+  var params = req.body;
+
+  if (params.name && params.address && params.phone && params.email) {
+    user.name = params.name;
+    user.address = params.address;
+    user.phone = params.phone;
+    user.school = req.user.sub;
+    user.profile = params.profile;
+    user.email = params.email;
+    user.state = params.state == 1 ? true : false;
+    user.type = 2;
+    user.validatePass = true
+
+    User.findOne({ email: user.email.toLowerCase() }, (err, issetUser) => {
+      if (err) {
+        res.status(500).send({ message: 'Error al comprobar usuario' });
+      } else {
+        if (!issetUser) {
+          // ciframos contraseña
+          bcrypt.hash(params.password, null, null, function (err, hash) {
+            user.password = hash;
+
+            user.save((err, userStored) => {
+              if (err) {
+                console.log(err);
+                res.status(500).send({ message: 'Error al guardar usuario' });
+              } else {
+                if (!userStored) {
+                  res.status(404).send({ message: 'No se ha registrado el usuario' });
+                } else {
+                  res.status(200).send({ user: userStored });
+                }
+              }
+            });
+          });
+        } else {
+          res.status(400).send({ message: 'Usuario ya existe!' });
+        }
+      }
+    });
+  } else {
+    res.status(400).send({ message: 'Ingresa los datos correctos para poder registrar al usuario' });
+  }
+}
+
+
+
+function putUser(req, res) {
+  var userId = req.params.id;
+  var update = req.body;
+
+  User.findOne({ _id: userId }).exec((err, user) => {
+
+    bcrypt.compare(update.password, user.password, (err, check) => {
+      if (!check) {
+        bcrypt.hash(update.password, null, null, function (err, hash) {
+          update.password = hash;
+        })
+      }
+    })
+  })
+
+
+  User.findByIdAndUpdate(userId, update, { new: true }, (err, userUpdated) => {
+    if (err) {
+      res.status(500).send({
+        message: 'Error al actualizar usuario!'
+      })
+    } else {
+      if (!userUpdated) {
+        res.status(404).send({ message: 'No se a podido actualizar usuario!' });
+      } else {
+        res.status(200).send({ user: userUpdated });
+      }
+    }
+  });
+}
+
+function login(req, res) {
+// recogemos parametros de petición
+  var params = req.body;
+  var email = params.email; 
+  var password = params.password;
+  //var email = 'sheylert@gmail.com'; 
+  //var password = '123456';
+
+ models.User.findOne( { where: { email: email.toLowerCase() }}).then( function(user) { 
+
+        if (!user) {
+          res.status(500).send({ message: 'Error al comprobar usuario' });
+        } else {
+          if (user) {
+         // bcrypt.compare(password, user.password, (err, check) => {
+           models.User.findOne( { where: { password: password, id: user.id }} ).then( function(check) { 
+            if (!check) {
+                 res.status(404).send({ message: 'El usuario no ha podido loguearse correctamente!' });
+             }
+             else
+             {
+              models.Profile.findOne( { where: { id: user.profile}}).then( function(profileStoraged) { 
+
+               if (profileStoraged) {
+                   user.profile = Util.ejecutar_arreglo(profileStoraged);
+               }
+              }); 
+
+              //-----------------------------------------------------
+              if (user.school) {
+
+                 models.Client.findOne( { where: { id: user.school }} ).then( function(schoolStoraged) { 
+
+                    user.services = schoolStoraged.services;
+
+                    if (schoolStoraged) {
+                      if (user.school) {
+
+                        user.school = Util.ejecutar_arreglo(schoolStoraged);    
+
+                        console.log('debtro.........1');
+                        res.status(200).send({
+                          user: user,
+                          token: jwt.createToken(user)
+                        });
+                      } else {
+                        console.log('debtro.........2');
+                        console.log(user)
+                        res.status(200).send({
+                          user: user,
+                          token: jwt.createToken(user)
+                        });
+                      }
+                    }
+                  });
+                } else {
+                  if (params.getToken) {
+                    if (user.school) {
+                      res.status(200).send({
+                        user: user,
+                        token: jwt.createToken(user)
+                      });
+                    } else {
+                      res.status(200).send({
+                        user: user,
+                        token: jwt.createToken(user)
+                      });
+                    }
+                  } else {
+                    res.status(200).send({ user, token: jwt.createToken(user) });
+                  }
+                }
+             } 
+            });
+          } else {
+            res.status(404).send({ message: 'Usuario no existe!' });
+          }
+        }
+      });
+}
+
+function sendSmsMasiveNewApi(req,res){
+  /** =======================================================================================
+        Función para enviar mensajes masivos a varios apoderado, recibe el id del estudiante y el 
+        id del template.... \\ prueba nueva api \\
+        
+      ====================================================================================== **/
+
+  let arregloConsultas = [];
+  let arregloSmsMasive = [];
+  let number = '';
+
+  var params = req.body,
+    mensaje = '',
+    idTemplate = '',
+    typeSms = params.type == 1 ? true : false,
+    aviso = '',
+    total_estudiantes = params.estudiante.length,
+    quantityErrorCount = 0,
+    quantitySuccessCount = 0
+  // buscamos el template
+  Template.findOne({ _id: params.template }).exec((err, template) => {
+    if (err) {
+      res.status(500).send({ message: "Error al buscar el template" })
+    }
+    else {
+      if (!template) {
+        res.status(200).send({ message: "No se encontro ningún template" })
+      }
+      else {
+        mensaje = template.template_text
+        idTemplate = template._id
+      }
+    }
+
+    // iteramos por cada estudiante
+    params.estudiante.forEach(function (ele, index) {
+      arregloConsultas.push(Student.findOne({ _id: ele }).populate('responsable').exec((err, student) => {
+        /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
+          
+        })*/
+        
+      })) // fin carga de promesas y función para buscar los estudiantes
+    });// fin foreach student
+
+    Promise.all(arregloConsultas).then(responsePromise => {
+
+      let objetoPorEstudiante = {
+            typeSms : typeSms,
+            templateId :idTemplate,
+            totalEstudiantes : total_estudiantes,
+            labsmobileResponse: {},
+            aviso,
+            estudiante: {}
+          }
+      
+      responsePromise.forEach( function(element, index) {
+        
+        let labsmobileResponse = {
+          statusResponseApi : null,
+          statusMessageApi  : null,
+          quantitySuccess: 1,
+          quantityError  : 1
+        }
+
+        if(typeSms)
+        {
+          number = '56'+element.responsable.phone
+
+          let anotherUrl = `https://platform.clickatell.com/messages/http/send?apiKey=-bcLQqdjQ0OJV-vI8l_HJA==&to=${number}&content=${mensaje}`
+
+          request({
+            url: anotherUrl,
+            method: 'GET',
+            headers: {
+            'Access-Control-Allow-Origin': '*'
+            }
+          }, function (error, response, body) {
+            
+            var body = JSON.parse(body)
+
+            if (error) 
+            {
+              // si hubo un error en al enviar la mensajeria
+              aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos'
+              labsmobileResponse.statusResponseApi = 500
+              labsmobileResponse.statusMessageApi  = null
+
+              
+
+              arregloSmsMasive.push(Object.assign({}, objetoPorEstudiante, {
+                labsmobileResponse: labsmobileResponse,
+                estudiante: element
+              }))
+
+              if(index + 1 == total_estudiantes)
+              {
+                setTimeout(() => {
+                  UtilPrueba.storedSmsMasive(req,res,arregloSmsMasive)
+                }, 500)
+              }
+            }
+            else 
+            {
+              
+              labsmobileResponse.statusResponseApi = body.messages[0].accepted ? 200 : 500
+              labsmobileResponse.statusMessageApi  = body.messages[0].error
+
+              arregloSmsMasive.push(Object.assign({}, objetoPorEstudiante, {
+                labsmobileResponse: labsmobileResponse,
+                estudiante: element
+              })) 
+
+              if(index + 1 == total_estudiantes)
+              {
+                setTimeout(() => {
+                  UtilPrueba.storedSmsMasive(req,res,arregloSmsMasive)
+                }, 500)
+              }
+            } // fin si no hubo error*/
+          }) // fin funcion request*/
+        } // aquii
+        else
+        {
+          assingObjet.labsmobileResponse.statusResponseApi = 200
+
+          arregloSmsMasive.push(Object.assign({}, objetoPorEstudiante, {
+                labsmobileResponse: labsmobileResponse,
+                estudiante: element
+          }))
+
+          if(index + 1 == total_estudiantes)
+          {
+            setTimeout(() => {
+              UtilPrueba.storedSmsMasive(req,res,arregloSmsMasive)
+            }, 500)
+          }
+        } //fin si es una notificación
+      });
+      
+    }).catch(reject => {
+        console.log(reject)
+        res.status(400).send({ message: "Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos" })
+    })
+  })// fin función buscar template
+}
+
+function sendSmsMasive(req, res) {
+  /* =========================================================================================================
+    Función para el envio masivo de sms, recibe un array llamado sms por el que se itera y el id del template
+    a buscar.. \\ Vieja Api \\
+   ========================================================================================================= */
+
+  let arregloConsultas = [];
+  let numbers = '';
+
+  var params = req.body,
+    mensaje = '',
+    idTemplate = '',
+    typeSms = params.type == 1 ? true : false,
+    aviso = '',
+    total_estudiantes = params.estudiante.length,
+    quantityErrorCount = 0,
+    quantitySuccessCount = 0
+  // buscamos el template
+  Template.findOne({ _id: params.template }).exec((err, template) => {
+    if (err) {
+      res.status(500).send({ message: "Error al buscar el template" })
+    }
+    else {
+      if (!template) {
+        res.status(200).send({ message: "No se encontro ningún template" })
+      }
+      else {
+        mensaje = template.template_text
+        idTemplate = template._id
+      }
+    }
+
+    // iteramos por cada estudiante
+    params.estudiante.forEach(function (ele, index) {
+      arregloConsultas.push(Student.findOne({ _id: ele }).populate('responsable').exec((err, student) => {
+        /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
+          
+        })*/
+        numbers = index === 0 ? `56${student.responsable.phone}` : `${numbers},56${student.responsable.phone}`;
+        quantityErrorCount++;
+        quantitySuccessCount++;
+        
+      })) // fin carga de promesas y función para buscar los estudiantes
+    });// fin foreach student
+
+    Promise.all(arregloConsultas).then(responsePromise => {
+
+      let labsmobileResponse = {
+        statusResponseApi : null,
+        statusMessageApi  : null,
+        quantitySuccess: quantityErrorCount,
+        quantityError  : quantitySuccessCount
+      }
+
+      if(typeSms)
+      {
+        let urlRequest = 'https://api.labsmobile.com/get/send.php?username=contactopronotas@gmail.com&password=kf94rd36&msisdn=' + numbers + '&message=' + mensaje + '&sender=56999415041'
+        request({
+          url: urlRequest,
+          method: 'GET',
+        }, function (error, response, body) {
+          if (error) 
+          {
+            // si hubo un error en al enviar la mensajeria
+            aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos'
+            labsmobileResponse.statusResponseApi = response.statusCode
+            labsmobileResponse.statusMessageApi  = response.statusMessage
+            Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
+          }
+          else 
+          {
+            aviso = 'Mensajería Enviada con Éxito'
+            labsmobileResponse.statusResponseApi = response.statusCode
+            labsmobileResponse.statusMessageApi  = response.statusMessage
+            Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
+
+          } // fin si no hubo error
+        }) // fin funcion request*/
+      } // aquii
+      else
+      {
+        aviso = "Notificaciónes guardadas con éxito"
+        Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
+      } //fin si es una notificación
+        
+
+  
+    }).catch(reject => {
+        console.log(reject)
+        res.status(400).send({ message: "Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos" })
+    })
+  })// fin función buscar template
+} // aquii
+
+function sendSmsSingle(req, res) {
+
+  /** =======================================================================================
+        Función para enviar un solo mensaje a un apoderado, recibe el id del estudiante y el 
+        id del template
+      ====================================================================================== **/
+
+  var params = req.body,
+    number = '',
+    mensaje = '',
+    idTemplate = '',
+    typeSms = params.type == 1 ? true : false,
+    aviso = ''
+
+
+  Template.findOne({ _id: params.template }).exec((err, template) => {
+
+    if (err) {
+      res.status(500).send({ message: "Error al buscar el template" })
+    }
+    else {
+      if (!template) {
+        res.status(200).send({ message: "No se encontro ningún template" })
+      }
+      else {
+        mensaje = template.template_text
+        idTemplate = template._id
+      }
+    }
+
+
+    Student.findOne({ _id: params.estudiante }).populate('responsable').exec((err, student) => {
+      /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
+      })*/
+        
+        number = `56${student.responsable.phone}`
+        mensaje = mensaje.indexOf(':responsable') != -1 ? mensaje.replace(':responsable', student.responsable.name + student.responsable.lastname) : mensaje
+        mensaje = mensaje.indexOf(':estudiante') != -1 ? mensaje.replace(':responsable', student.name + student.lastname) : mensaje
+
+        let labsmobileResponse = {
+            statusResponseApi : null,
+            statusMessageApi  : null,
+            quantityError : 1,
+            quantitySuccess: 1
+        }
+
+        if (typeSms) 
+        {  
+          // si es un sms lo que hay que enviar
+          request({
+            url: 'http://api.labsmobile.com/get/send.php?username=contactopronotas@gmail.com&password=kf94rd36&msisdn=' + number + '&sender=SENDER&message=' + mensaje,
+            method: 'GET',
+          }, function (error, response, body) {
+            if (error) {
+              // si hubo un error en al enviar la mensajeria
+              aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin créditos'
+
+              labsmobileResponse.statusResponseApi = response.statusCode
+              labsmobileResponse.statusMessageApi  = response.statusMessage
+
+              Util.storedSmsSingle(req,res,student,idTemplate,typeSms,labsmobileResponse,aviso)
+            }
+            else 
+            {
+
+              aviso = 'Mensajería Enviada con Éxito'
+
+              labsmobileResponse.statusResponseApi = response.statusCode
+              labsmobileResponse.statusMessageApi  = response.statusMessage
+
+              Util.storedSmsSingle(req,res,student,idTemplate,typeSms,labsmobileResponse,aviso)
+
+            } // fin si no hubo error al enviar el sms
+          }) // fin funcion request
+        } // si no es un sms
+        else 
+        {
+          aviso = 'Notificación guardada con éxito'
+          Util.storedSmsSingle(req,res,student,idTemplate,typeSms,labsmobileResponse,aviso)
+          
+        } // fin if si no es un sms lo que hay que enviar
+       // })fin busqueda de numero país en settings
+    })// fin find Student function
+  }) // fin función buscar template
+
+
+}
+
+function getUsers(req, res) {
+
+  var params = req.body;
+
+  var school = req.user.sub;
+
+  User.find({ school: school }).populate([{
+    path: 'profile',
+    model: 'Profile'
+  },
+  {
+    path: 'school',
+    model: 'Client'
+  }
+  ]).exec((err, courses) => {
+    if (err) {
+      res.status(500).send({ message: 'Error en la petición' })
+    } else {
+      if (!courses) {
+        res.status(200).send([])
+      } else {
+        res.status(200).send(courses);
+      }
+    }
+  });
+}
+
+function overwritePass(req, res) {
+  // función para mandar los datos del usuario a la vista de reestablecer contraseña por defecto(Solo para apoderados)
+  let usuario = req.user
+
+  User.findOne({ _id: usuario.sub }).exec((err, user) => {
+    if (err) {
+      res.status(404).send({ message: "Error al buscar el usuario" })
+    }
+    else {
+      if (!user) {
+        res.status(404).send({})
+      }
+      else {
+        usuario.pass = user.password
+        res.status(200).send(usuario)
+      }
+    }
+  })
+
+}
+
+function updatePass(req, res) {
+  // función para sobreescribir el pass por defecto y validar que ya hizo session por primera vez (Solo para apoderados)
+  let update = {
+    validatePass: true,
+    password: req.body.password
+  }
+
+  bcrypt.hash(update.password, null, null, function (err, hash) {
+    update.password = hash;
+  })
+
+  User.findByIdAndUpdate(req.params.id, update, function (err, user) {
+    if (err) {
+      res.status(404).send({ message: "Error al intentar modificar el usuario" })
+    }
+    else {
+      if (!user) {
+        res.status(404).send({ message: "Hubo un error al modificar el usuario" })
+      }
+      else {
+        res.status(200).send(user)
+      }
+    }
+  })
+}
+
+function recoveryPassword(req, res) {
+  // funcioón para recuperar contraseña mandando la contraseña al correo
+
+  User.findOne({ email: req.body.email }).exec((err, user) => {
+
+    var Service = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'pronotas7@gmail.com',
+        pass: 'asdQWE123'
+      }
+    });
+
+    var mailOptions = {
+      from: '"Pronotas" <pronotas7@gmail.com>',
+      to: req.body.email,
+      subject: 'Recuperación de Contraseña',
+      text: 'Tú contraseña es ' + user.password
+    };
+
+    Service.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+        res.status(500)({ message: "Error al enviar el correo" });
+      } else {
+        res.status(200).send({ message: "Su contraseña fue enviada a su correo electrónico" });
+      }
+    })
+
+  })
+}
+
+module.exports = {
+  saveUser,
+  login,
+  sendSmsMasive,
+  sendSmsMasiveNewApi,
+  sendSmsSingle,
+  getUsers,
+  putUser,
+  overwritePass,
+  updatePass,
+  recoveryPassword
+}
