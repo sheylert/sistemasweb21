@@ -5,7 +5,7 @@ var models = require('./models');
 var path = require('path');
 var http = require('http');
 
-var port = process.env.PORT || 3789;
+var port = process.env.PORT || 8000;
 
 models.sequelize.sync().then(runserver);
 
