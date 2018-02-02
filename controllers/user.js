@@ -15,7 +15,7 @@ var Client = require('../models/client');
 var Profile = require('../models/profile');
 //var Sms = require('../models/sms');
 //var ListSms = require('../models/listSms')
-//var Template = require('../models/template');
+var Template = require('../models/template');
 //var Settings = require('../models/setting');
 var Util     = require('../util/function')
 var UtilPrueba     = require('../util/functionPrueba')
@@ -110,9 +110,7 @@ function login(req, res) {
   var params = req.body;
   var email = params.email; 
   var password = params.password;
-  //var email = 'sheylert@gmail.com'; 
-  //var password = '123456';
-
+  
  models.User.findOne( { where: { email: email.toLowerCase() }}).then( function(user) { 
 
         if (!user) {
@@ -516,30 +514,45 @@ function sendSmsSingle(req, res) {
 
 function getUsers(req, res) {
 
-  var params = req.body;
+// revisar parametros y como llegan con el nuevo token
+//profile y cliente como inner join
+//var params = req.body;
+// var school = req.user.sub; //revisar el school que esta cableado
 
-  var school = req.user.sub;
+  models.User.findAll( { where: { school: 1}} ).then( function(user) { 
+     
+     if (!user) {
+          res.status(500).send({ message: 'Error en la petición' });
+        } else {
+          if (user) {
 
-  User.find({ school: school }).populate([{
-    path: 'profile',
-    model: 'Profile'
-  },
-  {
-    path: 'school',
-    model: 'Client'
-  }
-  ]).exec((err, courses) => {
-    if (err) {
-      res.status(500).send({ message: 'Error en la petición' })
-    } else {
-      if (!courses) {
-        res.status(200).send([])
-      } else {
-        res.status(200).send(courses);
-      }
-    }
+            user.map((e,i) => {
+                  
+                  models.Profile.findOne( { where: { id: e.dataValues.profile}}).then( function(profileStoraged) { 
+
+                  if (profileStoraged) {    
+                    e.dataValues.profile = Util.ejecutar_arreglo(profileStoraged);
+
+                    console.log(e.dataValues.profile,'aquii')
+                  }
+                  else
+                  {
+                    return e
+                  } 
+            });
+           });       
+
+            res.status(200).send(user);
+          } 
+        }     
   });
 }
+
+
+
+
+
+
 
 function overwritePass(req, res) {
   // función para mandar los datos del usuario a la vista de reestablecer contraseña por defecto(Solo para apoderados)

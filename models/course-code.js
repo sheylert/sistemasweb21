@@ -1,8 +1,9 @@
 'use strict'
 
+
 module.exports = (sequelize, DataTypes) => {
 
-  const Profile = sequelize.define("profile", {
+  const CourseCode = sequelize.define("coursecode", {
 
   _id: { 
           type: DataTypes.INTEGER,
@@ -14,23 +15,22 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING    
         },         
   });
-    return Profile;
+    return CourseCode;
 
 };
 
 
 /*
-'use strict'
 
 var moongose = require('mongoose');
 var Schema = moongose.Schema;
 
-var ProfileSchema = Schema({
-  id: String,  ---------------------------------ojo
+var CourseCodeSchema = Schema({
+  id: String,
   name: String,
   slug: String
 });
 
-module.exports = moongose.model('Profile', ProfileSchema);
+module.exports = moongose.model('CourseCode', CourseCodeSchema);
 
 */

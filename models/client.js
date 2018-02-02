@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
 
   const Client = sequelize.define("client", {
 
+  _id: {  
+          type: DataTypes.INTEGER,
+        },
   rbd: { 
           type: DataTypes.STRING    
         },
@@ -28,9 +31,24 @@ membership: {
         }, 
 services: { 
           type: DataTypes.BOOLEAN    
-        },  
+        }, 
+type: { 
+          type: DataTypes.ENUM( "1", "2", "3") 
+        },
+
+admin: { 
+          type: DataTypes.INTEGER    
+        }, 
+
+code_setting: { 
+          type: DataTypes.INTEGER    
+        }, 
+code_school: { 
+          type: DataTypes.INTEGER    
+        }, 
+
   });
-    return Client;
+    return Client; 
 };
 
 

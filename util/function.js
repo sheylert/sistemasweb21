@@ -317,7 +317,6 @@ function ejecutar_arreglo(profile)
                                }    
                        }
                     } 
-
          return arreglo;           
 }
 
