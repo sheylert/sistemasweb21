@@ -12,32 +12,36 @@ var Util     = require('../util/function')
 // services
 var jwt = require('../services/jwt');
 
-
-/*
-api.put('/worker/:id', mdAuth.ensureAuth,WorkerController.updateWorker);
-api.post('/worker', mdAuth.ensureAuth,WorkerController.saveWorker);
-api.get('/worker', mdAuth.ensureAuth,WorkerController.getWorkers);
-*/
+var validator  = require('email-validator');
 
 function saveWorker(req, res) {
   // recogemos parametros
   var params = req.body;
-
   params.school =  1;  //req.user.sub
   // crear objeto profesor
-   models.Worker.create(params).then( function(insertarworkers) { 
+   var validar =  validator.validate(params.email)
+    if (validar) {
+
+    models.Worker.create(params).then( function(insertarworkers) { 
 
         if (!insertarworkers) {
-          res.status(404).send({ message: 'No se ha guardado del Trabajador' });
+          res.status(500).send({ message: 'No se ha guardado del Trabajador' });
         } else {
 
            models.Worker.update({ _id: insertarworkers.id }, 
-            {where: { id: insertarworkers.id } }).then(() => {
-        })     
-          res.status(200).send({ worker: insertarworkers });
-        }
+            {where: { id: insertarworkers.id }, returning: true }).then( result => {
 
-    })  
+            res.status(200).json({ worker: result[1][0] });
+        })     
+        }
+    })    
+  
+
+ } else
+  {
+  res.status(500).send({ message: 'Error Escriba Email con formato correcto' });
+
+  }  
 }
 
 function getWorkers(req, res) {
@@ -90,35 +94,46 @@ function getWorkers(req, res) {
 
 
 function updateWorker(req, res) {
-
- // revisar en la parte de update y el id y la ruta del front_end
+  // revisar en la parte de update y el id y la ruta del front_end
   // recogemos parametros
   var params = req.body;
 
-  params.school =  1;  //req.user.sub //hacer en el id
-  // crear objeto profesor
+  var validar =  validator.validate(params.email)
+    if (validar) {
+
    models.Worker.update({ params }, 
                          {where: { id: params.id } }).then( function(updateworkers) { 
 
         if (!updateworkers) {
-          res.status(404).send({ message: 'No se a podido actualizar profesor!' });
+          res.status(500).send({ message: 'No se a podido actualizar profesor!' });
         } else {
           res.status(200).send({ worker: updateworkers });
         }
-
     }) 
 
-    /*
-    models.Profile.update({ _id: insertarProfiles.id }, 
-                         {where: { id: insertarProfiles.id } }).then(() => {
-        })
-           res.status(200).send({ message: 'Exito!' }); 
-           */
+    } else
+  {
+  res.status(500).send({ message: 'Error Escriba Email con formato correcto' });
 
+  }                     
 }
+
+
+
+function deleteWorker(req, res) {
+  // recogemos parametros
+  var userId = req.params.id;
+        // bulk destroy
+      models.Worker.destroy({ where: { id: userId } })
+        .then(function(deleteworkers){
+           res.status(200).send({ worker: deleteworkers });   
+        })
+    }                   
+
 
 module.exports = {
   saveWorker,
   getWorkers,
-  updateWorker
+  updateWorker,
+  deleteWorker
 }

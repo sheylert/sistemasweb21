@@ -36,15 +36,18 @@ function saveProfile(req, res) {
 
 function saveClient(req, res) {
 
+    var params = req.body;
 
-    console.log("ssssssssssssssss cliente");
-
-var params = req.body;
-
+    params.type = params.type.toString();
     params.services = false;
     params.code_setting = null;
-    params.code_school = null;
 
+    models.User.findOne( { where: { email: params.email.toLowerCase() }}).then( function(user) { 
+    
+      if (user) {
+      res.status(500).send({ message: 'Error Correo registrado' });
+      }else
+      {   
 
   // crear nuevo perfil
    models.Client.create(params).then( function(insertarClients) { 
@@ -56,27 +59,37 @@ var params = req.body;
         })
            res.status(200).send({ message: 'Exito!' });
 
+                    var user={};
 
-           //registro de usuario
-
-                    var user = new User();
-                    user.name = client.name;
-                    user.address = client.address;
-                    user.phone = client.phone;
-                    user.school = client.id;
-                    user.email = client.email;
+                    user.name = insertarClients.name;
+                    user.address = insertarClients.address;
+                    user.phone = insertarClients.phone;
+                    user.email = insertarClients.email;
+                    user.password = "123456";
                     user.type = 1;
+                    user.school = insertarClients.id;
                     user.state = true;
-
-                    console.log("ssssssssssssssss1111--->"+user.id);
-
-
+                    user.profile = 1;
+                    user.services = true;
 
 
+                    models.User.create(user).then( function(insertarUser) { 
 
-        }
-    })  
+                    if (!insertarUser) {
+                      res.status(404).send({ message: 'No se ha guardado correctamente' });
+                    } else {
 
+                    models.User.update({ _id: insertarUser.id }, 
+                        {where: { id: insertarUser.id }, returning: true }).then( result => {
+                         res.status(200).send({ client: insertarClients });
+                    })     
+                  }
+
+                })  
+               }            
+            })
+         }  
+      })
 
 /*
     // crear objeto profesor

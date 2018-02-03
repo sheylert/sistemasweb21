@@ -42,12 +42,8 @@ admin: {
 
 code_setting: { 
           type: DataTypes.INTEGER    
-        }, 
-code_school: { 
-          type: DataTypes.INTEGER    
-        }, 
-
-  });
+        },  
+  }); 
     return Client; 
 };
 

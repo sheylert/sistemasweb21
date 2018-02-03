@@ -80,12 +80,9 @@ api.put('/teacher/:id', mdAuth.ensureAuth,TeacherController.updateTeacher);
 api.post('/teacher', mdAuth.ensureAuth,TeacherController.saveTeacher);
 api.get('/teacher', mdAuth.ensureAuth,TeacherController.getTeachers);
 
-
-
-
-
 // Worker
 api.put('/worker/:id', mdAuth.ensureAuth,WorkerController.updateWorker);
+api.delete('/worker/:id', mdAuth.ensureAuth,WorkerController.deleteWorker);
 api.post('/worker', mdAuth.ensureAuth,WorkerController.saveWorker);
 api.get('/worker', mdAuth.ensureAuth,WorkerController.getWorkers);
 
