@@ -32,8 +32,8 @@ membership: {
 services: { 
           type: DataTypes.BOOLEAN    
         }, 
-type: { 
-          type: DataTypes.ENUM( "1", "2", "3") 
+profile: { 
+          type: DataTypes.INTEGER
         },
 
 admin: { 

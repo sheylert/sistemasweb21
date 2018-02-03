@@ -1,7 +1,9 @@
 'use strict'
 
 // modulos
-var bcrypt = require('bcrypt-nodejs');
+//var bcrypt = require('bcrypt-nodejs');
+var bcrypt = require('bcrypt');
+
 var nodemailer = require('nodemailer');
 var https = require('http');
 var request = require('request');
@@ -117,9 +119,10 @@ function login(req, res) {
           res.status(500).send({ message: 'Error al comprobar usuario' });
         } else {
           if (user) {
-         // bcrypt.compare(password, user.password, (err, check) => {
-           models.User.findOne( { where: { password: password, id: user.id }} ).then( function(check) { 
-            if (!check) {
+            
+          bcrypt.compare(password, user.password, function(err, respuesta) {
+          // models.User.findOne( { where: { password: password, id: user.id }} ).then( function(check) { 
+            if (!respuesta) {
                  res.status(404).send({ message: 'El usuario no ha podido loguearse correctamente!' });
              }
              else

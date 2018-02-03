@@ -1,7 +1,9 @@
 'use strict'
 
 // modulos
-var bcrypt = require('bcrypt-nodejs');
+ //var bcrypt = require('bcrypt-nodejs');
+
+ var bcrypt = require('bcrypt');
 
 // modelos
 var Client = require('../models/client');
@@ -35,13 +37,10 @@ function saveProfile(req, res) {
 }
 
 function saveClient(req, res) {
-
     var params = req.body;
 
-    params.type = params.type.toString();
-    params.services = false;
     params.code_setting = null;
-
+    
     models.User.findOne( { where: { email: params.email.toLowerCase() }}).then( function(user) { 
     
       if (user) {
@@ -57,19 +56,18 @@ function saveClient(req, res) {
          models.Client.update({ _id: insertarClients.id }, 
             {where: { id: insertarClients.id } }).then(() => {
         })
-           res.status(200).send({ message: 'Exito!' });
-
                     var user={};
-
                     user.name = insertarClients.name;
                     user.address = insertarClients.address;
                     user.phone = insertarClients.phone;
                     user.email = insertarClients.email;
-                    user.password = "123456";
-                    user.type = 1;
+
+                    user.password = bcrypt.hashSync(insertarClients.email, 10);
+                    user.validatePass = false;
+
                     user.school = insertarClients.id;
                     user.state = true;
-                    user.profile = 1;
+                    user.profile = insertarClients.profile;
                     user.services = true;
 
 
@@ -81,7 +79,12 @@ function saveClient(req, res) {
 
                     models.User.update({ _id: insertarUser.id }, 
                         {where: { id: insertarUser.id }, returning: true }).then( result => {
+
+                    models.Client.update({ admin: insertarUser.id }, 
+                        {where: { id: insertarClients.id }, returning: true }).then( result => {        
+
                          res.status(200).send({ client: insertarClients });
+                       })     
                     })     
                   }
 
