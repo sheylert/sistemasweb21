@@ -556,50 +556,22 @@ function getUsers(req, res) {
 }
 
 function overwritePass(req, res) {
-  // función para mandar los datos del usuario a la vista de reestablecer contraseña por defecto(Solo para apoderados)
-  let usuario = req.user
-
-  User.findOne({ _id: usuario.sub }).exec((err, user) => {
-    if (err) {
-      res.status(404).send({ message: "Error al buscar el usuario" })
-    }
-    else {
-      if (!user) {
-        res.status(404).send({})
-      }
-      else {
-        usuario.pass = user.password
-        res.status(200).send(usuario)
-      }
-    }
-  })
-
-}
-
-function updatePass(req, res) {
   // función para sobreescribir el pass por defecto y validar que ya hizo session por primera vez (Solo para apoderados)
   let update = {
     validatePass: true,
     password: req.body.password
   }
+      update.password = bcrypt.hashSync(update.password, 10);
 
-  bcrypt.hash(update.password, null, null, function (err, hash) {
-    update.password = hash;
-  })
+      models.User.update( update, 
+                         {where: { id: req.user.userId } }).then( function(updatepass) { 
 
-  User.findByIdAndUpdate(req.params.id, update, function (err, user) {
-    if (err) {
-      res.status(404).send({ message: "Error al intentar modificar el usuario" })
-    }
-    else {
-      if (!user) {
-        res.status(404).send({ message: "Hubo un error al modificar el usuario" })
-      }
-      else {
-        res.status(200).send(user)
-      }
-    }
-  })
+        if (!updatepass) {
+          res.status(500).send({ message: 'Error al intentar modificar el usuario' });
+        } else {
+          res.status(200).send(updatepass);
+        }
+    }) 
 }
 
 function recoveryPassword(req, res) {
@@ -643,6 +615,5 @@ module.exports = {
   getUsers,
   putUser,
   overwritePass,
-  updatePass,
   recoveryPassword
 }

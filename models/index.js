@@ -18,9 +18,6 @@ CourseCode: sequelize.import('./course-code'),
 Setting: sequelize.import('./setting'),
 Worker: sequelize.import('./worker'),
 
-
-
-
 };
 
 Object.keys(models).forEach((modelName) => {

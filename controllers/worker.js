@@ -17,7 +17,7 @@ var validator  = require('email-validator');
 function saveWorker(req, res) {
   // recogemos parametros
   var params = req.body;
-  params.school =  1;  //req.user.sub
+  params.school = req.user.sub
   // crear objeto profesor
    var validar =  validator.validate(params.email)
     if (validar) {
@@ -47,8 +47,7 @@ function saveWorker(req, res) {
 function getWorkers(req, res) {
 
   var params = req.body;
-  //req.user.sub
-  models.Worker.findAll( { where: { school: 1 }} ).then( function(workers) { 
+  models.Worker.findAll( { where: { school: req.user.sub }} ).then( function(workers) { 
      
      if (!workers) {
           res.status(500).send({ message: 'Error en la petición' });

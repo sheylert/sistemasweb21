@@ -51,10 +51,11 @@ api.post('/user', mdAuth.ensureAuth,UserController.getUsers);
 /*
 api.put('/user/:id', mdAuth.ensureAuth,UserController.putUser);
 api.get('/overwritePass', mdAuth.ensureAuth,UserController.overwritePass) // ruta para llevar los datos del usuario(responsable) a la vista de validate pass por primera vez que hizo session
-api.put('/overwritePass/:id', mdAuth.ensureAuth,UserController.overwritePass) // ruta para sobreescribir el pass que se le pone al responsable por defecto cuando es creado su user y validar que hizo session por primera vez
+*/
+api.post('/overwritePass', mdAuth.ensureAuth,UserController.overwritePass) // ruta para sobreescribir el pass que se le pone al responsable por defecto cuando es creado su user y validar que hizo session por primera vez
 api.post('/recoveryPassword', mdAuth.ensureAuth,UserController.recoveryPassword)
 
-*/
+/*
 // Course
 api.get('/course', mdAuth.ensureAuth,CourseController.getCourses);
 api.post('/course', mdAuth.ensureAuth,CourseController.saveCourse);
