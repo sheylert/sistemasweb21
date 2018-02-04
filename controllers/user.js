@@ -135,7 +135,9 @@ function login(req, res) {
           res.status(500).send({ message: 'Error al comprobar usuario' });
         } else {
           if (user) {
-           
+
+            if (user.state) {
+
           bcrypt.compare(password, user.password, function(err, respuesta) {
           // models.User.findOne( { where: { password: password, id: user.id }} ).then( function(check) {
             if (!respuesta) {
@@ -189,7 +191,13 @@ function login(req, res) {
                 }
              }
             });
-          } else {
+
+           } else {
+         res.status(500).send({ message: 'Usuario desactivado' });
+            }
+          }
+
+           else {
             res.status(404).send({ message: 'Usuario no existe!' });
           }
         }
