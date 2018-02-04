@@ -3,6 +3,8 @@ var moment = require('moment');
 var secret = 'clave_secreta_sistema_proNotas';
 
 exports.createToken = function (user) {
+  console.log("sssss"+user);
+  
   if (user.school) {
     var payload = {
       sub: user.school.id,
@@ -20,6 +22,9 @@ exports.createToken = function (user) {
       iat: moment().unix(),
       exp: moment().add(30, 'days').unix()
     }
+
+    console.log(payload, 'tokennn')
+
     return jwt.encode(payload, secret);
   } else {
     var payload = {
