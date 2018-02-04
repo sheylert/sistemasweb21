@@ -191,7 +191,12 @@ function saveClient(req, res) {
 function getClients(req, res) {
 
 
-    models.Client.findAll().then( function(clients) { 
+    models.Client.findAll( {
+      include: [{
+        model: models.User,
+        as : 'users'
+      }]
+}).then( function(clients) { 
         if (!clients) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
