@@ -39,31 +39,32 @@ module.exports = (sequelize, DataTypes) => {
  })
 
   Sms.associate = model => {
-
-  	Sms.belogsTo(model.Student, {
+    
+  	Sms.belongsTo(model.Student, {
   		foreignKey: 'student_id',
   		as : 'estudiante'
   	})
 
-  	Sms.belogsTo(model.Template, {
+  	Sms.belongsTo(model.Template, {
   		foreignKey: 'template_id',
   		as : 'template'
   	})
 
-  	Sms.belogsTo(model.Course, {
+  	Sms.belongsTo(model.Course, {
   		foreignKey: 'course_id',
   		as : 'curso'
   	})
 
-    Sms.belogsTo(model.Client, {
+    Sms.belongsTo(model.Client, {
       foreignKey: 'school',
       as : 'cliente'
     })
 
-    Sms.belogsTo(model.User, {
+    Sms.belongsTo(model.User, {
       foreignKey: 'user_id',
       as : 'usuario'
     })
   }
 
   return Sms
+}

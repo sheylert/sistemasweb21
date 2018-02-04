@@ -3,7 +3,6 @@ var moment = require('moment');
 var secret = 'clave_secreta_sistema_proNotas';
 
 exports.createToken = function (user) {
-  console.log("sssss"+user);
   
   if (user.school) {
     var payload = {

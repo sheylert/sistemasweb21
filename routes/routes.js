@@ -27,8 +27,9 @@ var CourseManagementController = require('../controllers/courseManagement');
 
 var NotificationController = require('../controllers/notification')
 var ResponsableController = require('../controllers/responsable');
-var SmsController = require('../controllers/sms');
 */
+var SmsController = require('../controllers/sms');
+
 
 var mdAuth = require('../middlewares/authenticated');
 

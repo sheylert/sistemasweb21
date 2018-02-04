@@ -136,7 +136,7 @@ function listSmsLastMoth(req, res) {
 		[Op.lte] : lastDate
 	}
 
-	models.Sms.findAll({ where : createt_at : range }).exec((result) => {
+	models.Sms.findAll({ where : { createt_at : range } }).exec((result) => {
 
 		if (!result){
 			res.status(500).json({ message: "error al ejecutar la busqueda de los mensajes" })
@@ -318,7 +318,7 @@ function listSmsWeekAndMonthNotConfirm(req, res) {
 }
 
 function logSmsStored(req, res) {
-	ListSms.find({ school: req.user.sub }).
+	/*ListSms.find({ school: req.user.sub }).
 		populate([{
 			path: 'school',
 			model: 'Client'
@@ -344,7 +344,8 @@ function logSmsStored(req, res) {
 
 			res.status(200).send(result)
 
-		})
+		})*/
+	res.json([])
 }
 
 function smsMonthWeekTotal(req, res) {
@@ -352,18 +353,18 @@ function smsMonthWeekTotal(req, res) {
 
 	// Para sacar el rango de la última semana
 
-	models.TotalSms.findOne({ school: req.user.sub }).exec((err, result) => {
-
-		if (err) 
+	models.TotalSms.findOne({ where : { school: req.user.sub } }).then(result => {
+		if(result)
 		{
-			res.status(400).send({ message: "Error al buscar los datos totales de sms por tiempos" })
+
+			res.status(200).send([])
 		}
 		else
 		{
 			res.status(200).send(result)
-		}
+		}	
 
-	})
+	}).catch(err => res.status(400).send({ message: "A ocurrido un error al buscar los datos totales de sms por tiempos" }) )
 }
 
 function recieveStatusSms(req, res) {
