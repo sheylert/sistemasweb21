@@ -18,6 +18,8 @@ Template: sequelize.import('./template'),
 CourseCode: sequelize.import('./course-code'),
 Setting: sequelize.import('./setting'),
 Worker: sequelize.import('./worker'),
+Sms: sequelize.import('./sms'),
+TotalSms: sequelize.import('./totalSms'),
 
 }; 
 

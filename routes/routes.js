@@ -199,7 +199,7 @@ api.post('/responsable', mdAuth.ensureAuth,ResponsableController.saveResponsable
 
 // Notifications 
 api.get('/course_notifications/:id', mdAuth.ensureAuth,NotificationController.getData) // se buscan los estudiantes del curso
-api.get('/get_notifications/:id', mdAuth.ensureAuth,NotificationController.getNotifications) // buscar las notificaciones
+api.get('/get_notifications/:id', mdAuth.ensureAuth,NotificationController.getNotifications) // buscar las notificaciones*/
 
 // Sms
 api.get('/countsmsbyschool/:idSchool', mdAuth.ensureAuth,SmsController.countSmsBySchool) 
@@ -212,9 +212,6 @@ api.get('/smsTotalM-W',mdAuth.ensureAuth, SmsController.smsMonthWeekTotal)
 api.get('/smsBySchool/:id',mdAuth.ensureAuth,SmsController.smsDetailsBySchool)
 api.get('/smsStatusLabs', SmsController.recieveStatusSms)
 api.get('/smsNotConfirm', SmsController.listSmsWeekAndMonthNotConfirm)
-
-
-*/
 
 
 module.exports = api;
