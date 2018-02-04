@@ -47,6 +47,8 @@ api.post('/save-user', mdAuth.ensureAuth,UserController.saveUser);
 */
 
 api.post('/user', mdAuth.ensureAuth,UserController.getUsers);
+api.post('/save-user', mdAuth.ensureAuth, UserController.saveUser);
+api.put('/user/:id', mdAuth.ensureAuth, UserController.putUser);
 
 /*
 api.put('/user/:id', mdAuth.ensureAuth,UserController.putUser);

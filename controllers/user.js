@@ -24,88 +24,94 @@ var UtilPrueba     = require('../util/functionPrueba')
 // services
 var jwt = require('../services/jwt');
 
-function saveUser(req, res) {
-  // crear objeto usuario
-  var user = new User();
 
-  // recogemos parametros de petición
-  var params = req.body;
+
+function saveUser(req, res) {
+ 
+   var user = new Object();
+
+   var params = req.body;
 
   if (params.name && params.address && params.phone && params.email) {
+
     user.name = params.name;
     user.address = params.address;
     user.phone = params.phone;
     user.school = req.user.sub;
     user.profile = params.profile;
+    user.services = true;
     user.email = params.email;
+    user.password = params.password;
     user.state = params.state == 1 ? true : false;
-    user.type = 2;
-    user.validatePass = true
+    user.validatePass = false;
 
-    User.findOne({ email: user.email.toLowerCase() }, (err, issetUser) => {
-      if (err) {
-        res.status(500).send({ message: 'Error al comprobar usuario' });
-      } else {
-        if (!issetUser) {
-          // ciframos contraseña
-          bcrypt.hash(params.password, null, null, function (err, hash) {
-            user.password = hash;
-
-            user.save((err, userStored) => {
-              if (err) {
-                console.log(err);
-                res.status(500).send({ message: 'Error al guardar usuario' });
-              } else {
-                if (!userStored) {
-                  res.status(404).send({ message: 'No se ha registrado el usuario' });
-                } else {
-                  res.status(200).send({ user: userStored });
-                }
-              }
-            });
-          });
+     models.User.findOne( { where: { email: user.email.toLowerCase() }}).then( function(users) { 
+   
+       if (users) {
+          //res.status(500).send({ message: 'Error al comprobar usuario' });
+          res.status(500).send({ message: 'Usuario ya existe!' });
         } else {
-          res.status(400).send({ message: 'Usuario ya existe!' });
-        }
-      }
-    });
+          if (!users) {
+
+            user.password = bcrypt.hashSync(user.password, 10);
+
+                models.User.create(user).then( function(insertarUser) 
+              { 
+
+                    if (!insertarUser) {
+                      res.status(404).send({ message: 'No se ha guardado correctamente' });
+                    } else 
+                    {
+
+                    models.User.update({ _id: insertarUser.id }, 
+                        {where: { id: insertarUser.id }, returning: true }).then( result => {
+
+                         res.status(200).send({ user: insertarUser });
+                       });     
+                   }     
+
+            });
+         } //if (!users) 
+
+       }
+      }); 
+
   } else {
     res.status(400).send({ message: 'Ingresa los datos correctos para poder registrar al usuario' });
   }
 }
 
-
-
 function putUser(req, res) {
-  var userId = req.params.id;
-  var update = req.body;
 
-  User.findOne({ _id: userId }).exec((err, user) => {
+var userId = req.params.id;
+var updaterecord = req.body;
 
-    bcrypt.compare(update.password, user.password, (err, check) => {
-      if (!check) {
-        bcrypt.hash(update.password, null, null, function (err, hash) {
-          update.password = hash;
-        })
-      }
-    })
-  })
+updaterecord.school = updaterecord.school.id;
+var password;
 
-
-  User.findByIdAndUpdate(userId, update, { new: true }, (err, userUpdated) => {
-    if (err) {
-      res.status(500).send({
-        message: 'Error al actualizar usuario!'
-      })
-    } else {
-      if (!userUpdated) {
-        res.status(404).send({ message: 'No se a podido actualizar usuario!' });
-      } else {
-        res.status(200).send({ user: userUpdated });
-      }
+  models.User.findOne( { where: { id: userId }}).then( function(users) { 
+    if (users) {
+         password = users.password;
     }
   });
-}
+
+  bcrypt.compare(password, updaterecord.password, function(err, respuesta) {
+            if (!respuesta) {
+                updaterecord.password = bcrypt.hashSync(updaterecord.password, 10);
+            }
+    });   
+
+  models.User.update( updaterecord, 
+                         {where: { id: userId } }).then( function(updateuser) { 
+
+        if (!updateuser) {
+          res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
+        } else {
+          res.status(200).send({ user: updateuser });
+        }
+    }) 
+} 
+
 
 function login(req, res) {
 // recogemos parametros de petición
@@ -516,8 +522,15 @@ function sendSmsSingle(req, res) {
 }
 
 function getUsers(req, res) {
+
+   let filtro = {}
+
+   if (req.user.profile.slug !== "SUPER_ADMIN"){
+    filtro = {school : req.user.sub}
+   }
+
 // var school = req.user.sub; //revisar el school que esta cableado
-  models.User.findAll( /*{ where: { school: 1}}*/ ).then( function(user) { 
+  models.User.findAll({ where: filtro }).then( function(user) { 
      
      if (!user) {
           res.status(500).send({ message: 'Error en la petición' });
