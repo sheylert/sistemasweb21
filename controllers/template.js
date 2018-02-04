@@ -15,7 +15,7 @@ function getAllTemplates(req, res) {
   // school: req.user.sub ---------------- ojo  
   var params = req.body;
   //req.user.sub
-  models.Template.findAll( { where: { school: 1 }} ).then( function(templates) { 
+  models.Template.findAll( { where: { school: req.user.sub }} ).then( function(templates) { 
      
      if (!templates) {
           res.status(500).send({ message: 'Error en la petición' });
@@ -34,14 +34,21 @@ function saveTemplate(req, res) {
 
   var params = req.body;
 
-  params.school =  1;  //req.user.sub
+  params.school =  req.user.sub
   // crear objeto profesor
    models.Template.create(params).then( function(insertartemplate) { 
 
         if (!insertartemplate) {
           res.status(404).send({ message: 'No se ha guardado el profesor' });
         } else {
-          res.status(200).send({ template: insertartemplate });
+
+          models.Template.update({ _id: insertartemplate.id }, 
+            {where: { id: insertartemplate.id }, returning: true }).then( result => {
+
+            //res.status(200).json({ worker: result[1][0] });
+
+            res.status(200).send({ template: insertartemplate });
+        })     
         }
 
     })

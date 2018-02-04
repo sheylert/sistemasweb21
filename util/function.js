@@ -24,7 +24,7 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
           school: req.user.sub,
           course: req.body.course ? req.body.course : null,
           smsBody : labsmobileResponse.statusMessageApi,
-          phone: ele.responsable.phone
+          phone: ele.responsable.phone,
           user_id: req.user.userId,
           school_id  : req.user.sub,
           course_id: req.body.course ? req.body.course : null,
