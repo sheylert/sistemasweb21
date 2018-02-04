@@ -14,7 +14,6 @@ exports.createToken = function (user) {
       email: user.email,
       state: user.state,
       validatePass: user.validatePass,
-      type:  user.type,
       iat: moment().unix(),
       exp: moment().add(1, 'days').unix()
     }
@@ -27,7 +26,6 @@ exports.createToken = function (user) {
       email: user.email,
       state: user.state,
       validatePass: user.validatePass,
-      type:  user.type,
       iat: moment().unix(),
       exp: moment().add(1, 'days').unix()
     

@@ -3,6 +3,10 @@
 module.exports = (sequelize, DataTypes) => {
 
   const Responsable = sequelize.define("responsable", {
+
+   _id: { 
+          type: DataTypes.INTEGER    
+        },  
   name: { 
           type: DataTypes.STRING    
         }, 

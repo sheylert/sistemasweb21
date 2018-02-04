@@ -97,12 +97,11 @@ function updateWorker(req, res) {
   // revisar en la parte de update y el id y la ruta del front_end
   // recogemos parametros
   var params = req.body;
-
-  var validar =  validator.validate(params.email)
+   var validar =  validator.validate(params.email)
     if (validar) {
 
-   models.Worker.update({ params }, 
-                         {where: { id: params.id } }).then( function(updateworkers) { 
+   models.Worker.update( params, 
+                         {where: { id: params._id } }).then( function(updateworkers) { 
 
         if (!updateworkers) {
           res.status(500).send({ message: 'No se a podido actualizar profesor!' });

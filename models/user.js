@@ -23,10 +23,6 @@ module.exports = (sequelize, DataTypes) => {
  password: { 
           type: DataTypes.STRING    
         },
-type: { 
-          type: DataTypes.INTEGER    
-        }, 
-
 state: { 
           type: DataTypes.BOOLEAN    
         },

@@ -246,6 +246,24 @@ function getClients(req, res) {
 }
 
 function updateClient(req, res) {
+
+
+    const clientId = req.body._id;
+    const update = req.body;  
+
+ models.Client.update(update, 
+                         {where: { id: clientId } }).then( function(updateclient) { 
+
+        if (!updateclient) {
+          res.status(500).send({ message: 'No se a podido actualizar Cliente!' });
+        } else {
+          res.status(200).send({ client: updateclient });
+        }
+    }) 
+
+                         
+
+/*
     const clientId = req.params.id;
     const update = req.body;
 
@@ -262,6 +280,9 @@ function updateClient(req, res) {
             }
         }
     });
+*/
+
+
 }
 
 // Asignar Configuración a Cliente

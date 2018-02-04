@@ -11,34 +11,35 @@ module.exports = (sequelize, DataTypes) => {
   dateLimitConfig: { 
           type: DataTypes.DATE    
         },
-  logo: { 
+
+  nameLogo: { 
           type: DataTypes.STRING
           //  data: Buffer, contentType: String     
         },
-        
-  period: { 
+                
+  periodo: { 
           type: DataTypes.STRING    
-        }, 
-
-   yaerCurrent: { 
+        },  
+ 
+   yearCurrent: { 
           type: DataTypes.INTEGER,
 
           //numberico ojooooo
         },
    
-   dateInit_1: { 
+   dateInit1: { 
           type: DataTypes.DATE    
         },
 
-   dateEnd_1: { 
+   dateEnd1: { 
           type: DataTypes.DATE    
         },
 
-    dateInit_2: { 
+    dateInit2: { 
           type: DataTypes.DATE    
         },
 
-    dateEnd_2: { 
+    dateEnd2: { 
           type: DataTypes.DATE    
         },
 
@@ -64,17 +65,19 @@ var Schema = moongose.Schema;
 var SettingSchema = Schema({
     _id: String,
     dateLimitConfig: Date,
-    logo: { data: Buffer, contentType: String },
-    period: String,
-    yaerCurrent: Number,
-    dateInit_1: Date,
-    dateEnd_1: Date,
-    dateInit_2: Date,
-    dateEnd_2: Date,
+    logo: { type: Buffer, contentType: String },
+    nameLogo: String,
+
+
+    periodo: String,
+    yearCurrent: Number,
+    dateInit1: Date,
+    dateEnd1: Date,
+    dateInit2: Date,
+    dateEnd2: Date,
    codeNumber: {type: Number, default: 56},
    school: [{ type: Schema.ObjectId, ref: 'Client' }],
 });
 
 module.exports = moongose.model('Setting', SettingSchema);
-
 */

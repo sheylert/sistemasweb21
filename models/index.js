@@ -1,6 +1,6 @@
 var Sequelize = require('sequelize');
 
-const sequelize = new Sequelize("pronotas_2018","postgres","123456", {
+const sequelize = new Sequelize("pronota_2019","postgres","123456", {
 dialect: 'postgres'
 });
 
@@ -17,6 +17,9 @@ Template: sequelize.import('./template'),
 CourseCode: sequelize.import('./course-code'),
 Setting: sequelize.import('./setting'),
 Worker: sequelize.import('./worker'),
+
+
+
 
 };
 

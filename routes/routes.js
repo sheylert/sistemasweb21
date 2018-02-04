@@ -17,12 +17,14 @@ var TeachingController = require('../controllers/teaching');
 var WorkerController = require('../controllers/worker');
 var CourseCodeController = require('../controllers/course-code');
 
+var SettingController = require('../controllers/setting');
+
 /*
 var SubjectController = require('../controllers/subject');
 
 var StudentExcelController = require('../controllers/studentExcel');
 var CourseManagementController = require('../controllers/courseManagement');
-var SettingController = require('../controllers/setting');
+
 var NotificationController = require('../controllers/notification')
 var ResponsableController = require('../controllers/responsable');
 var SmsController = require('../controllers/sms');
@@ -107,12 +109,13 @@ api.get('/course-code', mdAuth.ensureAuth,CourseCodeController.getCourseCode);
 
 api.get('/client', mdAuth.ensureAuth,ClientController.getClients);
 api.post('/client', mdAuth.ensureAuth,ClientController.saveClient);
+api.put('/client/:id', mdAuth.ensureAuth,ClientController.updateClient);
 
 /*
 
 
 
-api.put('/client/:id', mdAuth.ensureAuth,ClientController.updateClient);
+
 
 api.post('/client/:idClient/setting', mdAuth.ensureAuth,ClientController.saveClientSetting);
 api.post('/client/:idClient/school', mdAuth.ensureAuth,ClientController.saveClientSchool);
@@ -163,15 +166,15 @@ api.post('/student', mdAuth.ensureAuth,StudentController.saveStudent) // Ruta pa
 api.put('/student/:id', mdAuth.ensureAuth,StudentController.updateStudent) // Ruta para actualizar un estudiante
 api.delete('/student/:id', mdAuth.ensureAuth,StudentController.deleteStudent) // Ruta para eliminar un estudiante
 api.get('/student/countstudentbyschool/:idSchool', mdAuth.ensureAuth,StudentController.countStudentBySchool) //contar estudiantes de una escuela
-
+*/
 
 // Setting
-api.get('/setting', mdAuth.ensureAuth,SettingController.showAllSettings)
-api.post('/setting', mdAuth.ensureAuth,images.single('logo'), SettingController.saveSetting)
-api.get('/setting/onlyDateLimit', mdAuth.ensureAuth,SettingController.getDateLimitConfig) //obtener solo el limite de fecha de configuracion
+api.get('/setting', mdAuth.ensureAuth, SettingController.showAllSettings)
+api.post('/setting', mdAuth.ensureAuth, images.single('logo'), SettingController.saveSetting)
+api.put('/setting/:id',mdAuth.ensureAuth, images.single('logo'), SettingController.updateSetting)
+api.get('/setting/onlyDateLimit', mdAuth.ensureAuth, SettingController.getDateLimitConfig) //obtener solo el limite de fecha de configuracion
 
-
-
+/*
 // Course Management
 api.get('/courseManagement', mdAuth.ensureAuth,CourseManagementController.getAllCourses) // Ruta para buscar todos los cursos
 api.put('/courseManagement/:id', mdAuth.ensureAuth,CourseManagementController.masiveAssingStudentNote) // Ruta para almacenar masivamente las notas
