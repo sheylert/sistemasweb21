@@ -67,7 +67,7 @@ function saveClient(req, res) {
 
                     user.school = insertarClients.id;
                     user.state = true;
-                    user.profile = insertarClients.profile_id;
+                    user.profile_id = insertarClients.profile_id;
                     user.services = true;
 
 

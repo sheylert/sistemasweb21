@@ -38,7 +38,7 @@ function saveUser(req, res) {
     user.address = params.address;
     user.phone = params.phone;
     user.school = req.user.sub;
-    user.profile = params.profile;
+    user.profile_id = params.profile_id;
     user.services = true;
     user.email = params.email;
     user.password = params.password;
@@ -156,16 +156,16 @@ function login(req, res) {
                     if (schoolStoraged) {
                       if (user.dataValues.school) {
 
-                        user.school = user.dataValues.clientes.dataValues
+                        user.dataValues.school = user.dataValues.clientes.dataValues
                         res.status(200).send({
                           user: user.dataValues,
-                          token: jwt.createToken(user)
+                          token: jwt.createToken(user.dataValues)
                         });
                       } else {
                        
                         res.status(200).send({
                           user: user.dataValues,
-                          token: jwt.createToken(user)
+                          token: jwt.createToken(user.dataValues)
                         });
                       }
                     }
@@ -175,16 +175,16 @@ function login(req, res) {
                     if (user.school) {
                       res.status(200).send({
                         user: user,
-                        token: jwt.createToken(user)
+                        token: jwt.createToken(user.dataValues)
                       });
                     } else {
                       res.status(200).send({
                         user: user,
-                        token: jwt.createToken(user)
+                        token: jwt.createToken(user.dataValues)
                       });
                     }
                   } else {
-                    res.status(200).send({ user, token: jwt.createToken(user) });
+                    res.status(200).send({ user  : user.dataValues, token: jwt.createToken(user.dataValues) });
                   }
                 }
              }
@@ -526,18 +526,20 @@ function sendSmsSingle(req, res) {
 
 function getUsers(req, res) {
 
-
-  console.log("sssssssssssss");
-
    let filtro = {}
 
-  /* if (req.user.profile.slug !== "SUPER_ADMIN"){
+   // filtro = {school : req.user.sub}
+
+
+   if (req.user.profile.slug !== "SUPER_ADMIN"){
     filtro = {school : req.user.sub}
    }
-   */
+ 
+// var school = req.user.sub; //revisar el school que esta cableado
+  //models.User.findAll({ where: filtro })
 
-     models.User.findOne( {
-      where: { school : req.user.sub },
+   models.User.findAll( {
+      where:  filtro,
       include: [{
         model: models.Client,
         as : 'clientes'
@@ -545,12 +547,15 @@ function getUsers(req, res) {
         model: models.Profile,
         as : 'perfiles'
       }]
-}).then( function(user) { 
-     
+})
+ .then( function(user) { 
+
      if (!user) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
-            res.status(200).send(user);
+          if (user) { 
+                 res.status(200).send(user);
+          } 
         }     
   });
 }
