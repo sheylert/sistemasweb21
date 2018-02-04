@@ -530,7 +530,6 @@ function getUsers(req, res) {
 
    // filtro = {school : req.user.sub}
 
-
    if (req.user.profile.slug !== "SUPER_ADMIN"){
     filtro = {school : req.user.sub}
    }
