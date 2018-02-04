@@ -14,22 +14,27 @@ var models = require('../models');
 
 function countSmsBySchool(req, res) {
 
-
-
-	models.Sms.findAll({ where : { school: req.params.idSchool } }).exec(function (results) {
+	models.ListSms.findAll({ where : { school: req.params.idSchool } }).then(function (results) {
+		
 		if (!results) {
-			res.status(500).send({ message: "error en la petición" })
+			
+			var count = results.length;
+			res.status(200).send({ cantidad: 0 });	
 		}
+		else
+		{
+			var count = results.length;
+			res.status(200).send({ cantidad: count });	
+		}	
 
-		var count = results.length;
-		res.status(200).send({ cantidad: count });
+		
 
 	});
 }
 
 function smsDetailsBySchool(req, res) {
 	
-	/*models.Sms.findAll({ where:{ _id: req.params.id }, 
+	/*models.ListSms.findAll({ where:{ _id: req.params.id }, 
 		insert:[{
 			model : model.Client,
 			as    : 'cliente'
@@ -77,24 +82,41 @@ function smsDetailsBySchool(req, res) {
 function listSmsStored(req, res) {
 	// función para listar los sms guardados, nota: si el campo type es true es un mensaje si es false es una notificación
 
-	models.Sms.findAll({ where: { school: req.user.sub, course: req.params.course },
-		include: [{
-			model : models.Student,
-			as    : 'estudiante'
-		},{
-			model : models.Template,
-			as    : 'template'
-		}] 
-	}).then( result => {
-		if(!result)
-		{
-			res.status(500).json( { message: 'Ha ocurrido un error buscando los datos de los mensajes' })
-		}
-		else
-		{
-			res.json(result)
-		}
-	})
+	if(req.user.profile.slug.indexOf('ENTERPRISE') !== -1)
+	{
+		models.ListSms.findAll({ where: { school: req.user.sub } }).then( result => {
+			if(!result)
+			{
+				res.json([])	
+			}
+			else
+			{
+				res.json(result)
+			}
+		}).catch(err => res.status(500).json( { message: 'Ha ocurrido un error buscando los datos de los mensajes guardados' }) )	
+	}
+	else
+	{
+		models.ListSms.findAll({ where: { school: req.user.sub, course_id: req.params.course },
+			include: [{
+				model : models.Student,
+				as    : 'estudiante'
+			},{
+				model : models.Template,
+				as    : 'template'
+			}] 
+		}).then( result => {
+			if(!result)
+			{
+				res.json([])	
+			}
+			else
+			{
+				res.json(result)
+			}
+		}).catch(err => res.status(500).json( { message: 'Ha ocurrido un error buscando los datos de los mensajes Guardados' }) )	
+	}
+		
 		/*.populate([{
 			path: 'studentId',
 			model: 'Student',
@@ -136,16 +158,16 @@ function listSmsLastMoth(req, res) {
 		[Op.lte] : lastDate
 	}
 
-	models.Sms.findAll({ where : { createt_at : range } }).exec((result) => {
+	models.ListSms.findAll({ where : { createt_at : range, school : req.user.sub } }).then((result) => {
 
 		if (!result){
-			res.status(500).json({ message: "error al ejecutar la busqueda de los mensajes" })
+			res.status(200).json([])
 		}
 		else
 		{
 			res.status(200).send(result)
 		}
-	})
+	}).catch(err => res.status(500).json({ message: "error al ejecutar la busqueda de los mensajes" }) )
 }
 
 function listSmsLastWeek(req, res) {
@@ -155,7 +177,7 @@ function listSmsLastWeek(req, res) {
 		date1 = new Date()
 
 	date.setHours(date.getHours() - 4)
-	date1.setHours(date1.getHours() - date1.getHours() - 4)
+	date1.setHours(0 - 4, 0, 0, 0)
 
 	switch (date.getDay()) {
 		case 0:
@@ -187,15 +209,15 @@ function listSmsLastWeek(req, res) {
 		[Op.lte]: lastDate
 	}
 
-	Sms.findAll({ where : { createt_at: range } }).exec((err, result) => {
+	Sms.findAll({ where : { createt_at: range, school : req.user.sub } }).exec((err, result) => {
 		if (!result){
-			res.status(500).json({ message: "error al ejecutar la busqueda de los mensajes" })
-		}
+			res.status(200).send([])
+		}	
 		else
 		{
 			res.status(200).send(result)
 		}
-	})
+	}).catch( err => res.status(500).json({ message: "error al ejecutar la busqueda de los mensajes" }) )
 }
 
 function listSmsWeekAndMonthNotConfirm(req, res) {
@@ -204,7 +226,7 @@ function listSmsWeekAndMonthNotConfirm(req, res) {
 		smsNotConfirm = {}
 
 	date.setHours(date.getHours() - 4)
-	date1.setHours(date1.getHours() - date1.getHours() - 4)
+	date1.setHours(0 - 4, 0, 0 ,0)
 
 	switch (date.getDay()) {
 		case 0:
@@ -373,7 +395,11 @@ function recieveStatusSms(req, res) {
 	const confirmado = req.query.acklevel
 	const id_envio = req.query.subid
 
-	models.Sms.findOne({ phone: number }).sort({ createt_at: -1 }).exec((err, resultSearch) => {
+	models.ListSms.findOne({ where: { phone: number },
+		order: [
+			['createt_at', 'DESC']
+		]
+	}).then(resultSearch => {
 
 		if (resultSearch) {
 			let string = status == "ok" ? "SUCCESS" : "WARNING"
@@ -400,8 +426,7 @@ function recieveStatusSms(req, res) {
 
 			})
 		}
-
-	})
+	}).catch( err => console.log(err))
 }
 
 function listSmsShipping(req, res) {
@@ -433,6 +458,7 @@ function listSmsShipping(req, res) {
 						})
 				);
 			});
+			
 			console.log('promises');
 			console.log(promises);
 			Promise.all(promises)
@@ -453,6 +479,7 @@ function listSmsShipping(req, res) {
 			})
 		});
 }
+
 
 module.exports = {
 	countSmsBySchool,

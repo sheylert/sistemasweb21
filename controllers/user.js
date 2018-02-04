@@ -360,31 +360,45 @@ function sendSmsMasive(req, res) {
     quantityErrorCount = 0,
     quantitySuccessCount = 0
   // buscamos el template
-  Template.findOne({ _id: params.template }).exec((err, template) => {
-    if (err) {
-      res.status(500).send({ message: "Error al buscar el template" })
+  models.Template.findOne({ where : { _id: params.template } }).then( template => {
+    
+    if (!template) {
+      res.status(200).send({ message: "No se encontro ningún template" })
+      return false
     }
-    else {
-      if (!template) {
-        res.status(200).send({ message: "No se encontro ningún template" })
-      }
-      else {
-        mensaje = template.template_text
-        idTemplate = template._id
-      }
+    else 
+    {
+      mensaje = template.template_text
+      idTemplate = template._id
     }
+    
 
     // iteramos por cada estudiante
     params.estudiante.forEach(function (ele, index) {
-      arregloConsultas.push(Student.findOne({ _id: ele }).populate('responsable').exec((err, student) => {
-        /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
+      if(req.user.profile.slug.indexOf('ENTERPRISE') === -1)
+      {
+        arregloConsultas.push(models.Student.findOne({ where: { _id: ele } }).populate('responsable').exec((err, student) => {
+          /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
+            
+          })*/
+          numbers = index === 0 ? `56${student.responsable.phone}` : `${numbers},56${student.responsable.phone}`;
+          quantityErrorCount++;
+          quantitySuccessCount++;
           
-        })*/
-        numbers = index === 0 ? `56${student.responsable.phone}` : `${numbers},56${student.responsable.phone}`;
-        quantityErrorCount++;
-        quantitySuccessCount++;
-        
-      })) // fin carga de promesas y función para buscar los estudiantes
+        })) // fin carga de promesas y función para buscar los estudiantes
+      }
+      else
+      {
+        arregloConsultas.push(models.Worker.findOne({ where: { _id: ele } }).then(worker => {
+          /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
+            
+          })*/
+          numbers = index === 0 ? `56${worker.phone}` : `${numbers},56${worker.phone}`;
+          quantityErrorCount++;
+          quantitySuccessCount++;
+          
+        }).catch(err => console.log('el id del traajador es incorrecto'))) // fin carga de promesas y función para buscar los estudiantes 
+      }
     });// fin foreach student
 
     Promise.all(arregloConsultas).then(responsePromise => {
@@ -396,6 +410,8 @@ function sendSmsMasive(req, res) {
         quantityError  : quantitySuccessCount
       }
 
+      console.log(labsmobileResponse,numbers, 'log de numbers y objeto')
+      /*
       if(typeSms)
       {
         let urlRequest = 'https://api.labsmobile.com/get/send.php?username=contactopronotas@gmail.com&password=kf94rd36&msisdn=' + numbers + '&message=' + mensaje + '&sender=56999415041'
@@ -420,12 +436,13 @@ function sendSmsMasive(req, res) {
 
           } // fin si no hubo error
         }) // fin funcion request*/
+      /*
       } // aquii
       else
       {
         aviso = "Notificaciónes guardadas con éxito"
         Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
-      } //fin si es una notificación
+      } //fin si es una notificación*/
         
 
   

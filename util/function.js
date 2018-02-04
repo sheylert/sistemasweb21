@@ -3,6 +3,8 @@
 //var ListSms = require('../models/listSms')
 //const TotalSms = require('../models/totalSms')
 
+var models = require('../models');
+
 function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
 {
 	let word = typeSms === true ? 'el mensaje' : ' la notificación',
@@ -23,6 +25,14 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
           course: req.body.course ? req.body.course : null,
           smsBody : labsmobileResponse.statusMessageApi,
           phone: ele.responsable.phone
+          user_id: req.user.userId,
+          school_id  : req.user.sub,
+          course_id: req.body.course ? req.body.course : null,
+          sms_id : arrayId,
+          type: typeSms,
+          status: lastSend,
+          quantitySuccess: labsmobileResponse.quantitySuccess,
+          quantityError: labsmobileResponse.quantityError
         }
 
         if(!typeSms)

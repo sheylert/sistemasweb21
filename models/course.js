@@ -35,8 +35,26 @@ code_student: {
 code_school: { 
           type: DataTypes.INTEGER    
         },        
-
   });
+
+    Course.associate = model =>{
+      
+      Course.belongsTo(model.Client,{
+        foreignKey: 'code_school',
+        as : 'clientes'
+      })
+
+      Course.hasMany(model.Student,{
+        foreignKey: 'course',
+        as : 'cursos'
+      })
+
+      /*Course.hasMany(model.Subject,{
+        foreignKey: 'course',
+        as : 'cursos'
+      })*/
+    }
+
     return Course;
 
 };
