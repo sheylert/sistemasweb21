@@ -32,6 +32,10 @@ state: {
  services: { 
           type: DataTypes.BOOLEAN    
         }, 
+     
+  admin: { 
+          type: DataTypes.INTEGER    
+        }, 
         /*++++++++++++++++++++cambiar de nuevo a referencias++++++++++++++++++++++++*/
         profile_id: { 
           type: DataTypes.INTEGER    

@@ -23,7 +23,7 @@ exports.createToken = function (user) {
       exp: moment().add(30, 'days').unix()
     }
 
-    console.log(payload, 'tokennn')
+    //console.log(payload, 'tokennn')
 
     return jwt.encode(payload, secret);
   } else {

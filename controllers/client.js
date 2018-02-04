@@ -44,6 +44,7 @@ function saveClient(req, res) {
     models.User.findOne( { where: { email: params.email.toLowerCase() }}).then( function(user) { 
     
       if (user) {
+        console.log("ssss");
       res.status(500).send({ message: 'Error Correo registrado' });
       }else
       {   
@@ -66,6 +67,7 @@ function saveClient(req, res) {
                     user.validatePass = false;
 
                     user.school = insertarClients.id;
+                    user.admin = insertarClients.id;
                     user.state = true;
                     user.profile_id = insertarClients.profile_id;
                     user.services = true;
@@ -252,7 +254,6 @@ function getClients(req, res) {
 
 function updateClient(req, res) {
 
-
     const clientId = req.body._id;
     const update = req.body;  
 
@@ -262,6 +263,19 @@ function updateClient(req, res) {
         if (!updateclient) {
           res.status(500).send({ message: 'No se a podido actualizar Cliente!' });
         } else {
+
+                  /* var user={};
+
+                    user.name = update.name;
+                    user.address = update.address;
+                    user.phone = update.phone;
+                    user.email = update.email;
+
+                    models.User.update(user, 
+                         {where: { admin: clientId } }).then( function(updateuser) {
+
+                    }); */        
+
           res.status(200).send({ client: updateclient });
         }
     }) 
