@@ -114,54 +114,57 @@ var password;
 
 
 function login(req, res) {
-// recogemos parametros de petición
+  // recogemos parametros de petición
   var params = req.body;
-  var email = params.email; 
+  var email = params.email;
   var password = params.password;
-  
- models.User.findOne( { where: { email: email.toLowerCase() }}).then( function(user) { 
+ 
+ models.User.findOne( {
+      where: { email: email.toLowerCase() },
+      include: [{
+        model: models.Client,
+        as : 'clientes'
+      },{
+        model: models.Profile,
+        as : 'perfiles'
+      }]
+})
+ .then( function(user) {
 
         if (!user) {
           res.status(500).send({ message: 'Error al comprobar usuario' });
         } else {
           if (user) {
-            
+           
           bcrypt.compare(password, user.password, function(err, respuesta) {
-          // models.User.findOne( { where: { password: password, id: user.id }} ).then( function(check) { 
+          // models.User.findOne( { where: { password: password, id: user.id }} ).then( function(check) {
             if (!respuesta) {
                  res.status(404).send({ message: 'El usuario no ha podido loguearse correctamente!' });
              }
              else
              {
-              models.Profile.findOne( { where: { id: user.profile}}).then( function(profileStoraged) { 
 
-               if (profileStoraged) {
-                   user.profile = Util.ejecutar_arreglo(profileStoraged);
-               }
-              }); 
+              user.dataValues.profile  = user.dataValues.perfiles.dataValues
 
               //-----------------------------------------------------
               if (user.school) {
 
-                 models.Client.findOne( { where: { id: user.school }} ).then( function(schoolStoraged) { 
+                 models.Client.findOne( { where: { id: user.school }} ).then( function(schoolStoraged) {
 
-                    user.services = schoolStoraged.services;
+                    user.dataValues.services = schoolStoraged.dataValues.services;
 
                     if (schoolStoraged) {
-                      if (user.school) {
+                      if (user.dataValues.school) {
 
-                        user.school = Util.ejecutar_arreglo(schoolStoraged);    
-
-                        console.log('debtro.........1');
+                        user.school = user.dataValues.clientes.dataValues
                         res.status(200).send({
-                          user: user,
+                          user: user.dataValues,
                           token: jwt.createToken(user)
                         });
                       } else {
-                        console.log('debtro.........2');
-                        console.log(user)
+                       
                         res.status(200).send({
-                          user: user,
+                          user: user.dataValues,
                           token: jwt.createToken(user)
                         });
                       }
@@ -184,7 +187,7 @@ function login(req, res) {
                     res.status(200).send({ user, token: jwt.createToken(user) });
                   }
                 }
-             } 
+             }
             });
           } else {
             res.status(404).send({ message: 'Usuario no existe!' });
@@ -523,47 +526,31 @@ function sendSmsSingle(req, res) {
 
 function getUsers(req, res) {
 
+
+  console.log("sssssssssssss");
+
    let filtro = {}
 
-   if (req.user.profile.slug !== "SUPER_ADMIN"){
+  /* if (req.user.profile.slug !== "SUPER_ADMIN"){
     filtro = {school : req.user.sub}
    }
+   */
 
-// var school = req.user.sub; //revisar el school que esta cableado
-  models.User.findAll({ where: filtro }).then( function(user) { 
+     models.User.findOne( {
+      where: { school : req.user.sub },
+      include: [{
+        model: models.Client,
+        as : 'clientes'
+      },{
+        model: models.Profile,
+        as : 'perfiles'
+      }]
+}).then( function(user) { 
      
      if (!user) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
-          if (user) { 
-            var userResponse = [];
-            //arreglo
-            user.map((elemento,index) => {  
-                models.Profile.findOne( { where: { id: elemento.dataValues.profile}}).then( function(profileStoraged) { 
-                    if (profileStoraged) { 
-                        elemento.dataValues.profile = profileStoraged.dataValues
-               
-                       models.Client.findOne( { where: { id: elemento.dataValues.school}}).then( function(clientStoraged) { 
-                        if (clientStoraged) { 
-                          elemento.dataValues.school = clientStoraged.dataValues
-                          userResponse.push(elemento)
-                        if(index + 1 == user.length)
-                        {
-                          res.status(200).send(userResponse);
-                        }
-                        }else
-                        {
-                          userResponse.push(elemento)
-                        if(index + 1 == user.length)
-                        {
-                            res.status(200).send(userResponse);
-                        }
-                        }
-                       });        
-                    }
-                })
-            })
-          } 
+            res.status(200).send(user);
         }     
   });
 }

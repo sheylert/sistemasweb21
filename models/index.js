@@ -1,8 +1,9 @@
 var Sequelize = require('sequelize');
 
-const sequelize = new Sequelize("pronota_2019","postgres","123456", {
+const sequelize = new Sequelize("pronota_2021","postgres","123456", {
 dialect: 'postgres'
 });
+
 
 const models = {
 User: sequelize.import('./user'),
@@ -18,7 +19,7 @@ CourseCode: sequelize.import('./course-code'),
 Setting: sequelize.import('./setting'),
 Worker: sequelize.import('./worker'),
 
-};
+}; 
 
 Object.keys(models).forEach((modelName) => {
 

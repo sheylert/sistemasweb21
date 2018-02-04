@@ -14,6 +14,14 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING    
         },         
   });
+
+  Profile.associate = model => {
+    Profile.hasMany(model.User, {
+      foreignKey: 'profile_id',
+      'as': 'perfiles'
+    })
+  }
+  
     return Profile;
 
 };

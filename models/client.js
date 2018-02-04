@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING    
         },        
 phone: { 
-          type: DataTypes.INTEGER    
+          type: DataTypes.STRING    
         }, 
  ree: { 
           type: DataTypes.STRING    
@@ -32,7 +32,7 @@ membership: {
 services: { 
           type: DataTypes.BOOLEAN    
         }, 
-profile: { 
+profile_id: { 
           type: DataTypes.INTEGER
         },
 
@@ -43,7 +43,15 @@ admin: {
 code_setting: { 
           type: DataTypes.INTEGER    
         },  
-  }); 
+  });
+
+Client.associate = model => {
+    Client.hasMany(model.User, {
+        foreignKey: 'school',
+        as: 'users'
+    })
+  }
+
     return Client; 
 };
 

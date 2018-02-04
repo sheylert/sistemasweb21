@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING    
         },
    phone: { 
-          type: DataTypes.INTEGER    
+          type: DataTypes.STRING    
         },  
  email: { 
           type: DataTypes.STRING,
@@ -33,7 +33,7 @@ state: {
           type: DataTypes.BOOLEAN    
         }, 
         /*++++++++++++++++++++cambiar de nuevo a referencias++++++++++++++++++++++++*/
-        profile: { 
+        profile_id: { 
           type: DataTypes.INTEGER    
         }, 
         school: { 
@@ -43,7 +43,21 @@ state: {
           type: DataTypes.INTEGER    
         }, 
         /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-  });
+  }); 
+
+  User.associate = model => {
+
+      User.belongsTo(model.Client,{
+        foreignKey: 'school',
+        as : 'clientes'
+      })
+
+      User.belongsTo(model.Profile,{
+        foreignKey: 'profile_id',
+        as : 'perfiles'
+      })
+  }
+
     return User;
 };
 
