@@ -15,11 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     course_id: {
     	type: DataTypes.INTEGER	
     },
-    sms_id: {
-      type: DataTypes.INTEGER 
-    },
     student_id: {
     	type: DataTypes.INTEGER	
+    },
+    worker_id: {
+      type: DataTypes.INTEGER 
     },
     phone: {
     	type: DataTypes.STRING	
@@ -48,6 +48,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     quantityError: {
     	type: DataTypes.INTEGER		
+    },
+    worker_or_student: {
+      type: DataTypes.STRING  
     }
  })
 

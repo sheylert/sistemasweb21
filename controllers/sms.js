@@ -14,7 +14,7 @@ var models = require('../models');
 
 function countSmsBySchool(req, res) {
 
-	models.ListSms.findAll({ where : { school: req.params.idSchool } }).then(function (results) {
+	models.ListSms.findAll({ where : { school_id: req.params.idSchool } }).then(function (results) {
 		
 		if (!results) {
 			
@@ -84,7 +84,7 @@ function listSmsStored(req, res) {
 
 	if(req.user.profile.slug.indexOf('ENTERPRISE') !== -1)
 	{
-		models.ListSms.findAll({ where: { school: req.user.sub } }).then( result => {
+		models.ListSms.findAll({ where: { school_id: req.user.sub } }).then( result => {
 			if(!result)
 			{
 				res.json([])	
@@ -97,7 +97,7 @@ function listSmsStored(req, res) {
 	}
 	else
 	{
-		models.ListSms.findAll({ where: { school: req.user.sub, course_id: req.params.course },
+		models.ListSms.findAll({ where: { school_id: req.user.sub, course_id: req.params.course },
 			include: [{
 				model : models.Student,
 				as    : 'estudiante'
@@ -154,11 +154,11 @@ function listSmsLastMoth(req, res) {
 	const firstDate = date1
 
 	let range = {
-		[Op.gte] : firstDate,
-		[Op.lte] : lastDate
+		[models.Op.gte] : firstDate,
+		[models.Op.lte] : lastDate
 	}
 
-	models.ListSms.findAll({ where : { createt_at : range, school : req.user.sub } }).then((result) => {
+	models.ListSms.findAll({ where : { createt_at : range, school_id : req.user.sub } }).then((result) => {
 
 		if (!result){
 			res.status(200).json([])
@@ -205,11 +205,11 @@ function listSmsLastWeek(req, res) {
 	const firstDate = date1
 
 	let range = {
-		[Op.gte]: firstDate,
-		[Op.lte]: lastDate
+		[models.Op.gte]: firstDate,
+		[models.Op.lte]: lastDate
 	}
 
-	Sms.findAll({ where : { createt_at: range, school : req.user.sub } }).exec((err, result) => {
+	Sms.findAll({ where : { createt_at: range, school_id : req.user.sub } }).exec((err, result) => {
 		if (!result){
 			res.status(200).send([])
 		}	

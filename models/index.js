@@ -34,5 +34,6 @@ if('associate' in models[modelName]) {
 
 models.sequelize = sequelize;
 models.Sequelize = sequelize;
+models.Op = Sequelize.Op
 
 module.exports = models;
