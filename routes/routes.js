@@ -39,13 +39,11 @@ var api = express.Router();
 api.post('/login', UserController.login); //pruebas
 
 
-/*
+
 api.post('/sendSmsMasiveApi', mdAuth.ensureAuth,UserController.sendSmsMasiveNewApi); // envio masivo de sms
 api.post('/sendSmsMasive', mdAuth.ensureAuth,UserController.sendSmsMasive); // envio masivo de sms
 api.post('/sendSmsSingle', mdAuth.ensureAuth,UserController.sendSmsSingle); // envio de sms de un solo responsable
 api.post('/save-user', mdAuth.ensureAuth,UserController.saveUser);
-
-*/
 
 api.post('/user', mdAuth.ensureAuth,UserController.getUsers);
 api.post('/save-user', mdAuth.ensureAuth, UserController.saveUser);
@@ -114,6 +112,7 @@ api.get('/course-code', mdAuth.ensureAuth,CourseCodeController.getCourseCode);
 api.get('/client', mdAuth.ensureAuth,ClientController.getClients);
 api.post('/client', mdAuth.ensureAuth,ClientController.saveClient);
 api.put('/client/:id', mdAuth.ensureAuth,ClientController.updateClient);
+api.put('/client/:id/modifySmsData', mdAuth.ensureAuth, ClientController.updateSmsData);
 
 /*
 
@@ -210,6 +209,8 @@ api.get('/smsTotalM-W',mdAuth.ensureAuth, SmsController.smsMonthWeekTotal)
 api.get('/smsBySchool/:id',mdAuth.ensureAuth,SmsController.smsDetailsBySchool)
 api.get('/smsStatusLabs', SmsController.recieveStatusSms)
 api.get('/smsNotConfirm', SmsController.listSmsWeekAndMonthNotConfirm)
+
+
 
 
 module.exports = api;

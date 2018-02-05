@@ -15,6 +15,7 @@ var Profile = require('../models/profile');
 // services
 var jwt = require('../services/jwt');
 var models = require('../models');
+const Util = require('../util/function')
 
 
 
@@ -359,11 +360,22 @@ function saveClientSchool(req, res) {
     }
 }
 
+function updateSmsData (req,res) {
+  
+  const id = req.params.id
+
+  Util.updateLastRegistersOfSms('SUCCESS',req)
+
+  res.json({})
+
+}
+
 module.exports = {
     saveClient,
     getClients,
     updateClient,
     saveProfile,
     saveClientSetting,
-    saveClientSchool
+    saveClientSchool,
+    updateSmsData
 }

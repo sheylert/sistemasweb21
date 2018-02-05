@@ -384,6 +384,7 @@ function sendSmsMasive(req, res) {
 
     // iteramos por cada estudiante
     params.estudiante.forEach(function (ele, index) {
+
       if(req.user.profile.slug.indexOf('ENTERPRISE') === -1)
       {
         arregloConsultas.push(models.Student.findOne({ where: { _id: ele } }).populate('responsable').exec((err, student) => {
@@ -398,13 +399,15 @@ function sendSmsMasive(req, res) {
       }
       else
       {
+
         arregloConsultas.push(models.Worker.findOne({ where: { _id: ele } }).then(worker => {
           /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
             
           })*/
-          numbers = index === 0 ? `56${worker.phone}` : `${numbers},56${worker.phone}`;
+          numbers = index === 0 ? `58${worker.phone}` : `${numbers},58${worker.phone}`;
           quantityErrorCount++;
           quantitySuccessCount++;
+          return worker
           
         }).catch(err => console.log('el id del traajador es incorrecto'))) // fin carga de promesas y función para buscar los estudiantes 
       }
@@ -413,22 +416,19 @@ function sendSmsMasive(req, res) {
     Promise.all(arregloConsultas).then(responsePromise => {
 
       let labsmobileResponse = {
-        statusResponseApi : null,
-        statusMessageApi  : null,
+        statusResponseApi : 200,
+        statusMessageApi  : 'Ok',
         quantitySuccess: quantityErrorCount,
         quantityError  : quantitySuccessCount
       }
-
-      console.log(labsmobileResponse,numbers, 'log de numbers y objeto')
-      /*
       if(typeSms)
       {
         let urlRequest = 'https://api.labsmobile.com/get/send.php?username=contactopronotas@gmail.com&password=kf94rd36&msisdn=' + numbers + '&message=' + mensaje + '&sender=56999415041'
         request({
-          url: urlRequest,
+          //url: urlRequest,
           method: 'GET',
         }, function (error, response, body) {
-          if (error) 
+        if (response) 
           {
             // si hubo un error en al enviar la mensajeria
             aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos'
@@ -445,16 +445,14 @@ function sendSmsMasive(req, res) {
 
           } // fin si no hubo error
         }) // fin funcion request*/
-      /*
-      } // aquii
+      
+      }// aquii
       else
       {
         aviso = "Notificaciónes guardadas con éxito"
         Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
       } //fin si es una notificación*/
         
-
-  
     }).catch(reject => {
         console.log(reject)
         res.status(400).send({ message: "Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos" })

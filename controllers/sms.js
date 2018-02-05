@@ -14,7 +14,7 @@ var models = require('../models');
 
 function countSmsBySchool(req, res) {
 
-	models.ListSms.findAll({ where : { school: req.params.idSchool } }).then(function (results) {
+	models.ListSms.findAll({ where : { school_id: req.params.idSchool } }).then(function (results) {
 		
 		if (!results) {
 			
@@ -84,7 +84,7 @@ function listSmsStored(req, res) {
 
 	if(req.user.profile.slug.indexOf('ENTERPRISE') !== -1)
 	{
-		models.ListSms.findAll({ where: { school: req.user.sub } }).then( result => {
+		models.ListSms.findAll({ where: { school_id: req.user.sub } }).then( result => {
 			if(!result)
 			{
 				res.json([])	
@@ -97,7 +97,7 @@ function listSmsStored(req, res) {
 	}
 	else
 	{
-		models.ListSms.findAll({ where: { school: req.user.sub, course_id: req.params.course },
+		models.ListSms.findAll({ where: { school_id: req.user.sub, course_id: req.params.course },
 			include: [{
 				model : models.Student,
 				as    : 'estudiante'
@@ -154,11 +154,11 @@ function listSmsLastMoth(req, res) {
 	const firstDate = date1
 
 	let range = {
-		[Op.gte] : firstDate,
-		[Op.lte] : lastDate
+		[models.Op.gte] : firstDate,
+		[models.Op.lte] : lastDate
 	}
 
-	models.ListSms.findAll({ where : { createt_at : range, school : req.user.sub } }).then((result) => {
+	models.ListSms.findAll({ where : { createt_at : range, school_id : req.user.sub } }).then((result) => {
 
 		if (!result){
 			res.status(200).json([])
@@ -205,11 +205,11 @@ function listSmsLastWeek(req, res) {
 	const firstDate = date1
 
 	let range = {
-		[Op.gte]: firstDate,
-		[Op.lte]: lastDate
+		[models.Op.gte]: firstDate,
+		[models.Op.lte]: lastDate
 	}
 
-	Sms.findAll({ where : { createt_at: range, school : req.user.sub } }).exec((err, result) => {
+	Sms.findAll({ where : { createt_at: range, school_id : req.user.sub } }).exec((err, result) => {
 		if (!result){
 			res.status(200).send([])
 		}	
@@ -340,34 +340,18 @@ function listSmsWeekAndMonthNotConfirm(req, res) {
 }
 
 function logSmsStored(req, res) {
-	/*ListSms.find({ school: req.user.sub }).
-		populate([{
-			path: 'school',
-			model: 'Client'
-		},
+	models.ListSms.findAll({ where :{ school_id: req.user.sub },
+		include: [{ all : true}]
+	}).then(result => {
+		if(result)
 		{
-			path: 'course',
-			model: 'Course',
-			populate: {
-				path: 'code_grade',
-				model: 'CourseCode'
-			}
-		},
+			res.json(result)
+		}
+		else
 		{
-			path: 'idSender',
-			model: 'User',
-		},
-		{
-			path: 'listSms',
-			model: 'Sms'
-		}])
-		.sort({ createt_at: -1 }).limit(20).exec((err, result) => {
-			if (err) res.status(400).send({ message: "error al ejecutar la busqueda de los envios" })
-
-			res.status(200).send(result)
-
-		})*/
-	res.json([])
+			res.json([])	
+		}
+	}).catch(err => res.status(500).json( {message : 'Ha ocurrido un error en logSmsStored'} ) )
 }
 
 function smsMonthWeekTotal(req, res) {
@@ -375,8 +359,8 @@ function smsMonthWeekTotal(req, res) {
 
 	// Para sacar el rango de la última semana
 
-	models.TotalSms.findOne({ where : { school: req.user.sub } }).then(result => {
-		if(result)
+	models.TotalSms.findOne({ where : { school_id: req.user.sub } }).then(result => {
+		if(!result)
 		{
 
 			res.status(200).send([])
