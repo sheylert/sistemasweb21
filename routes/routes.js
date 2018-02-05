@@ -211,8 +211,8 @@ api.get('/logSmsStored',mdAuth.ensureAuth, SmsController.logSmsStored)
 api.get('/smsTotalM-W',mdAuth.ensureAuth, SmsController.smsMonthWeekTotal)
 api.get('/smsBySchool/:id',mdAuth.ensureAuth,SmsController.smsDetailsBySchool)
 api.get('/smsStatusLabs', SmsController.recieveStatusSms)
-api.get('/smsNotConfirm', SmsController.listSmsWeekAndMonthNotConfirm)
-
+api.get('/smsNotConfirm', mdAuth.ensureAuth,SmsController.countMonthNotConfirm)
+api.get('/sms-shipping/:id', mdAuth.ensureAuth, SmsController.listSmsShipping)
 
 
 

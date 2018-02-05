@@ -49,6 +49,11 @@ code_school: {
         as : 'cursos'
       })
 
+      Course.belongsTo(model.CourseCode,{
+        foreignKey: 'code_grade',
+        as : 'code_grade_course'
+      })
+
       /*Course.hasMany(model.Subject,{
         foreignKey: 'course',
         as : 'cursos'

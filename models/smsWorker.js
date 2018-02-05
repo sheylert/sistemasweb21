@@ -1,13 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
 
-	const Sms = sequelize.define("sms", {
+	const SmsWorker = sequelize.define("sms_worker", {
 	  	_id: { 
 	          type: DataTypes.INTEGER,
 	        },
-	    course_id:{
-	    	type: DataTypes.INTEGER,
-		},
-		student_id: {
+		worker_id: {
 			type: DataTypes.INTEGER,
 		},
 		template_id: {
@@ -16,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
 		school_id: {
 			type: DataTypes.INTEGER,
 		},
-		user_id :{
+		user_id: {
 			type: DataTypes.INTEGER,
 		},
 		phone: {
@@ -36,33 +33,28 @@ module.exports = (sequelize, DataTypes) => {
 		}
 	})
 
-	Sms.associate = model => {
+	SmsWorker.associate = model => {
     
-	  	Sms.belongsTo(model.User, {
+	  	SmsWorker.belongsTo(model.User, {
 	  		foreignKey: 'user_id',
 	  		as : 'usuarios'
 	  	})
 
-	  	Sms.belongsTo(model.Client, {
+	  	SmsWorker.belongsTo(model.Client, {
 	  		foreignKey: 'school_id',
 	  		as : 'clientes'
 	  	})
 
-	  	Sms.belongsTo(model.Course, {
-	  		foreignKey: 'course_id',
-	  		as : 'curso'
-	  	})
+	    SmsWorker.belongsTo(model.Worker,{
+	      foreignKey: 'worker_id',
+	      as: 'trabajadores'
+	    })
 
-	    Sms.belongsTo(model.Student, {
-	  		foreignKey: 'student_id',
-	  		as : 'estudiante'
-	  	})
-
-	  	Sms.belongsTo(model.Template, {
+	  	SmsWorker.belongsTo(model.Template, {
 	  		foreignKey: 'template_id',
 	  		as : 'template'
 	  	})
   	}
 
-  	return Sms
+  	return SmsWorker
 }

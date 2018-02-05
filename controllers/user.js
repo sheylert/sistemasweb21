@@ -366,7 +366,8 @@ function sendSmsMasive(req, res) {
     aviso = '',
     total_estudiantes = params.estudiante.length,
     quantityErrorCount = 0,
-    quantitySuccessCount = 0
+    quantitySuccessCount = 0,
+    codigoPais = 56;
   // buscamos el template
   models.Template.findOne({ where : { _id: params.template } }).then( template => {
     
@@ -379,6 +380,15 @@ function sendSmsMasive(req, res) {
       mensaje = template.template_text
       idTemplate = template._id
     }
+
+    models.Setting.findOne( { where :{ school: req.user.sub } } ).then(setting => {
+
+        if(setting) 
+          {
+            codigoPais = setting.codeNumber
+          }
+
+    }).catch(err => console.log('error al buscar las configuraciones', err))
     
 
     // iteramos por cada estudiante
@@ -387,9 +397,9 @@ function sendSmsMasive(req, res) {
       if(req.user.profile.slug.indexOf('ENTERPRISE') === -1)
       {
         arregloConsultas.push(models.Student.findOne({ where: { _id: ele } }).populate('responsable').exec((err, student) => {
-          /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
+          models.Settings.findOne( { where :{school: ele.school} }).select('codeNumber').exec((err,setting) => {
             
-          })*/
+          })
           numbers = index === 0 ? `56${student.responsable.phone}` : `${numbers},56${student.responsable.phone}`;
           quantityErrorCount++;
           quantitySuccessCount++;
@@ -400,15 +410,16 @@ function sendSmsMasive(req, res) {
       {
 
         arregloConsultas.push(models.Worker.findOne({ where: { _id: ele } }).then(worker => {
-          /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
-            
-          })*/
-          numbers = index === 0 ? `58${worker.phone}` : `${numbers},58${worker.phone}`;
-          quantityErrorCount++;
-          quantitySuccessCount++;
-          return worker
           
-        }).catch(err => console.log('el id del traajador es incorrecto'))) // fin carga de promesas y función para buscar los estudiantes 
+          // buscamos en la configuración el código de tlf internacional para agg como prefijo al tlf
+
+          
+            numbers = index === 0 ? `${codigoPais}${worker.phone}` : `${numbers},${codigoPais}${worker.phone}`;
+            quantityErrorCount++;
+            quantitySuccessCount++;
+            return worker
+          
+        }).catch(err => console.log('el id del trabajador es incorrecto'))) // fin carga de promesas y función para buscar los estudiantes 
       }
     });// fin foreach student
 
@@ -431,15 +442,15 @@ function sendSmsMasive(req, res) {
           {
             // si hubo un error en al enviar la mensajeria
             aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos'
-            labsmobileResponse.statusResponseApi = response.statusCode
-            labsmobileResponse.statusMessageApi  = response.statusMessage
+            //labsmobileResponse.statusResponseApi = response.statusCode
+            //labsmobileResponse.statusMessageApi  = response.statusMessage
             Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
           }
           else 
           {
             aviso = 'Mensajería Enviada con Éxito'
-            labsmobileResponse.statusResponseApi = response.statusCode
-            labsmobileResponse.statusMessageApi  = response.statusMessage
+            //labsmobileResponse.statusResponseApi = response.statusCode
+            //labsmobileResponse.statusMessageApi  = response.statusMessage
             Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
 
           } // fin si no hubo error

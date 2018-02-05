@@ -9,30 +9,50 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 {
 	let word = typeSms === true ? 'el mensaje' : ' la notificación',
 		arrayId     = [],
-		lastSend = lastSentDeterminated(typeSms,labsmobileResponse.statusResponseApi)
+		lastSend = lastSentDeterminated(typeSms,labsmobileResponse.statusResponseApi),
+		profileSession = profileInSession(req), // si es estudiante: true, trabajador : false,
+		sms = {}
 
 	labsmobileResponse = determinatedSuccess(typeSms,labsmobileResponse)
 	estudiantes.forEach((ele, index) => {
 
+		if(profileSession)
+		{
+			sms = {
+	          student_id: ele._id,
+	          template_id: idTemplate,
+	          school_id: req.user.sub,
+	          cursoId: req.body.course,
+	          user_id: req.user.userId,
+	          type: typeSms,
+	          smsBody : labsmobileResponse.statusMessageApi,
+	          phone: ele.responsable ? ele.responsable.phone : ele.phone,
+	          envio_id: 0,
+	          status: "DEFAULT",
+	        }
+		}
+		else
+		{
+			sms = {
+	          worker_id: ele._id,
+	          template_id: idTemplate,
+	          school_id: req.user.sub,
+	          user_id: req.user.userId,
+	          type: typeSms,
+	          smsBody : labsmobileResponse.statusMessageApi,
+	          phone: ele.responsable ? ele.responsable.phone : ele.phone,
+	          envio_id: 0,
+	          status: "DEFAULT",
+	        }
+		}
+	        
 
-        let sms = {
-          student_id: profileInSession(req) ? ele._id : 0,
-          worker_id: profileInSession(req) ? 0 : ele._id,
-          template_id: idTemplate,
-          school_id: req.user.sub,
-          course_id: req.body.course ? req.body.course : 1,
-          type: typeSms,
-          smsBody : labsmobileResponse.statusMessageApi,
-          phone: ele.responsable ? ele.responsable.phone : ele.phone,
-          envio_id: 0,
-          status: null,
-          worker_or_student: profileInSession(req) ? 'Estudiante' : 'Trabajador'
-        }
+
 
 
         if(!typeSms)
         {
-        	if(req.user.profile.slug.indexOf('ENTERPRISE') !== -1)
+        	if(!profileSession)
         	{
         		models.Worker.update( {lastSms : 'SUCCESS'}, 
                 {where: { id: ele._id } }).then( function(updateworkers) {
@@ -49,52 +69,109 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
         }
         else
         {
-        	
-        	models.Sms.create(sms).then( result => {
+        	if(profileSession)
+        	{
+        		models.Sms.create(sms).then( result => {
 
-        			arrayId.push(result.id)
+	        			arrayId.push(result.id)
 
-	        		models.Sms.update( {_id : result.id}, 
-	                	{where: { id: result.id } } )
-	                .then( function(updateworkers) {
+		        		models.Sms.update( {_id : result.id}, 
+		                	{where: { id: result.id } } )
+		                .then( function(updateworkers) {
 
-	                }).catch(err => console.log(err))
+		                }).catch(err => console.log(err))
 
-	            if(index + 1 == estudiantes.length)
-        		{
+		            if(index + 1 == estudiantes.length)
+        			{	
         			// guardar list sms
 
-        			let listsms = {
-			          user_id: req.user.userId,
-			          school_id  : req.user.sub,
-			          course_id: req.body.course ? req.body.course : 1,
-			          type: typeSms,
-			          status: lastSend,
-			          quantitySuccess: labsmobileResponse.quantitySuccess,
-			          quantityError: labsmobileResponse.quantityError,
-			          list_sms: arrayId
-			        }
+	        			let listsms = {
+				          user_id: req.user.userId,
+				          school_id  : req.user.sub,
+				          course_id: req.body.course,
+				          type: typeSms,
+				          status: lastSend,
+				          quantitySuccess: labsmobileResponse.quantitySuccess,
+				          quantityError: labsmobileResponse.quantityError,
+				          list_sms: arrayId
+				        }
 
-        			models.ListSms.create(listsms).then( function(insertarworkers) { 
-        				
-		   				res.json({ message : 'Mensajeria Enviada con éxito' })
-        				updateLastRegistersOfSms(lastSend,req)
+	        			models.ListSms.create(listsms).then( function(insertar) { 
+	        				
+			   				res.json({ message : 'Mensajeria Enviada con éxito' })
+	        				updateLastRegistersOfSms(lastSend,req)
 
-        			}).catch(err => console.log(err))
+	        				models.ListSms.update( {_id : insertar.id}, 
+		                		{where: { id: insertarworkers.id } } )
+		                	.then( function(updateworkers) {
+
+		                	}).catch(err => console.log(err)) //fin modificar _id
+
+	        			}).catch(err => console.log(err)) // fin crear list sms student
 		   			
-        		}
+        			}
 
+        		}).catch(err => { // catch error sms create student
 
+	        		if(index + 1 == total_estudiantes)
+		            {
+		            	aviso+= `, No se ha registrado ${word} en la bd del estudiante ${ele.name} ${ele.lastname}`
+		            	console.log(err)
+		             	res.status(400).send({ message: aviso })
+		            }
+	        	})
+        	}
+        	else
+        	{
+        		models.SmsWorker.create(sms).then( result => {
 
-        	}).catch(err => {
+	        			arrayId.push(result.id)
 
-        		if(index + 1 == total_estudiantes)
-	            {
-	            	aviso+= `, No se ha registrado ${word} en la bd del estudiante ${ele.name} ${ele.lastname}`
-	            	console.log(err)
-	             	res.status(400).send({ message: aviso })
-	            }
-        	})
+		        		models.SmsWorker.update( {_id : result.id}, 
+		                	{where: { id: result.id } } )
+		                .then( function(updateworkers) {
+
+		                }).catch(err => console.log(err))
+
+		            if(index + 1 == estudiantes.length)
+        			{	
+        			// guardar list sms
+
+	        			let listsms = {
+				          user_id: req.user.userId,
+				          school_id  : req.user.sub,
+				          type: typeSms,
+				          status: lastSend,
+				          quantitySuccess: labsmobileResponse.quantitySuccess,
+				          quantityError: labsmobileResponse.quantityError,
+				          list_sms: arrayId
+				        }
+
+	        			models.ListSmsWorker.create(listsms).then( function(insertarworkers) { 
+	        				
+			   				res.json({ message : 'Mensajeria Enviada con éxito' })
+	        				updateLastRegistersOfSms(lastSend,req)
+
+	        				models.ListSmsWorker.update( {_id : insertarworkers.id}, 
+		                		{where: { id: insertarworkers.id } } )
+		                	.then( function(updateworkers) {
+
+		                	}).catch(err => console.log(err)) //fin modificar _id
+
+	        			}).catch(err => console.log(err)) // fin crear worker
+		   			
+        			}
+
+        		}).catch(err => { // catch error cuando se esta creando sms
+
+	        		if(index + 1 == total_estudiantes)
+		            {
+		            	aviso+= `, No se ha registrado ${word} en la bd del trabajador ${ele.name} ${ele.lastname}`
+		            	console.log(err)
+		             	res.status(400).send({ message: aviso })
+		            }
+	        	})	
+        	}
         }
 
 	}) // fin guardar sms 
@@ -226,6 +303,8 @@ function updateLastRegistersOfSms(status,req)
 	{
 		/** Función para buscar el total de sms por el últimos mes y la última semana **/
 
+		profileSession = profileInSession(req)
+
 		// Para sacar el rango de la última semana
 
 		let date = new Date()
@@ -267,6 +346,7 @@ function updateLastRegistersOfSms(status,req)
 		date2.setDate(0)
 		let date3 = new Date()
 		date3.setDate(1)
+		date3.setHours(0 - 4,0,0,0)
 
 		//console.log(date2)
 		//console.log(date3)
@@ -286,35 +366,71 @@ function updateLastRegistersOfSms(status,req)
 		},
 		totalData = {}
 
-		models.ListSms.findAll( { where : { createdAt: range, school_id: req.user.sub } }).then(result => {
+		if(profileSession)
+		{
+			models.ListSms.findAll( { where : { createdAt: range, school_id: req.user.sub } }).then(result => {
 
-			totalData.totalSmsWeek = result.length
+				totalData.totalSmsWeek = result.length
 
-			models.ListSms.findAll({ where : { createdAt: rangeMonth, school_id: req.user.sub } }).then(resultMoth => {
+				models.ListSms.findAll({ where : { createdAt: rangeMonth, school_id: req.user.sub } }).then(resultMoth => {
 
-				totalData.totalSmsMonth = resultMoth.length
+					totalData.totalSmsMonth = resultMoth.length
 
-				models.ListSms.findAll({ where : {school_id: req.user.sub} }).then(resultGlobal => {
-					totalData.totalHistory = resultGlobal.length
+					models.ListSms.findAll({ where : {school_id: req.user.sub} }).then(resultGlobal => {
+						totalData.totalHistory = resultGlobal.length
 
-					models.TotalSms.findAll({ where : {school_id: req.user.sub} }).then(result => {
-						if(result.length > 0)
-						{
-							models.TotalSms.update(totalData,{ where : {school_id: req.user.sub} }).then( result => {
-							})
-							
-						}
-						else
-						{
-							totalData.school_id = req.user.sub
-							models.TotalSms.create(totalData).then(result => {
-							})
-						}
-					}).catch(err => console.log(err))
-				})
+						models.TotalSms.findAll({ where : {school_id: req.user.sub} }).then(result => {
+							if(result.length > 0)
+							{
+								models.TotalSms.update(totalData,{ where : {school_id: req.user.sub} }).then( result => {
+								})
+								
+							}
+							else
+							{
+								totalData.school_id = req.user.sub
+								models.TotalSms.create(totalData).then(result => {
+								})
+							}
+						}).catch(err => console.log(err))
+					})
 
-			}).catch( err => console.log(err) )
-		}).catch(err =>  console.log(err) )
+				}).catch( err => console.log(err) )
+			}).catch(err =>  console.log(err) )
+		}
+		else
+		{
+			models.ListSmsWorker.findAll( { where : { createdAt: range, school_id: req.user.sub } }).then(result => {
+
+				totalData.totalSmsWeek = result.length
+
+				models.ListSmsWorker.findAll({ where : { createdAt: rangeMonth, school_id: req.user.sub } }).then(resultMoth => {
+
+					totalData.totalSmsMonth = resultMoth.length
+
+					models.ListSmsWorker.findAll({ where : {school_id: req.user.sub} }).then(resultGlobal => {
+						totalData.totalHistory = resultGlobal.length
+
+						models.TotalSms.findAll({ where : {school_id: req.user.sub} }).then(result => {
+							if(result.length > 0)
+							{
+								models.TotalSms.update(totalData,{ where : {school_id: req.user.sub} }).then( result => {
+								})
+								
+							}
+							else
+							{
+								totalData.school_id = req.user.sub
+								models.TotalSms.create(totalData).then(result => {
+								})
+							}
+						}).catch(err => console.log(err))
+					})
+
+				}).catch( err => console.log(err) )
+			}).catch(err =>  console.log(err) )
+		}
+
 	}
 }
 
@@ -346,5 +462,6 @@ module.exports = {
 	storedSmsMasive,
 	storedSmsSingle,
 	ejecutar_arreglo,
-	updateLastRegistersOfSms
+	updateLastRegistersOfSms,
+	profileInSession
 }

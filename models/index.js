@@ -21,7 +21,9 @@ const models = {
 	Worker: sequelize.import('./worker'),
 	TotalSms: sequelize.import('./totalSms'),
 	ListSms : sequelize.import('./listSms'),
-	Sms     : sequelize.import('./sms')
+	Sms     : sequelize.import('./sms'),
+	ListSmsWorker : sequelize.import('./listSmsWorker'),
+	SmsWorker     : sequelize.import('./smsWorker')
 }; 
 
 Object.keys(models).forEach((modelName) => {

@@ -10,6 +10,8 @@ var ResponseStatusLabsMobile = require('../models/statusResponseLabsmobile')*/
 // Mostrar cantidad de mensajes enviados por colegio
 // Get http://localhost:3789/countsmsbyschool/:idSchool
 
+const Util = require('../util/function')
+
 var models = require('../models');
 
 function countSmsBySchool(req, res) {
@@ -84,7 +86,12 @@ function listSmsStored(req, res) {
 
 	if(req.user.profile.slug.indexOf('ENTERPRISE') !== -1)
 	{
-		models.ListSms.findAll({ where: { school_id: req.user.sub } }).then( result => {
+		models.ListSmsWorker.findAll({ where: { school_id: req.user.sub }, 
+			include :[{
+				model : models.Template,
+				as    : 'template'
+			}]
+		}).then( result => {
 			if(!result)
 			{
 				res.json([])	
@@ -220,138 +227,92 @@ function listSmsLastWeek(req, res) {
 	}).catch( err => res.status(500).json({ message: "error al ejecutar la busqueda de los mensajes" }) )
 }
 
-function listSmsWeekAndMonthNotConfirm(req, res) {
-	let date = new Date(),
-		date1 = new Date(),
-		smsNotConfirm = {}
+function countMonthNotConfirm(req, res) {
+	let date2 = new Date()
+		date2.setMonth(date2.getMonth() + 1)
+		date2.setDate(0)
+		let date3 = new Date()
+		date3.setDate(1)
+		date3.setHours(0 - 4,0,0,0)
 
-	date.setHours(date.getHours() - 4)
-	date1.setHours(0 - 4, 0, 0 ,0)
-
-	switch (date.getDay()) {
-		case 0:
-			date1.setDate(date1.getDate() - 6)
-			break;
-		case 2:
-			date1.setDate(date1.getDate() - 1)
-			break;
-		case 3:
-			date1.setDate(date1.getDate() - 2)
-			break;
-		case 4:
-			date1.setDate(date1.getDate() - 3)
-			break;
-		case 5:
-			date1.setDate(date1.getDate() - 4)
-			break;
-		case 6:
-			date1.setDate(date1.getDate() - 5)
-			break;
-	}
+	const profileSession = Util.profileInSession(req)
 
 
-	const lastDate = date
-	const firstDate = date1
+	const lastDate = date2
+	const firstDate = date3
 
 	let range = {
 		$gte: firstDate,
-		$lt: lastDate
+		$lte: lastDate
 	}
 
-	Sms.find({ createt_at: range, status: "DEFAULT" }).
-		populate([{
-			path: 'school',
-			model: 'Client'
-		},
-		{
-			path: 'course',
-			model: 'Course',
-			populate: {
-				path: 'code_grade',
-				model: 'CourseCode'
+	if(profileSession)
+	{
+		models.Sms.findAll({ where : {  createdAt: range, status: "DEFAULT" } }).then(result => {
+			if(result)
+			{
+				res.json(result)
 			}
-		},
-		{
-			path: 'idSender',
-			model: 'User',
-		},
-		{
-			path: 'listSms',
-			model: 'Sms'
-		}])
-		.exec((err, result) => {
-			if (err) {
-				res.status(400).send({ message: "error al ejecutar la busqueda de los mensajes por semana" })
+			else
+			{
+				res.json([])
 			}
-			else {
-
-				smsNotConfirm.smsWeek = result
-
-				let date2 = new Date()
-				date2.setHours(date2.getHours() - 4)
-				date2.setDate(0)
-				let date3 = new Date()
-				date3.setMonth(date3.getMonth() - 1)
-				date3.setHours(date2.getHours() - 4)
-				date3.setDate(1)
-
-				const lastDateMonth = date2
-				const firstDateMonth = date3
-
-				let rangeMonth = {
-					$gte: firstDateMonth,
-					$lt: lastDateMonth
-				}
-
-				Sms.find({ createt_at: rangeMonth, status: "DEFAULT" }).
-					populate([{
-						path: 'school',
-						model: 'Client'
-					},
-					{
-						path: 'course',
-						model: 'Course',
-						populate: {
-							path: 'code_grade',
-							model: 'CourseCode'
-						}
-					},
-					{
-						path: 'idSender',
-						model: 'User',
-					},
-					{
-						path: 'listSms',
-						model: 'Sms'
-					}])
-					.exec((err, resultMoth) => {
-						if (err) {
-							res.status(400).send({ message: "error al ejecutar la busqueda de los mensajes" })
-						}
-						else {
-							smsNotConfirm.smsMonth = resultMoth
-
-							res.status(200).send(smsNotConfirm)
-						}
-					})
+		}).catch( err => res.status(500).json({ message: "Error buscando los sms no confirmados"}))
+	}
+	else
+	{
+		models.SmsWorker.findAll({ where : {  createdAt: range, status: "DEFAULT" } }).then(result => {
+			if(result)
+			{
+				res.json(result)
 			}
-		})
+			else
+			{
+				res.json([])
+			}
+		}).catch( err => res.status(500).json({ message: "Error buscando los sms no confirmados"}))
+	}
+
+		
+			
 
 }
 
 function logSmsStored(req, res) {
-	models.ListSms.findAll({ where :{ school_id: req.user.sub },
-		include: [{ all : true}]
-	}).then(result => {
-		if(result)
-		{
-			res.json(result)
-		}
-		else
-		{
-			res.json([])	
-		}
-	}).catch(err => res.status(500).json( {message : 'Ha ocurrido un error en logSmsStored'} ) )
+
+	const profile = Util.profileInSession(req)
+
+	if(profile)
+	{
+		models.ListSms.findAll({ where :{ school_id: req.user.sub },
+			include: [{ all : true}]
+		}).then(result => {
+			if(result)
+			{
+				res.json(result)
+			}
+			else
+			{
+				res.json([])	
+			}
+		}).catch(err => res.status(500).json( {message : 'Ha ocurrido un error en logSmsStored'} ) )
+	}
+	else
+	{
+		models.ListSmsWorker.findAll({ where :{ school_id: req.user.sub },
+			include: [{ all : true}]
+		}).then(result => {
+			if(result)
+			{
+				res.json(result)
+			}
+			else
+			{
+				res.json([])	
+			}
+		}).catch(err => res.status(500).json( {message : 'Ha ocurrido un error en logSmsStored'} ) )	
+	}
+		
 }
 
 function smsMonthWeekTotal(req, res) {
@@ -379,7 +340,7 @@ function recieveStatusSms(req, res) {
 	const confirmado = req.query.acklevel
 	const id_envio = req.query.subid
 
-	models.ListSms.findOne({ where: { phone: number },
+	models.Sms.findOne({ where: { phone: number },
 		order: [
 			['createt_at', 'DESC']
 		]
@@ -389,23 +350,35 @@ function recieveStatusSms(req, res) {
 			let string = status == "ok" ? "SUCCESS" : "WARNING"
 			string = confirmado == "handset" ? "SUCCESS" : "WARNING"
 
-			resultSearch.status = string
-			resultSearch.idEnvio = id_envio
-			resultSearch.save((err, resultUpdated) => {
-				if (err) {
+			models.Sms.update({status : string, envio_id: id_envio}, {
+				where: {id : resultSearch.id}
+			}).then(smsUpdate => {
+
+				if (!smsUpdate) {
 					console.log("error al modificar el sms con status " + string)
 				}
-				else {
+				else 
+				{
 					console.log('modificado con status ' + string + ' con éxito')
 
-					Student.findByIdAndUpdate(resultSearch.studentId, { lastSms: "SUCCESS" }, { new: true }, (err, studentUpdated) => {
-						if (err) {
-							console.log("error al modificar el estudiante con status " + string)
-						}
-						else {
+					if(resultUpdated.worker_or_student === "Estudiante")
+					{
+						models.Student.update({ lastSms: "SUCCESS" }, {where : {id: resultSearch.student_id} }).then(studentUpdated=> {
+							
 							console.log('estudiante modificado status ' + string)
-						}
-					})
+
+						}).catch(err => console.log('err al guardar respuesta de lasbsmobile', err))
+					}
+					else
+					{
+						models.Worker.update({ lastSms: "SUCCESS" }, {where : {id: resultSearch.worker_id} }).then(workerUpdated=> {
+							
+							console.log('trabajador modificado status ' + string)
+
+						}).catch(err => console.log('err al guardar respuesta de lasbsmobile', err))
+					}
+
+						
 				}
 
 			})
@@ -414,37 +387,31 @@ function recieveStatusSms(req, res) {
 }
 
 function listSmsShipping(req, res) {
-	ListSms.findOne({ school: req.user.sub, _id: req.params.id })
+
+	const profile = Util.profileInSession(req)
+	if(profile)
+	{
+		models.ListSms.findOne({ school: req.user.sub, _id: req.params.id })
 		.then((result) => {
 			var promises = [];
-			console.log('result');
-			console.log(result);
-			console.log('result.listSms');
-			console.log(result.listSms);
-			result.listSms.forEach(idSms => {
+			result.list_sms.forEach(idSms => {
 				promises.push(
-					Sms.findById(idSms)
-						.populate([{
-							path: 'studentId',
-							model: 'Student',
-							populate: {
-								path: 'responsable',
-								model: 'Responsable'
-							}
-						}])
-						.then((sms) => {
-							return sms;
+					models.Sms.findOne({ where : {id : idSms},
+						include : [{
+							model : models.Student,
+							as    : 'estudiante'
+						}]
+					}).then(smsStored => {
+						return smsStored
+					})
+					.catch((error) => {
+						res.status(500).send({
+							message: 'Error al entregar cliente!'
 						})
-						.catch((error) => {
-							res.status(500).send({
-								message: 'Error al entregar cliente!'
-							})
-						})
+					})
 				);
 			});
 			
-			console.log('promises');
-			console.log(promises);
 			Promise.all(promises)
 				.then((responses) => {
 					res.status(200).send(responses);
@@ -456,12 +423,49 @@ function listSmsShipping(req, res) {
 				});
 		})
 		.catch((err) => {
-			console.log('err');
-			console.log(err);
 			res.status(500).send({
 				message: "Error, no se pudo realizar la búsqueda de mensajes"
 			})
-		});
+		})
+	}
+	else
+	{
+		models.ListSmsWorker.findOne({ where : { school_id: req.user.sub, id: req.params.id } })
+		.then((result) => {
+			var promises = [];
+			result.list_sms.forEach(idSms => {
+				promises.push(
+					models.SmsWorker.findOne({ where : {id : idSms},
+						include: [{ all: true}]
+					})
+					.then(smsStored => {
+						return smsStored
+					})
+					.catch((error) => {
+						res.status(500).send({
+							message: 'Error al entregar cliente!'
+						})
+					})
+				);
+			});
+			
+			Promise.all(promises)
+				.then((responses) => {
+					res.status(200).send(responses);
+				})
+				.catch((err) => {
+					res.status(500).send({
+						message: "Error, no se pudo realizar la búsqueda de mensajes"
+					})
+				});
+		})
+		.catch((err) => {
+			res.status(500).send({
+				message: "Error, no se pudo realizar la búsqueda de mensajes"
+			})
+		})	
+	}
+
 }
 
 
@@ -474,6 +478,6 @@ module.exports = {
 	smsMonthWeekTotal,
 	recieveStatusSms,
 	smsDetailsBySchool,
-	listSmsWeekAndMonthNotConfirm,
+	countMonthNotConfirm,
 	listSmsShipping
 }
