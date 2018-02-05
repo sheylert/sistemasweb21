@@ -93,24 +93,28 @@ var password;
   models.User.findOne( { where: { id: userId }}).then( function(users) { 
     if (users) {
          password = users.password;
-    }
-  });
 
-  bcrypt.compare(password, updaterecord.password, function(err, respuesta) {
+          bcrypt.compare(password, updaterecord.password, function(err, respuesta) {
             if (!respuesta) {
                 updaterecord.password = bcrypt.hashSync(updaterecord.password, 10);
             }
+
+         models.User.update( updaterecord, 
+                                 {where: { id: userId } }).then( function(updateuser) { 
+
+                if (!updateuser) {
+                  res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
+                } else {
+                  res.status(200).send({ user: updateuser });
+                }
+            });          
     });   
+    }
+  });
 
-  models.User.update( updaterecord, 
-                         {where: { id: userId } }).then( function(updateuser) { 
+ 
 
-        if (!updateuser) {
-          res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
-        } else {
-          res.status(200).send({ user: updateuser });
-        }
-    }) 
+ 
 } 
 
 
