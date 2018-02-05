@@ -13,25 +13,22 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 
 	labsmobileResponse = determinatedSuccess(typeSms,labsmobileResponse)
 	estudiantes.forEach((ele, index) => {
-		
-		let sms = {
+
+
+        let sms = {
           student_id: profileInSession(req) ? ele._id : 0,
-          worker_id : profileInSession(req) ? 0 : ele._id,
+          worker_id: profileInSession(req) ? 0 : ele._id,
           template_id: idTemplate,
-          type: typeSms,
-          school: req.user.sub,
-          smsBody : labsmobileResponse.statusMessageApi,
-          phone: ele.responsable ? ele.responsable.phone : ele.phone,
-          user_id: req.user.userId,
-          school_id  : req.user.sub,
+          school_id: req.user.sub,
           course_id: req.body.course ? req.body.course : 1,
           type: typeSms,
-          status: lastSend,
-          quantitySuccess: labsmobileResponse.quantitySuccess,
-          quantityError: labsmobileResponse.quantityError,
-          created_at : new Date(),
+          smsBody : labsmobileResponse.statusMessageApi,
+          phone: ele.responsable ? ele.responsable.phone : ele.phone,
+          envio_id: 0,
+          status: null,
           worker_or_student: profileInSession(req) ? 'Estudiante' : 'Trabajador'
         }
+
 
         if(!typeSms)
         {
@@ -52,15 +49,52 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
         }
         else
         {
-        	models.ListSms.create(sms).then( function(insertarworkers) { 
+        	
+        	models.Sms.create(sms).then( result => {
 
-        		if(index + 1 == estudiantes.length)
+        			arrayId.push(result.id)
+
+	        		models.Sms.update( {_id : result.id}, 
+	                	{where: { id: result.id } } )
+	                .then( function(updateworkers) {
+
+	                }).catch(err => console.log(err))
+
+	            if(index + 1 == estudiantes.length)
         		{
-		   			updateLastRegistersOfSms(lastSend,req)
-		   			res.json({ message : 'Mensajeria Enviada con éxito' })
+        			// guardar list sms
+
+        			let listsms = {
+			          user_id: req.user.userId,
+			          school_id  : req.user.sub,
+			          course_id: req.body.course ? req.body.course : 1,
+			          type: typeSms,
+			          status: lastSend,
+			          quantitySuccess: labsmobileResponse.quantitySuccess,
+			          quantityError: labsmobileResponse.quantityError,
+			          list_sms: arrayId
+			        }
+
+        			models.ListSms.create(listsms).then( function(insertarworkers) { 
+        				
+		   				res.json({ message : 'Mensajeria Enviada con éxito' })
+        				updateLastRegistersOfSms(lastSend,req)
+
+        			}).catch(err => console.log(err))
+		   			
         		}
 
-		   	}).catch(err => console.log(err))
+
+
+        	}).catch(err => {
+
+        		if(index + 1 == total_estudiantes)
+	            {
+	            	aviso+= `, No se ha registrado ${word} en la bd del estudiante ${ele.name} ${ele.lastname}`
+	            	console.log(err)
+	             	res.status(400).send({ message: aviso })
+	            }
+        	})
         }
 
 	}) // fin guardar sms 
@@ -252,22 +286,30 @@ function updateLastRegistersOfSms(status,req)
 		},
 		totalData = {}
 
-		console.log(range)
-		console.log(rangeMonth)
-
-		models.ListSms.findAll( { where : { created_at: range, school: req.user.sub } }).then(result => {
+		models.ListSms.findAll( { where : { createdAt: range, school_id: req.user.sub } }).then(result => {
 
 			totalData.totalSmsWeek = result.length
 
-			models.ListSms.findAll({ where : { created_at: rangeMonth, school_id: req.user.sub } }).then(resultMoth => {
+			models.ListSms.findAll({ where : { createdAt: rangeMonth, school_id: req.user.sub } }).then(resultMoth => {
 
 				totalData.totalSmsMonth = resultMoth.length
 
-				models.ListSms.findAll({ where : {school_id: req.user.sub} }).exec((err,resultGlobal) => {
+				models.ListSms.findAll({ where : {school_id: req.user.sub} }).then(resultGlobal => {
 					totalData.totalHistory = resultGlobal.length
 
-					models.TotalSms.update( totalData, { where : {school: req.user.sub} }, result => {
-						
+					models.TotalSms.findAll({ where : {school_id: req.user.sub} }).then(result => {
+						if(result.length > 0)
+						{
+							models.TotalSms.update(totalData,{ where : {school_id: req.user.sub} }).then( result => {
+							})
+							
+						}
+						else
+						{
+							totalData.school_id = req.user.sub
+							models.TotalSms.create(totalData).then(result => {
+							})
+						}
 					}).catch(err => console.log(err))
 				})
 

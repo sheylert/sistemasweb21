@@ -415,20 +415,19 @@ function sendSmsMasive(req, res) {
     Promise.all(arregloConsultas).then(responsePromise => {
 
       let labsmobileResponse = {
-        statusResponseApi : null,
-        statusMessageApi  : null,
+        statusResponseApi : 200,
+        statusMessageApi  : 'Ok',
         quantitySuccess: quantityErrorCount,
         quantityError  : quantitySuccessCount
       }
-      console.log(responsePromise)
       if(typeSms)
       {
         let urlRequest = 'https://api.labsmobile.com/get/send.php?username=contactopronotas@gmail.com&password=kf94rd36&msisdn=' + numbers + '&message=' + mensaje + '&sender=56999415041'
         request({
-          url: urlRequest,
+          //url: urlRequest,
           method: 'GET',
         }, function (error, response, body) {
-          if (error) 
+        if (response) 
           {
             // si hubo un error en al enviar la mensajeria
             aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos'
@@ -446,7 +445,7 @@ function sendSmsMasive(req, res) {
           } // fin si no hubo error
         }) // fin funcion request*/
       
-      } // aquii
+      }// aquii
       else
       {
         aviso = "Notificaciónes guardadas con éxito"

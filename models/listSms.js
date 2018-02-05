@@ -2,7 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
 
-	const ListSms = sequelize.define("listSms", {
+	const ListSms = sequelize.define("list_sms", {
   	_id: { 
           type: DataTypes.INTEGER,
         },
@@ -15,33 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     course_id: {
     	type: DataTypes.INTEGER	
     },
-    student_id: {
-    	type: DataTypes.INTEGER	
-    },
-    worker_id: {
-      type: DataTypes.INTEGER 
-    },
-    phone: {
-    	type: DataTypes.STRING	
-    },
-    template_id: {
-    	type: DataTypes.INTEGER	
-    },
-    status: {
-    	type: DataTypes.ENUM('SUCCESS','WARNING','DANGER','DEFAULT'),
-    	defaultValue: 'DEFAULT'		
-    },
-    smsBody:{
-    	type: DataTypes.STRING		
-    },
     type: {
     	type: DataTypes.BOOLEAN		
     },
     status: {
     	type: DataTypes.STRING	
-    },
-    created_at: {
-    	type: DataTypes.DATE
     },
     quantitySuccess:{
     	type: DataTypes.INTEGER		
@@ -49,8 +27,8 @@ module.exports = (sequelize, DataTypes) => {
     quantityError: {
     	type: DataTypes.INTEGER		
     },
-    worker_or_student: {
-      type: DataTypes.STRING  
+    list_sms:{
+      type: DataTypes.ARRAY(DataTypes.INTEGER)
     }
  })
 
@@ -69,16 +47,6 @@ module.exports = (sequelize, DataTypes) => {
   	ListSms.belongsTo(model.Course, {
   		foreignKey: 'course_id',
   		as : 'curso'
-  	})
-
-    ListSms.belongsTo(model.Student, {
-  		foreignKey: 'student_id',
-  		as : 'estudiante'
-  	})
-
-  	ListSms.belongsTo(model.Template, {
-  		foreignKey: 'template_id',
-  		as : 'template'
   	})
   }
 

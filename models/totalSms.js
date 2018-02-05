@@ -2,8 +2,8 @@
 
 module.exports = (sequelize, DataTypes) => {
 
-	 const TotalSms = sequelize.define("totalSms", {
-	 	school: {
+	 const TotalSms = sequelize.define("total_sms", {
+	 	school_id: {
       		type: DataTypes.INTEGER 
     	},
     	totalSmsWeek: {
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 
 	 	TotalSms.hasOne(model.Client,{
 
-	 		foreignKey: 'school',
+	 		foreignKey: 'id',
 	 		as        : 'cliente'
 	 	})
 	 }

@@ -340,34 +340,18 @@ function listSmsWeekAndMonthNotConfirm(req, res) {
 }
 
 function logSmsStored(req, res) {
-	/*ListSms.find({ school: req.user.sub }).
-		populate([{
-			path: 'school',
-			model: 'Client'
-		},
+	models.ListSms.findAll({ where :{ school_id: req.user.sub },
+		include: [{ all : true}]
+	}).then(result => {
+		if(result)
 		{
-			path: 'course',
-			model: 'Course',
-			populate: {
-				path: 'code_grade',
-				model: 'CourseCode'
-			}
-		},
+			res.json(result)
+		}
+		else
 		{
-			path: 'idSender',
-			model: 'User',
-		},
-		{
-			path: 'listSms',
-			model: 'Sms'
-		}])
-		.sort({ createt_at: -1 }).limit(20).exec((err, result) => {
-			if (err) res.status(400).send({ message: "error al ejecutar la busqueda de los envios" })
-
-			res.status(200).send(result)
-
-		})*/
-	res.json([])
+			res.json([])	
+		}
+	}).catch(err => res.status(500).json( {message : 'Ha ocurrido un error en logSmsStored'} ) )
 }
 
 function smsMonthWeekTotal(req, res) {
@@ -375,8 +359,8 @@ function smsMonthWeekTotal(req, res) {
 
 	// Para sacar el rango de la última semana
 
-	models.TotalSms.findOne({ where : { school: req.user.sub } }).then(result => {
-		if(result)
+	models.TotalSms.findOne({ where : { school_id: req.user.sub } }).then(result => {
+		if(!result)
 		{
 
 			res.status(200).send([])
