@@ -62,6 +62,15 @@ responsable: {
 
 
   });
+
+    Student.associate = model => {
+
+      Student.belongsTo(model.Responsable,{
+        foreignKey: 'responsable',
+        as : 'responsableStudent'
+      })
+  }
+
     return Student;
 
 };

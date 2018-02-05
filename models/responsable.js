@@ -21,12 +21,21 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING    
         },        
   phone: { 
-          type: DataTypes.INTEGER    
+          type: DataTypes.STRING    
         }, 
  address: { 
           type: DataTypes.STRING    
         },        
   });
+ 
+
+Responsable.associate = model => {
+    Responsable.hasMany(model.Student, {
+        foreignKey: 'responsable',
+        as: 'studentResponsable'
+    })
+  }
+
     return Responsable;
 };
 
