@@ -12,7 +12,8 @@ var models = require('../models');
 
 // modelos
 var User = require('../models/user');
-//var Student = require('../models/student');
+var Student = require('../models/student');
+var Responsable = require('../models/responsable');
 var Client = require('../models/client');
 var Profile = require('../models/profile');
 //var Sms = require('../models/sms');
@@ -475,27 +476,28 @@ function sendSmsSingle(req, res) {
     typeSms = params.type == 1 ? true : false,
     aviso = ''
 
-
-  Template.findOne({ _id: params.template }).exec((err, template) => {
-
-    if (err) {
-      res.status(500).send({ message: "Error al buscar el template" })
+    models.Template.findOne({ where : { _id: params.template } }).then( template => {
+    
+    if (!template) {
+      res.status(200).send({ message: "No se encontro ningún template" })
+      return false
     }
-    else {
-      if (!template) {
-        res.status(200).send({ message: "No se encontro ningún template" })
-      }
-      else {
-        mensaje = template.template_text
-        idTemplate = template._id
-      }
+    else 
+    {
+      mensaje = template.template_text
+      idTemplate = template._id
     }
 
 
-    Student.findOne({ _id: params.estudiante }).populate('responsable').exec((err, student) => {
-      /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
-      })*/
-        
+    models.Student.findOne( {
+      where: { _id: params.estudiante },
+          include: [{
+            model: models.Responsable,
+            as : 'responsableStudent'
+          }]
+    })
+     .then( function(student) {
+
         number = `56${student.responsable.phone}`
         mensaje = mensaje.indexOf(':responsable') != -1 ? mensaje.replace(':responsable', student.responsable.name + student.responsable.lastname) : mensaje
         mensaje = mensaje.indexOf(':estudiante') != -1 ? mensaje.replace(':responsable', student.name + student.lastname) : mensaje

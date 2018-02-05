@@ -119,15 +119,30 @@ function storedSmsSingle(req,res,estudiante,idTemplate,typeSms,labsmobileRespons
           type: typeSms,
           school: req.user.sub,
           course: req.body.course ? req.body.course : null,
-          status : lastSend,
-          smsBody : labsmobileResponse.statusMessageApi
+          smsBody : labsmobileResponse.statusMessageApi,
+          phone: ele.responsable.phone,
+          user_id: req.user.userId,
+          school_id  : req.user.sub,
+          course_id: req.body.course ? req.body.course : null,
+          sms_id : arrayId,
+          type: typeSms,
+          status: lastSend,
+          quantitySuccess: labsmobileResponse.quantitySuccess,
+          quantityError: labsmobileResponse.quantityError
+
+
         }
 
         if(!typeSms)
         {
-			Student.findByIdAndUpdate( ele._id, { lastSms : "SUCCESS"}, { new: true }, (err, studentUpdated) => {
-				if(err) console.log(err)
-			})        	
+		       models.Student.update( {lastSms : "SUCCESS"}, 
+		                         {where: { id: ele._id } }).then( function(studentUpdated) { 
+
+		        if (!studentUpdated) {
+		          console.log("error");
+		        } 
+		    }) 
+
         }
 
         let smsSave = new Sms(sms)

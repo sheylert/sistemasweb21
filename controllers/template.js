@@ -57,21 +57,17 @@ function saveTemplate(req, res) {
 function getTemplate(req, res) {
 
   // Función para buscar el template seleccionado
+  models.Template.findOne( { where: { id: req.params.id }} ).then( function(Template) { 
+     
+     if (!Template) {
+            res.status(500).send({ message: 'Ha ocurrido un error en la busqueda' });
+        } else {
+          if (Template) {
 
-  Template.findById(req.params.id, function (err, Template) {
-    if (err) {
-      res.status(500).send({ message: 'Ha ocurrido un error en la busqueda' });
-    }
-    else {
-      if (Template) {
-
-        res.status(200).send(Template)
-      }
-      else {
-        res.status(200).send({})
-      }
-    }
-  })
+         res.status(200).send(Template)
+          } 
+        }     
+  });
 }
 
 function updateTemplate(req, res) {
@@ -80,20 +76,15 @@ function updateTemplate(req, res) {
   const update     = req.body;
   update.school    = req.user.sub
 
-  Template.findByIdAndUpdate(templateId, update, { new: true }, (err, templateUpdated) => {
-    if (err) {
-      res.status(500).send({ message: 'Ha ocurrido un error al tratar de modificar la plantilla' });
-    }
-    else {
-      if (!templateUpdated) {
-        res.status(404).send({ message: 'No se a podido actualizar plantilla!' });
-      } else {
-        res.status(200).send({ template: templateUpdated });
-      }
-    }
+   models.Template.update( update, 
+                         {where: { id: templateId } }).then( function(templateUpdated) { 
 
-  })
-
+        if (!templateUpdated) {
+          res.status(404).send({ message: 'Ha ocurrido un error al tratar de modificar la plantilla!' });
+        } else {
+          res.status(200).send({ template: templateUpdated });
+        }
+    }) 
 }
 
 module.exports = {

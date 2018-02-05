@@ -116,8 +116,6 @@ function updateWorker(req, res) {
   }                     
 }
 
-
-
 function deleteWorker(req, res) {
   // recogemos parametros
   var userId = req.params.id;

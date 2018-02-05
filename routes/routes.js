@@ -144,9 +144,6 @@ api.delete('/subject/:id', mdAuth.ensureAuth,SubjectController.deleteSubject)
 // Template
 api.get('/template', mdAuth.ensureAuth,TemplateController.getAllTemplates)
 api.post('/template', mdAuth.ensureAuth,TemplateController.saveTemplate)
-
-/*
-
 api.get('/template/:id', mdAuth.ensureAuth,TemplateController.getTemplate)
 api.put('/template/:id', mdAuth.ensureAuth,TemplateController.updateTemplate)
 
