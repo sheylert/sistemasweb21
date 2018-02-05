@@ -18,6 +18,7 @@ var WorkerController = require('../controllers/worker');
 var CourseCodeController = require('../controllers/course-code');
 
 var SettingController = require('../controllers/setting');
+var SettingWorkerController = require('../controllers/settingworker');
 
 /*
 var SubjectController = require('../controllers/subject');
@@ -173,6 +174,12 @@ api.get('/setting', mdAuth.ensureAuth, SettingController.showAllSettings)
 api.post('/setting', mdAuth.ensureAuth, images.single('logo'), SettingController.saveSetting)
 api.put('/setting/:id',mdAuth.ensureAuth, images.single('logo'), SettingController.updateSetting)
 api.get('/setting/onlyDateLimit', mdAuth.ensureAuth, SettingController.getDateLimitConfig) //obtener solo el limite de fecha de configuracion
+
+
+api.get('/setting_worker', mdAuth.ensureAuth, SettingWorkerController.showAllSettings)
+api.post('/setting_worker', mdAuth.ensureAuth, images.single('logo'), SettingWorkerController.saveSetting)
+api.put('/setting_worker/:id',mdAuth.ensureAuth, images.single('logo'), SettingWorkerController.updateSetting)
+
 
 /*
 // Course Management

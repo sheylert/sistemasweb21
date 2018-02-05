@@ -1,7 +1,7 @@
 'use strict'
 
 
-var Setting = require('../models/setting');
+var SettingWorker = require('../models/settingWorker');
 
 // services
 var jwt = require('../services/jwt');
@@ -17,10 +17,10 @@ const chalk = require('chalk');
 function showAllSettings(req, res) { 
     //school: req.user.sub
 
-  models.Setting.findAll({ where: { school: 1 }}).then( function(settings) { 
+  models.SettingWorker.findAll({ where: { school: req.user.sub }}).then( function(settings) { 
         if (!settings) {
           res.status(500).send({ message: 'Error en la petición' });
-        } else {
+        } else { 
           if (settings) {
             res.status(200).send(settings);
           } 
@@ -62,7 +62,7 @@ function saveSetting(req, res) {
 }
 
 function getDateLimitConfig(req, res) {
-    Settings.find().select('dateLimitConfig').exec((err, result) => {
+    SettingWorker.find().select('dateLimitConfig').exec((err, result) => {
         if (err) {
             res.status(500).send({ message: "Error en la petición" });
         }
@@ -111,13 +111,10 @@ function save_params (req,res,params, path = null, edit = null)
         console.log(id)
         
 
-        if (params.dateLimitConfig && params.periodo &&
-                params.yearCurrent && params.dateInit1 &&
-                params.dateEnd1 && params.dateInit2 &&
-                params.dateEnd2) 
+        if (params.codeNumber) 
         {
 
-             models.Setting.findOne( { where: { id: id} }).then( function(result) {     
+             models.SettingWorker.findOne( { where: { id: id} }).then( function(result) {     
                 
                 if(path)
                 {
@@ -126,15 +123,8 @@ function save_params (req,res,params, path = null, edit = null)
 
                 var setting = new Object;
 
-                setting.dateLimitConfig = params.dateLimitConfig
-               
-                setting.nameLogo = path ? path+'.jpg' : null;
-                setting.periodo = params.periodo
-                setting.yearCurrent = params.yearCurrent
-                setting.dateInit1 = params.dateInit1
-                setting.dateEnd1 = params.dateEnd1
-                setting.dateInit2 = params.dateInit2
-                setting.dateEnd2 = params.dateEnd2
+                 setting.nameLogo = path ? path+'.jpg' : null;
+                      
                 setting.school = req.user.sub
 
                 if(params.codeNumber)
@@ -142,7 +132,7 @@ function save_params (req,res,params, path = null, edit = null)
                     setting.codeNumber = params.codeNumber
                 }
                 
-        models.Setting.update(setting, 
+        models.SettingWorker.update(setting, 
                          {where: { id: id } }).then( function(updateSetting) { 
 
         if (!updateSetting) {
@@ -162,25 +152,14 @@ function save_params (req,res,params, path = null, edit = null)
     {
         // guardar ===============================**
 
-        if (params.dateLimitConfig && params.periodo &&
-                params.yearCurrent && params.dateInit1 &&
-                params.dateEnd1 && params.dateInit2 &&
-                params.dateEnd2) 
+        if (params.codeNumber) 
             {
 
                 console.log(chalk.green('datos validados...'))
 
                 var setting = new Object;
-               
-                setting.dateLimitConfig = params.dateLimitConfig
-               
+                     
                 setting.nameLogo = path ? path+'.jpg' : null;
-                setting.periodo = params.periodo
-                setting.yearCurrent = 2  //params.yearCurrent revisar             
-                setting.dateInit1 = params.dateInit1
-                setting.dateEnd1 = params.dateEnd1
-                setting.dateInit2 = params.dateInit2
-                setting.dateEnd2 = params.dateEnd2
                 setting.school = req.user.sub
 
                 if(params.codeNumber)
@@ -188,12 +167,12 @@ function save_params (req,res,params, path = null, edit = null)
                     setting.codeNumber = params.codeNumber
                 }
        
-                   models.Setting.create(setting).then( function(settingStorage) { 
+                   models.SettingWorker.create(setting).then( function(settingStorage) { 
 
                     if (!settingStorage) {
                       res.status(500).send({ message: 'Error al guarda perfil' });
                     } else {
-                     models.Setting.update({ _id: settingStorage.id }, 
+                     models.SettingWorker.update({ _id: settingStorage.id }, 
                         {where: { id: settingStorage.id } }, {new : true}).then( result => {
                        res.status(200).send( {resu: result});
                     })
