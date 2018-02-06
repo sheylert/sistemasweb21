@@ -16,7 +16,7 @@ function saveTeacher(req, res) {
   // recogemos parametros
   var params = req.body;
 
-  params.school =  1;  //req.user.sub
+  params.school =  req.user.sub;  //
   // crear objeto profesor
    models.Teacher.create(params).then( function(insertarteachers) { 
 
@@ -33,48 +33,16 @@ function getTeachers(req, res) {
 
   var params = req.body;
   //req.user.sub
-  models.Teacher.findAll( { where: { school: 1 }} ).then( function(teachers) { 
+  models.Teacher.findAll( { where: { school: req.user.sub }} ).then( function(teachers) { 
      
      if (!teachers) {
-          res.status(500).send({ message: 'Error en la petición' });
+          res.json([]);
         } else {
           if (teachers) {
-              
-           /*   teachers = teachers.map((e,i) => {
-                  
-                  console.log(e.dataValues.profile,'aquii')
-                  console.log(e.dataValues,'aquii111')
-
-                  models.Profile.findOne( { where: { id: e.dataValues.profile}}).then( function(profileStoraged) { 
-
-                  if (profileStoraged) {    
-                    e.dataValues.profile = Util.ejecutar_arreglo(profileStoraged);
-                  }
-                  else
-                  {
-                    return e
-                  } 
-              });  
-              
-              })
-
-              */ 
-
-              //.Profile.findOne( { where: { id: teachers.profile}}).then( function(profileStoraged) { 
-
-                  // if (profileStoraged) {
-
-                   //console.log("sssssss");
-
-                 //  teachers.profile = Util.ejecutar_arreglo(profileStoraged);
-             //  } 
-             // });  
-            //teachers.responsable = Util.ejecutar_arreglo(teachers);
-            //console.log(teachers)
-            res.status(200).send(teachers);
+              res.json(teachers)
           } 
         }     
-  });
+  }).catch(err => res.status(500).json({ message : "Ha ocurrido un error buscando  a los profesores"}))
 }
 
 
@@ -84,17 +52,17 @@ function updateTeacher(req, res) {
   // recogemos parametros
   var params = req.body;
 
-  params.school =  1;  //req.user.sub
+  params.school = req.user.sub
   // crear objeto profesor
    models.Teacher.update(params).then( function(updateteachers) { 
 
         if (!updateteachers) {
-          res.status(404).send({ message: 'No se a podido actualizar profesor!' });
+          res.status(500).send({ message: 'No se a podido actualizar profesor!' });
         } else {
           res.status(200).send({ teacher: updateteachers });
         }
 
-    })  
+    }).catch( err => 'Ha ocurrido un error inesperado modificando el profesor')
 
 }
 

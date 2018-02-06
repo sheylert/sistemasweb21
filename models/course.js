@@ -27,10 +27,10 @@ code_teaching: {
           type: DataTypes.INTEGER    
         },         
 code_subject: { 
-          type: DataTypes.INTEGER    
+          type: DataTypes.ARRAY(DataTypes.INTEGER)    
         },  
 code_student: { 
-          type: DataTypes.INTEGER    
+          type: DataTypes.ARRAY(DataTypes.INTEGER)    
         }, 
 code_school: { 
           type: DataTypes.INTEGER    

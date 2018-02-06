@@ -24,7 +24,6 @@ var Util     = require('../util/function')
 // POST http://localhost:3789/course
 function saveCourse(req, res) {
 
-    var course = new Course();
     var params = req.body;
 
     if (params.character && params.dpyp && params.deval && params.code_grade && params.teacher_chief && params.code_teaching) {
@@ -37,8 +36,9 @@ function saveCourse(req, res) {
         course.code_teaching = params.code_teaching;
         //course.code_subject = params.code_subject;
         //course.code_student = params.code_student;
+        console.log(params)
 
-        course.save((err, savedCourse) => {
+        /*models.Course.create().then( courseStored  => {
             if (err) {
                 res.status(500).send({ message: 'Error al guarda curso', err: err.errors });
             } else {
@@ -48,7 +48,7 @@ function saveCourse(req, res) {
                     res.status(200).send({ course: savedCourse });
                 }
             }
-        });
+        });*/
 
     } else {
         res.status(400).send({ message: 'Ingresa los datos correctos para poder registrar al usuario' });
