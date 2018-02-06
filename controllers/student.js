@@ -133,7 +133,7 @@ function saveStudent(req, res) {
                         if (responsa) {
                             // Si existe el responsable
 
-                            student.responsable = responsa._id
+                            student.responsable = responsa.id
 
                             student.save((err, studentStore) => {
                                 if (err) {
@@ -181,7 +181,7 @@ function saveStudent(req, res) {
                                         {
                                             Profile.findOne({ slug: 'RESPONSABLE' }).exec((err, profile) => {
                                                 // agregar al objeto student el id del responsable
-                                                student.responsable = responStore._id
+                                                student.responsable = responStore.id
 
                                                 // agregar un usuario al responsable
                                                 var user = new User()
@@ -190,12 +190,12 @@ function saveStudent(req, res) {
                                                 user.address = params.address_res;
                                                 user.phone = params.phone_res;
                                                 user.school = req.user.sub
-                                                user.profile = profile._id;
+                                                user.profile = profile.id;
                                                 user.email = params.email_res;
                                                 user.state = true;
                                                 user.type = 3;
                                                 user.validatePassword = false;
-                                                user.responId = responStore._id
+                                                user.responId = responStore.id
 
                                                 user.save((err, userStore) => {
                                                     if (err) {
@@ -236,7 +236,7 @@ function saveStudent(req, res) {
 function getStudent(req, res) {
 
     // Función para buscar el estudiante seleccionado
-    Student.findOne({ _id: req.params.id }).populate('responsable').exec((err, student) => {
+    Student.findOne({ id: req.params.id }).populate('responsable').exec((err, student) => {
         if (err) {
             res.status(500).send({ message: 'Ha ocurrido un error en la busqueda' });
         } else {
@@ -457,7 +457,7 @@ function showAllDataStudent(req, res) {
         [{
             path: 'course',
             model: 'Course',
-            match: { code_student: { _id: idStudent } },
+            match: { code_student: { id: idStudent } },
 
         }]
     ).exec((err, eventFound) => {
@@ -469,7 +469,7 @@ function showAllDataStudent(req, res) {
         }
     })
 
-    Student.find({ state: true, _id: idStudent }).populate('responsable').exec((err, studentFound) => {
+    Student.find({ state: true, id: idStudent }).populate('responsable').exec((err, studentFound) => {
         if (err) {
             res.status(500).send({ message: 'Error en la petición' });
         }

@@ -1,9 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
 
 	const SmsWorker = sequelize.define("sms_worker", {
-	  	_id: { 
-	          type: DataTypes.INTEGER,
-	        },
+	  
 		worker_id: {
 			type: DataTypes.INTEGER,
 		},

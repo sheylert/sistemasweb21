@@ -14,10 +14,7 @@ function saveProfile(req, res) {
         if (!insertarProfiles) {
           res.status(500).send({ message: 'Error al guarda perfil' });
         } else {
-         models.Profile.update({ _id: insertarProfiles.id }, 
-            {where: { id: insertarProfiles.id } }, {new : true}).then( result => {
-           res.status(200).send( {resu: result});
-        })
+           res.status(200).send( {resu: insertarProfiles});
         }
     })  
 }

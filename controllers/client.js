@@ -55,9 +55,6 @@ function saveClient(req, res) {
         if (!insertarClients) {
           res.status(500).send({ message: 'Error al guarda perfil' });
         } else {
-         models.Client.update({ _id: insertarClients.id }, 
-            {where: { id: insertarClients.id } }).then(() => {
-        })
                     var user={};
                     user.name = insertarClients.name;
                     user.address = insertarClients.address;
@@ -80,15 +77,12 @@ function saveClient(req, res) {
                       res.status(404).send({ message: 'No se ha guardado correctamente' });
                     } else {
 
-                    models.User.update({ _id: insertarUser.id }, 
-                        {where: { id: insertarUser.id }, returning: true }).then( result => {
-
                     models.Client.update({ admin: insertarUser.id }, 
                         {where: { id: insertarClients.id }, returning: true }).then( result => {        
 
                          res.status(200).send({ client: insertarClients });
                        })     
-                    })     
+
                   }
 
                 })  
@@ -255,7 +249,7 @@ function getClients(req, res) {
 
 function updateClient(req, res) {
 
-    const clientId = req.body._id;
+    const clientId = req.body.id;
     const update = req.body;  
 
  models.Client.update(update, 

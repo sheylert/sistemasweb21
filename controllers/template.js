@@ -41,14 +41,7 @@ function saveTemplate(req, res) {
         if (!insertartemplate) {
           res.status(404).send({ message: 'No se ha guardado el profesor' });
         } else {
-
-          models.Template.update({ _id: insertartemplate.id }, 
-            {where: { id: insertartemplate.id }, returning: true }).then( result => {
-
-            //res.status(200).json({ worker: result[1][0] });
-
-            res.status(200).send({ template: insertartemplate });
-        })     
+            res.status(200).send({ template: insertartemplate });   
         }
 
     })

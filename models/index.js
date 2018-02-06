@@ -1,10 +1,8 @@
 var Sequelize = require('sequelize');
 
-const sequelize = new Sequelize("pronota","postgres","123456", { 
+const sequelize = new Sequelize("pronota_6","postgres","123456",  { 
 dialect: 'postgres'
 });
-
-
 
 const models = {
 	User: sequelize.import('./user'),

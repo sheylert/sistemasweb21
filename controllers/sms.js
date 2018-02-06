@@ -391,7 +391,7 @@ function listSmsShipping(req, res) {
 	const profile = Util.profileInSession(req)
 	if(profile)
 	{
-		models.ListSms.findOne({ school: req.user.sub, _id: req.params.id })
+		models.ListSms.findOne({ school: req.user.sub, id: req.params.id })
 		.then((result) => {
 			var promises = [];
 			result.list_sms.forEach(idSms => {

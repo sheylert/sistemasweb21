@@ -4,10 +4,6 @@
 module.exports = (sequelize, DataTypes) => {
 
   const Teaching = sequelize.define("teaching", {
-
-  _id: { 
-          type: DataTypes.INTEGER,
-        },
   name: { 
           type: DataTypes.ENUM('MEDIA', 'PRIMARIA', 'PREESCOLAR') 
         },

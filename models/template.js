@@ -4,10 +4,6 @@
 module.exports = (sequelize, DataTypes) => {
 
   const Template = sequelize.define("template", {
-
-  _id: { 
-          type: DataTypes.INTEGER,
-        },
   title: { 
           type: DataTypes.STRING    
         },
