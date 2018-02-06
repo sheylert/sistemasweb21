@@ -17,14 +17,5 @@ module.exports = (sequelize, DataTypes) => {
     	}
 	 })
 
-	 TotalSms.associate = model => {
-
-	 	TotalSms.hasOne(model.Client,{
-
-	 		foreignKey: 'id',
-	 		as        : 'cliente'
-	 	})
-	 }
-
 	 return TotalSms
 }
