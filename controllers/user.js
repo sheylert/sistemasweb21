@@ -93,24 +93,28 @@ var password;
   models.User.findOne( { where: { id: userId }}).then( function(users) { 
     if (users) {
          password = users.password;
-    }
-  });
 
-  bcrypt.compare(password, updaterecord.password, function(err, respuesta) {
+          bcrypt.compare(password, updaterecord.password, function(err, respuesta) {
             if (!respuesta) {
                 updaterecord.password = bcrypt.hashSync(updaterecord.password, 10);
             }
+
+         models.User.update( updaterecord, 
+                                 {where: { id: userId } }).then( function(updateuser) { 
+
+                if (!updateuser) {
+                  res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
+                } else {
+                  res.status(200).send({ user: updateuser });
+                }
+            });          
     });   
+    }
+  });
 
-  models.User.update( updaterecord, 
-                         {where: { id: userId } }).then( function(updateuser) { 
+ 
 
-        if (!updateuser) {
-          res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
-        } else {
-          res.status(200).send({ user: updateuser });
-        }
-    }) 
+ 
 } 
 
 
@@ -381,15 +385,29 @@ function sendSmsMasive(req, res) {
       mensaje = template.template_text
       idTemplate = template._id
     }
+    if(req.user.profile.slug.indexOf('ENTERPRISE') === -1)
+    {
+      models.Setting.findOne( { where :{ school: req.user.sub } } ).then(setting => {
 
-    models.Setting.findOne( { where :{ school: req.user.sub } } ).then(setting => {
+          if(setting) 
+            {
+              codigoPais = setting.codeNumber
+            }
 
-        if(setting) 
-          {
-            codigoPais = setting.codeNumber
-          }
+      }).catch(err => console.log('error al buscar las configuraciones', err))
+    }
+    else
+    {
+      models.SettingWorker.findOne( { where :{ school: req.user.sub } } ).then(setting => {
 
-    }).catch(err => console.log('error al buscar las configuraciones', err))
+          if(setting) 
+            {
+              codigoPais = setting.codeNumber
+            }
+
+      }).catch(err => console.log('error al buscar las configuraciones', err)) 
+    }
+      
     
 
     // iteramos por cada estudiante
@@ -436,22 +454,22 @@ function sendSmsMasive(req, res) {
       {
         let urlRequest = 'https://api.labsmobile.com/get/send.php?username=contactopronotas@gmail.com&password=kf94rd36&msisdn=' + numbers + '&message=' + mensaje + '&sender=56999415041'
         request({
-          //url: urlRequest,
+          url: urlRequest,
           method: 'GET',
         }, function (error, response, body) {
         if (response) 
           {
             // si hubo un error en al enviar la mensajeria
             aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos'
-            //labsmobileResponse.statusResponseApi = response.statusCode
-            //labsmobileResponse.statusMessageApi  = response.statusMessage
+            labsmobileResponse.statusResponseApi = response.statusCode
+            labsmobileResponse.statusMessageApi  = response.statusMessage
             Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
           }
           else 
           {
             aviso = 'Mensajería Enviada con Éxito'
-            //labsmobileResponse.statusResponseApi = response.statusCode
-            //labsmobileResponse.statusMessageApi  = response.statusMessage
+            labsmobileResponse.statusResponseApi = response.statusCode
+            labsmobileResponse.statusMessageApi  = response.statusMessage
             Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
 
           } // fin si no hubo error

@@ -20,13 +20,13 @@ function saveTeacher(req, res) {
   // crear objeto profesor
    models.Teacher.create(params).then( function(insertarteachers) { 
 
-        if (!insertarteachers) {
-          res.status(404).send({ message: 'No se ha guardado el profesor' });
-        } else {
-          res.status(200).send({ teacher: insertarteachers });
-        }
+      models.Teacher.update({ _id : insertarteachers.id},{ where : { id : insertarteachers.id} } ).then(updateTeacher=>{
 
-    })  
+        res.status(200).send({ teacher: updateTeacher });  
+
+      }).catch(err => res.status(500).send({ message: 'No se ha poodido guardar el profesor' }) )
+
+    }).catch(err => res.status(404).send({ message: 'No se ha guardado el profesor' }) )
 }
 
 function getTeachers(req, res) {

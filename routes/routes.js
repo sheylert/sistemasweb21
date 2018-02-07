@@ -18,6 +18,7 @@ var WorkerController = require('../controllers/worker');
 var CourseCodeController = require('../controllers/course-code');
 
 var SettingController = require('../controllers/setting');
+var SettingWorkerController = require('../controllers/settingworker');
 
 /*
 var SubjectController = require('../controllers/subject');
@@ -56,12 +57,12 @@ api.get('/overwritePass', mdAuth.ensureAuth,UserController.overwritePass) // rut
 api.post('/overwritePass', mdAuth.ensureAuth,UserController.overwritePass) // ruta para sobreescribir el pass que se le pone al responsable por defecto cuando es creado su user y validar que hizo session por primera vez
 api.post('/recoveryPassword', mdAuth.ensureAuth,UserController.recoveryPassword)
 
-/*
+
 // Course
 api.get('/course', mdAuth.ensureAuth,CourseController.getCourses);
 api.post('/course', mdAuth.ensureAuth,CourseController.saveCourse);
 api.put('/course/:id', mdAuth.ensureAuth,CourseController.updateCourse);
-/*
+
 api.get('/course/:id', mdAuth.ensureAuth,CourseController.getCourse);
 api.get('/course/searchSchool/:idSchool', mdAuth.ensureAuth,CourseController.getCourseSchool);
 
@@ -78,7 +79,6 @@ api.post('/course/:idCourse/subject', mdAuth.ensureAuth,CourseController.saveCou
 api.delete('/course/:idCourse/subject', mdAuth.ensureAuth,CourseController.deleteCourseSubject);
 
 
-*/
 // Teacher
 api.put('/teacher/:id', mdAuth.ensureAuth,TeacherController.updateTeacher);
 api.post('/teacher', mdAuth.ensureAuth,TeacherController.saveTeacher);
@@ -173,6 +173,12 @@ api.get('/setting', mdAuth.ensureAuth, SettingController.showAllSettings)
 api.post('/setting', mdAuth.ensureAuth, images.single('logo'), SettingController.saveSetting)
 api.put('/setting/:id',mdAuth.ensureAuth, images.single('logo'), SettingController.updateSetting)
 api.get('/setting/onlyDateLimit', mdAuth.ensureAuth, SettingController.getDateLimitConfig) //obtener solo el limite de fecha de configuracion
+
+
+api.get('/setting_worker', mdAuth.ensureAuth, SettingWorkerController.showAllSettings)
+api.post('/setting_worker', mdAuth.ensureAuth, images.single('logo'), SettingWorkerController.saveSetting)
+api.put('/setting_worker/:id',mdAuth.ensureAuth, images.single('logo'), SettingWorkerController.updateSetting)
+
 
 /*
 // Course Management

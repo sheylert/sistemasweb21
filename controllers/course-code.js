@@ -16,24 +16,15 @@ function saveCourseCode(req, res) {
 
    models.CourseCode.create(params).then( function(courseCodeStorage) { 
 
-        if (!courseCodeStorage) {
-          res.status(404).send({ message: 'No se ha guardado código' });
-        } else {
-          res.status(200).send({ CorseCode: courseCodeStorage });
-        }
-    })  
+   		res.json(courseCodeStorage)
+
+    }).catch(err => res.status(500).send({ message: 'No se ha poodido guardar el grado' }) )  
 }
 
 function getCourseCode(req, res) {
       models.CourseCode.findAll().then( function(coursecodes) { 
-        if (!coursecodes) {
-          res.status(500).send({ message: 'Error en la petición' });
-        } else {
-          if (coursecodes) {
-            res.status(200).send(coursecodes);
-          } 
-      } 
-  })
+        res.status(200).send(coursecodes);
+      }).catch(err => res.status(500).send({ message: 'Error en la petición' }) )
 }
 
 

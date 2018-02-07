@@ -309,21 +309,16 @@ function deleteCourseSchool(req, res) {
     }
 }
 
+
 // Mostrar todos los Cursos
 // GET http://localhost:3789/course
 function getCourses(req, res) {
 
-    models.Course.findAll().then( function(courses) { 
-        if (!courses) {
-          res.status(500).send({ message: 'Error en la petición' });
-        } else {
-          if (courses) {
-            res.status(200).send(courses);
-          } 
-      } 
+    models.Course.findAll({ where : { code_school: req.user.sub } }).then( function(courses) { 
+        res.json(courses)
+      }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al buscar todos los cursos"} )) 
 
-    });
-    
+}    
 
   /*  
 
@@ -367,16 +362,12 @@ function getCourses(req, res) {
 
 */
 
-     console.log('VVVVVVVVVVVVVVVVVVVVV ');
-
-}
-
 // Mostrar todos los Cursos
 // GET http://localhost:3789/course/:id
 function getCourse(req, res) {
 
     // Función para buscar el curso seleccionado
-    Course.find({ _id: req.params.id }).populate([{
+    models.Course.findAll({ where : { _id: req.params.id } }).populate([{
             path: 'teacher_chief',
             model: 'Teacher'
         },
