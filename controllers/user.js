@@ -81,8 +81,6 @@ function putUser(req, res) {
 
 var userId = req.params.id;
 var updaterecord = req.body;
-
-updaterecord.school = updaterecord.school.id;
 var password;
 
   models.User.findOne( { where: { id: userId }}).then( function(users) { 
@@ -90,27 +88,43 @@ var password;
          password = users.password;
 
           bcrypt.compare(password, updaterecord.password, function(err, respuesta) {
-            if (!respuesta) {
-                updaterecord.password = bcrypt.hashSync(updaterecord.password, 10);
-            }
+              if (!respuesta) {
+                  updaterecord.password = bcrypt.hashSync(updaterecord.password, 10);
+              }
 
-         models.User.update( updaterecord, 
-                                 {where: { id: userId } }).then( function(updateuser) { 
+              models.User.update( updaterecord, 
+                                   {where: { id: userId } }).then( function(updateuser) { 
 
-                if (!updateuser) {
-                  res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
-                } else {
-                  res.status(200).send({ user: updateuser });
-                }
-            });          
-    });   
-    }
-  });
+                  if (!updateuser) {
+                    res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
+                  } else {
+                    res.status(200).send({ user: updateuser });
+                  }
+              });          
+          });   
 
- 
-
- 
+    } // fin if users
+  }); // fin funcion encontrar users
 } 
+
+function findUser (req,res) {
+  const id  = req.params.id
+  const filtro = {
+    school : req.user.sub,
+    id
+  }
+
+  models.User.findOne({ where : filtro}).then(result => {
+    if(!result)
+    {
+      res.status(500).json({ message : "No existe ningún registro con ese id "}) 
+    }
+    else
+    {
+      res.json(result)
+    }
+  }).catch(err => res.status(500).json({ message : "Ha ocurrido un error buscando el usuario "}) )
+}
 
 
 function login(req, res) {
@@ -439,8 +453,8 @@ function sendSmsMasive(req, res) {
     Promise.all(arregloConsultas).then(responsePromise => {
 
       let labsmobileResponse = {
-        statusResponseApi : 200,
-        statusMessageApi  : 'Ok',
+        statusResponseApi : null,
+        statusMessageApi  : null,
         quantitySuccess: quantityErrorCount,
         quantityError  : quantitySuccessCount
       }
@@ -667,5 +681,6 @@ module.exports = {
   getUsers,
   putUser,
   overwritePass,
-  recoveryPassword
+  recoveryPassword,
+  findUser
 }

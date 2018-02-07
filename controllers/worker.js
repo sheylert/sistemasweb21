@@ -119,12 +119,34 @@ function deleteWorker(req, res) {
         .then(function(deleteworkers){
            res.status(200).send({ worker: deleteworkers });   
         })
-    }                   
+}                   
+
+function getWorker(req,res){
+  // Buscar un trabajador en especifico
+
+  const id = req.params.id
+  let filtro = {
+    school : req.user.sub,
+    id
+  }
+
+  models.Worker.findOne({ where : filtro }).then( result => {
+    if(result)
+    {
+      res.json(result)
+    }
+    else
+    {
+      res.status(500).json({ message:  "No se ha encontrado ningún trabajador con ese id"})
+    }
+  }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el trabajador"}) )
+}
 
 
 module.exports = {
   saveWorker,
   getWorkers,
   updateWorker,
-  deleteWorker
+  deleteWorker,
+  getWorker
 }

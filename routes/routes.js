@@ -38,24 +38,16 @@ var api = express.Router();
 
 // User
 api.post('/login', UserController.login); //pruebas
-
-
-
 api.post('/sendSmsMasiveApi', mdAuth.ensureAuth,UserController.sendSmsMasiveNewApi); // envio masivo de sms
 api.post('/sendSmsMasive', mdAuth.ensureAuth,UserController.sendSmsMasive); // envio masivo de sms
 api.post('/sendSmsSingle', mdAuth.ensureAuth,UserController.sendSmsSingle); // envio de sms de un solo responsable
 api.post('/save-user', mdAuth.ensureAuth,UserController.saveUser);
-
 api.post('/user', mdAuth.ensureAuth,UserController.getUsers);
 api.post('/save-user', mdAuth.ensureAuth, UserController.saveUser);
 api.put('/user/:id', mdAuth.ensureAuth, UserController.putUser);
-
-/*
-api.put('/user/:id', mdAuth.ensureAuth,UserController.putUser);
-api.get('/overwritePass', mdAuth.ensureAuth,UserController.overwritePass) // ruta para llevar los datos del usuario(responsable) a la vista de validate pass por primera vez que hizo session
-*/
 api.post('/overwritePass', mdAuth.ensureAuth,UserController.overwritePass) // ruta para sobreescribir el pass que se le pone al responsable por defecto cuando es creado su user y validar que hizo session por primera vez
 api.post('/recoveryPassword', mdAuth.ensureAuth,UserController.recoveryPassword)
+api.get('/user/:id',mdAuth.ensureAuth,UserController.findUser)
 
 
 // Course
@@ -87,6 +79,7 @@ api.get('/teacher', mdAuth.ensureAuth,TeacherController.getTeachers);
 // Worker
 api.put('/worker/:id', mdAuth.ensureAuth,WorkerController.updateWorker);
 api.delete('/worker/:id', mdAuth.ensureAuth,WorkerController.deleteWorker);
+api.get('/worker/:id', mdAuth.ensureAuth,WorkerController.getWorker);
 api.post('/worker', mdAuth.ensureAuth,WorkerController.saveWorker);
 api.get('/worker', mdAuth.ensureAuth,WorkerController.getWorkers);
 

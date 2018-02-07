@@ -3,11 +3,7 @@
 module.exports = (sequelize, DataTypes) => {
 
   const Worker = sequelize.define("worker", {
-
-  _id: { 
-          type: DataTypes.INTEGER,
-        },
-
+    
   name: { 
           type: DataTypes.STRING    
         },

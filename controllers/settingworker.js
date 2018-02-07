@@ -39,14 +39,17 @@ function saveSetting(req, res) {
     if(req.file)
     {
         if (req.file.mimetype == "image/jpeg" || req.file.mimetype == "image/png") {
+
             var path = "./public/uploads/" + req.file.filename
+            var name = process.env.API_URL+"/public/uploads/"+req.file.filename+req.file.originalname
+
             fs.exists(path, function(err) {
                 console.log(`nombre del archivo ${ path }`)
                 // renombrado imagen
-                fs.rename(path, path + '.jpg', function(err) {
+                fs.rename(path, path + req.file.originalname, function(err) {
                     console.log(`archivo renombrado exitosamente:`);
                     // validar otros parámetros
-                    save_params(req,res,params,path,false)
+                    save_params(req,res,params,path,false,name)
                 })
             })
         } else {
@@ -55,7 +58,7 @@ function saveSetting(req, res) {
     }
     else
     {
-        save_params(req,res,params,null,false)
+        save_params(req,res,params,null,false,null)
     }
         
 
@@ -81,13 +84,15 @@ function updateSetting (req,res) {
     {
         if (req.file.mimetype == "image/jpeg" || req.file.mimetype == "image/png") {
             var path = "./public/uploads/" + req.file.filename
+            var name = process.env.API_URL+"/public/uploads/"+req.file.filename+req.file.originalname
+
             fs.exists(path, function(err) {
                 console.log(`nombre del archivo ${ path }`)
                 // renombrado imagen
-                fs.rename(path, path + '.jpg', function(err) {
+                fs.rename(path, path + req.file.originalname, function(err) {
                     console.log(`archivo renombrado exitosamente:`);
                     // validar otros parámetros
-                    save_params(req,res,params,path,true)
+                    save_params(req,res,params,path,true,name)
                 })
             })
         } else {
@@ -96,11 +101,11 @@ function updateSetting (req,res) {
     }
     else
     {
-        save_params(req,res,params,null,true)
+        save_params(req,res,params,null,true,null)
     }
 }
 
-function save_params (req,res,params, path = null, edit = null) 
+function save_params (req,res,params, path = null, edit = null,nameImage=null) 
 {
 
     if(edit)
@@ -108,8 +113,6 @@ function save_params (req,res,params, path = null, edit = null)
         // editar ===============================**
         
         const id = req.params.id;
-        console.log(id)
-        
 
         if (params.codeNumber) 
         {
@@ -123,7 +126,7 @@ function save_params (req,res,params, path = null, edit = null)
 
                 var setting = new Object;
 
-                 setting.nameLogo = path ? path+'.jpg' : null;
+                 setting.nameLogo = nameImage ? nameImage : null;
                       
                 setting.school = req.user.sub
 
@@ -132,15 +135,14 @@ function save_params (req,res,params, path = null, edit = null)
                     setting.codeNumber = params.codeNumber
                 }
                 
-        models.SettingWorker.update(setting, 
-                         {where: { id: id } }).then( function(updateSetting) { 
+                models.SettingWorker.update(setting, {where: { id: id } }).then( function(updateSetting) { 
 
-        if (!updateSetting) {
-          res.status(500).send({ message: 'No se a podido actualizar Setting!' });
-        } else {
-          res.status(200).send({ setting: updateSetting });
-        }
-    })    
+                    if (!updateSetting) {
+                      res.status(500).send({ message: 'No se a podido actualizar Setting!' });
+                    } else {
+                      res.status(200).send({ setting: updateSetting });
+                    }
+                })    
             })
         }
         else
@@ -159,7 +161,7 @@ function save_params (req,res,params, path = null, edit = null)
 
                 var setting = new Object;
                      
-                setting.nameLogo = path ? path+'.jpg' : null;
+                setting.nameLogo = nameImage ? nameImage : null;
                 setting.school = req.user.sub
 
                 if(params.codeNumber)
