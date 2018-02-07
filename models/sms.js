@@ -1,9 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
 
 	const Sms = sequelize.define("sms", {
-	  	_id: { 
-	          type: DataTypes.INTEGER,
-	        },
+	
 	    course_id:{
 	    	type: DataTypes.INTEGER,
 		},

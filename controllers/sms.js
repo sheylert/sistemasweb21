@@ -248,7 +248,7 @@ function countMonthNotConfirm(req, res) {
 
 	if(profileSession)
 	{
-		models.Sms.findAll({ where : {  createdAt: range, status: "DEFAULT" } }).then(result => {
+		models.Sms.findAll({ where : {  createdAt: range, status: "DEFAULT", school_id: req.user.sub } }).then(result => {
 			if(result)
 			{
 				res.json(result)
@@ -261,7 +261,7 @@ function countMonthNotConfirm(req, res) {
 	}
 	else
 	{
-		models.SmsWorker.findAll({ where : {  createdAt: range, status: "DEFAULT" } }).then(result => {
+		models.SmsWorker.findAll({ where : {  createdAt: range, status: "DEFAULT", school_id: req.user.sub } }).then(result => {
 			if(result)
 			{
 				res.json(result)
@@ -391,7 +391,7 @@ function listSmsShipping(req, res) {
 	const profile = Util.profileInSession(req)
 	if(profile)
 	{
-		models.ListSms.findOne({ school: req.user.sub, _id: req.params.id })
+		models.ListSms.findOne({ school: req.user.sub, id: req.params.id })
 		.then((result) => {
 			var promises = [];
 			result.list_sms.forEach(idSms => {

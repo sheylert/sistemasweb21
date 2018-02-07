@@ -3,8 +3,6 @@ const sequelize = new Sequelize("pronota_2019","postgres","admin123", {
 dialect: 'postgres'
 });
 
-
-
 const models = {
 	User: sequelize.import('./user'),
 	Client: sequelize.import('./client'),

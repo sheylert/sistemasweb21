@@ -4,10 +4,6 @@ module.exports = (sequelize, DataTypes) => {
 
   const SettingWorker = sequelize.define("setting_worker", {
 
-  _id: { 
-          type: DataTypes.INTEGER,
-        },
-
   nameLogo: { 
           type: DataTypes.STRING
           //  data: Buffer, contentType: String     

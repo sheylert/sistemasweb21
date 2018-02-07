@@ -193,10 +193,7 @@ function save_params (req,res,params, path = null, edit = null)
                     if (!settingStorage) {
                       res.status(500).send({ message: 'Error al guarda perfil' });
                     } else {
-                     models.Setting.update({ _id: settingStorage.id }, 
-                        {where: { id: settingStorage.id } }, {new : true}).then( result => {
-                       res.status(200).send( {resu: result});
-                    })
+                          res.status(200).send( {resu: settingStorage});
                     }
                 });
             } else {

@@ -3,9 +3,6 @@
 module.exports = (sequelize, DataTypes) => {
 
 	const ListSmsWorker = sequelize.define("list_sms_worker", {
-  	_id: { 
-          type: DataTypes.INTEGER,
-        },
     user_id: {
     	type: DataTypes.INTEGER
     },

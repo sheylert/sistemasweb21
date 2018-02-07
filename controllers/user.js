@@ -63,12 +63,7 @@ function saveUser(req, res) {
                       res.status(404).send({ message: 'No se ha guardado correctamente' });
                     } else 
                     {
-
-                    models.User.update({ _id: insertarUser.id }, 
-                        {where: { id: insertarUser.id }, returning: true }).then( result => {
-
-                         res.status(200).send({ user: insertarUser });
-                       });     
+                         res.status(200).send({ user: insertarUser });   
                    }     
 
             });
@@ -162,7 +157,6 @@ function login(req, res) {
 
                     if (schoolStoraged) {
                       if (user.dataValues.school) {
-
                         user.dataValues.school = user.dataValues.clientes.dataValues
                         res.status(200).send({
                           user: user.dataValues,
@@ -229,7 +223,7 @@ function sendSmsMasiveNewApi(req,res){
     quantityErrorCount = 0,
     quantitySuccessCount = 0
   // buscamos el template
-  Template.findOne({ _id: params.template }).exec((err, template) => {
+  Template.findOne({ id: params.template }).exec((err, template) => {
     if (err) {
       res.status(500).send({ message: "Error al buscar el template" })
     }
@@ -239,13 +233,13 @@ function sendSmsMasiveNewApi(req,res){
       }
       else {
         mensaje = template.template_text
-        idTemplate = template._id
+        idTemplate = template.id
       }
     }
 
     // iteramos por cada estudiante
     params.estudiante.forEach(function (ele, index) {
-      arregloConsultas.push(Student.findOne({ _id: ele }).populate('responsable').exec((err, student) => {
+      arregloConsultas.push(Student.findOne({ id: ele }).populate('responsable').exec((err, student) => {
         /*Settings.findOne( {school: student.school} ).select('codeNumber').exec((err,setting) => {
           
         })*/
@@ -374,7 +368,7 @@ function sendSmsMasive(req, res) {
     quantitySuccessCount = 0,
     codigoPais = 56;
   // buscamos el template
-  models.Template.findOne({ where : { _id: params.template } }).then( template => {
+  models.Template.findOne({ where : { id: params.template } }).then( template => {
     
     if (!template) {
       res.status(200).send({ message: "No se encontro ningún template" })
@@ -383,7 +377,7 @@ function sendSmsMasive(req, res) {
     else 
     {
       mensaje = template.template_text
-      idTemplate = template._id
+      idTemplate = template.id
     }
     if(req.user.profile.slug.indexOf('ENTERPRISE') === -1)
     {
@@ -415,7 +409,7 @@ function sendSmsMasive(req, res) {
 
       if(req.user.profile.slug.indexOf('ENTERPRISE') === -1)
       {
-        arregloConsultas.push(models.Student.findOne({ where: { _id: ele } }).populate('responsable').exec((err, student) => {
+        arregloConsultas.push(models.Student.findOne({ where: { id: ele } }).populate('responsable').exec((err, student) => {
           models.Settings.findOne( { where :{school: ele.school} }).select('codeNumber').exec((err,setting) => {
             
           })
@@ -428,7 +422,7 @@ function sendSmsMasive(req, res) {
       else
       {
 
-        arregloConsultas.push(models.Worker.findOne({ where: { _id: ele } }).then(worker => {
+        arregloConsultas.push(models.Worker.findOne({ where: { id: ele } }).then(worker => {
           
           // buscamos en la configuración el código de tlf internacional para agg como prefijo al tlf
 
@@ -503,7 +497,7 @@ function sendSmsSingle(req, res) {
     typeSms = params.type == 1 ? true : false,
     aviso = ''
 
-    models.Template.findOne({ where : { _id: params.template } }).then( template => {
+    models.Template.findOne({ where : { id: params.template } }).then( template => {
     
     if (!template) {
       res.status(200).send({ message: "No se encontro ningún template" })
@@ -512,12 +506,12 @@ function sendSmsSingle(req, res) {
     else 
     {
       mensaje = template.template_text
-      idTemplate = template._id
+      idTemplate = template.id
     }
 
 
     models.Student.findOne( {
-      where: { _id: params.estudiante },
+      where: { id: params.estudiante },
           include: [{
             model: models.Responsable,
             as : 'responsableStudent'

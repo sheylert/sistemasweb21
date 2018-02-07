@@ -27,12 +27,7 @@ function saveWorker(req, res) {
         if (!insertarworkers) {
           res.status(500).send({ message: 'No se ha guardado del Trabajador' });
         } else {
-
-           models.Worker.update({ _id: insertarworkers.id }, 
-            {where: { id: insertarworkers.id }, returning: true }).then( result => {
-
-            res.status(200).json({ worker: result[1][0] });
-        })     
+            res.status(200).json({ worker: insertarworkers });
         }
     })    
   
@@ -100,7 +95,7 @@ function updateWorker(req, res) {
     if (validar) {
 
    models.Worker.update( params, 
-                         {where: { id: params._id } }).then( function(updateworkers) { 
+                         {where: { id: params.id } }).then( function(updateworkers) { 
 
         if (!updateworkers) {
           res.status(500).send({ message: 'No se a podido actualizar profesor!' });

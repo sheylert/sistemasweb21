@@ -19,7 +19,7 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 		if(profileSession)
 		{
 			sms = {
-	          student_id: ele._id,
+	          student_id: ele.id,
 	          template_id: idTemplate,
 	          school_id: req.user.sub,
 	          cursoId: req.body.course,
@@ -34,7 +34,7 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 		else
 		{
 			sms = {
-	          worker_id: ele._id,
+	          worker_id: ele.id,
 	          template_id: idTemplate,
 	          school_id: req.user.sub,
 	          user_id: req.user.userId,
@@ -55,13 +55,13 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
         	if(!profileSession)
         	{
         		models.Worker.update( {lastSms : 'SUCCESS'}, 
-                {where: { id: ele._id } }).then( function(updateworkers) {
+                {where: { id: ele.id } }).then( function(updateworkers) {
 
                 }).catch( err => console.log('error el modificar la notifiacion'))
         	}
         	else
         	{
-        		Student.findByIdAndUpdate( ele._id, { lastSms : "SUCCESS"}, { new: true }, (err, studentUpdated) => {
+        		Student.findByIdAndUpdate( ele.id, { lastSms : "SUCCESS"}, { new: true }, (err, studentUpdated) => {
 					if(err) console.log(err)
 				})        	
         	}
@@ -186,7 +186,7 @@ function storedSmsSingle(req,res,estudiante,idTemplate,typeSms,labsmobileRespons
 	labsmobileResponse = determinatedSuccess(typeSms,labsmobileResponse)
 		
 		let sms = {
-          studentId: estudiante._id,
+          studentId: estudiante.id,
           templateId: idTemplate,
           type: typeSms,
           school: req.user.sub,
@@ -208,7 +208,7 @@ function storedSmsSingle(req,res,estudiante,idTemplate,typeSms,labsmobileRespons
         if(!typeSms)
         {
 		       models.Student.update( {lastSms : "SUCCESS"}, 
-		                         {where: { id: ele._id } }).then( function(studentUpdated) { 
+		                         {where: { id: ele.id } }).then( function(studentUpdated) { 
 
 		        if (!studentUpdated) {
 		          console.log("error");
@@ -235,7 +235,7 @@ function storedSmsSingle(req,res,estudiante,idTemplate,typeSms,labsmobileRespons
 	           else
 	           {
 
-	           	 	arrayId.push(smsStored._id)
+	           	 	arrayId.push(smsStored.id)
 
 	           	 	setTimeout(() => {
 	           	 		let listSms = {

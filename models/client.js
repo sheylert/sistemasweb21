@@ -4,10 +4,6 @@
 module.exports = (sequelize, DataTypes) => {
 
   const Client = sequelize.define("client", {
-
-  _id: {  
-          type: DataTypes.INTEGER,
-        },
   rbd: { 
           type: DataTypes.STRING    
         },

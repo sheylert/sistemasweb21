@@ -4,9 +4,6 @@ module.exports = (sequelize, DataTypes) => {
 
   const Setting = sequelize.define("setting", {
 
-  _id: { 
-          type: DataTypes.INTEGER,
-        },
 
   dateLimitConfig: { 
           type: DataTypes.DATE    

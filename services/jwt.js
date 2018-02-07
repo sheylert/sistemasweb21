@@ -7,7 +7,7 @@ exports.createToken = function (user) {
   if (user.school) {
     var payload = {
       sub: user.school.id,
-      userId: user._id,
+      userId: user.id,
       name: user.name,
       address: user.address,
       phone: user.phone,

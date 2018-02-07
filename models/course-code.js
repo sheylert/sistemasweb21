@@ -4,10 +4,6 @@
 module.exports = (sequelize, DataTypes) => {
 
   const CourseCode = sequelize.define("coursecode", {
-
-  _id: { 
-          type: DataTypes.INTEGER,
-        },
   name: { 
           type: DataTypes.STRING    
         },
