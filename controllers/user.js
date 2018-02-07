@@ -109,9 +109,15 @@ var password;
 
 function findUser (req,res) {
   const id  = req.params.id
-  const filtro = {
-    school : req.user.sub,
-    id
+  const filtro = {}
+  if(req.user.profile.slug === "SUPER_ADMIN")
+  {
+    filtro.id = id
+  }
+  else
+  {
+    filtro.school = req.user.sub
+    filtro.id = id
   }
 
   models.User.findOne({ where : filtro}).then(result => {
