@@ -27,12 +27,13 @@ function saveCourse(req, res) {
     var params = req.body;
 
     if (params.character && params.dpyp && params.deval && params.code_grade && params.teacher_chief && params.code_teaching) {
-        console.log(params)
+
         models.Course.create(req.body).then( courseStored  => {        
             res.status(200).send({ course: courseStored });
         }).catch(err => {
             res.status(500).json({ message : "Ha ocurrido un error al tratar de guardar el curso"}) 
         })
+
 
     } else {
         res.status(400).send({ message: 'Ingresa los datos correctos para poder registrar al usuario' });
@@ -298,7 +299,9 @@ function deleteCourseSchool(req, res) {
 // GET http://localhost:3789/course
 function getCourses(req, res) {
 
-    models.Course.findAll({ where : { code_school: req.user.sub } }).then( function(courses) { 
+    models.Course.findAll({ where : { code_school: req.user.sub }, 
+        include : [{ all: true }]
+    }).then( function(courses) { 
         res.json(courses)
       }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al buscar todos los cursos"} )) 
 
@@ -436,17 +439,10 @@ function updateCourse(req, res) {
     const courseId = req.params.id;
     const update = req.body;
 
-    Course.findByIdAndUpdate(courseId, update, { new: true }, (err, courseUpdated) => {
-        if (err) {
-            res.status(500).send({ message: 'Error al actualziar curso!' })
-        } else {
-            if (!courseUpdated) {
-                res.status(404).send({ message: 'No se a podido actualizar el curso!' });
-            } else {
-                res.status(200).send({ course: courseUpdated });
-            }
-        }
-    });
+    models.Course.update(update, { where : {id: courseId} }).then(result => {
+        res.status(200).send({ course: result });
+
+    }).catch(err => res.status(500).json({ message: 'Ha ocurrido un error al actualizar el curso' }) )
 }
 
 // Remover item de un array

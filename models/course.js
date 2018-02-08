@@ -40,21 +40,17 @@ code_school: {
         as : 'clientes'
       })
 
-      Course.hasMany(model.Student,{
-        foreignKey: 'course',
-        as : 'cursos'
-      })
-
       Course.belongsTo(model.CourseCode,{
         foreignKey: 'code_grade',
         as : 'code_grade_course'
       })
 
-      /*Course.hasMany(model.Subject,{
-        foreignKey: 'course',
-        as : 'cursos'
-      })*/
+      Course.belongsTo(model.Teacher,{
+        foreignKey: 'teacher_chief',
+        as        : 'profesores'
+      })
     }
+
 
     return Course;
 
