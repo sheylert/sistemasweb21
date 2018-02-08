@@ -340,11 +340,15 @@ function recieveStatusSms(req, res) {
 	const confirmado = req.query.acklevel
 	const id_envio = req.query.subid
 
+	console.log(req.query,'aqui respuesta lasbsmobile')
+
 	models.Sms.findOne({ where: { phone: number },
 		order: [
 			['createt_at', 'DESC']
 		]
 	}).then(resultSearch => {
+
+		console.log('sms encontrado para modificar')
 
 		if (resultSearch) {
 			let string = status == "ok" ? "SUCCESS" : "WARNING"

@@ -27,28 +27,12 @@ function saveCourse(req, res) {
     var params = req.body;
 
     if (params.character && params.dpyp && params.deval && params.code_grade && params.teacher_chief && params.code_teaching) {
-
-        course.character = params.character;
-        course.dpyp = params.dpyp;
-        course.deval = params.deval;
-        course.code_grade = params.code_grade;
-        course.teacher_chief = params.teacher_chief;
-        course.code_teaching = params.code_teaching;
-        //course.code_subject = params.code_subject;
-        //course.code_student = params.code_student;
         console.log(params)
-
-        /*models.Course.create().then( courseStored  => {
-            if (err) {
-                res.status(500).send({ message: 'Error al guarda curso', err: err.errors });
-            } else {
-                if (!savedCourse) {
-                    res.status(404).send({ message: 'No se ha registrado el curso' });
-                } else {
-                    res.status(200).send({ course: savedCourse });
-                }
-            }
-        });*/
+        models.Course.create(req.body).then( courseStored  => {        
+            res.status(200).send({ course: courseStored });
+        }).catch(err => {
+            res.status(500).json({ message : "Ha ocurrido un error al tratar de guardar el curso"}) 
+        })
 
     } else {
         res.status(400).send({ message: 'Ingresa los datos correctos para poder registrar al usuario' });
