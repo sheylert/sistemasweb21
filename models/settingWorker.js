@@ -14,7 +14,9 @@ module.exports = (sequelize, DataTypes) => {
           // numeric ojooooooo
           default: 56,
         },
-
+    image: {
+      type: DataTypes.BLOB
+    },
     school: { 
           type: DataTypes.INTEGER,
         },

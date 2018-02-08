@@ -127,6 +127,7 @@ function save_params (req,res,params, path = null, edit = null,nameImage=null)
                 var setting = new Object;
 
                  setting.nameLogo = nameImage ? nameImage : null;
+                 setting.image = path ? path : null;
                       
                 setting.school = req.user.sub
 
@@ -162,6 +163,7 @@ function save_params (req,res,params, path = null, edit = null,nameImage=null)
                 var setting = new Object;
                      
                 setting.nameLogo = nameImage ? nameImage : null;
+                setting.image = path ? path : null;
                 setting.school = req.user.sub
 
                 if(params.codeNumber)

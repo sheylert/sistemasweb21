@@ -25,9 +25,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ARRAY(DataTypes.INTEGER)
     },
     requestRoute:{
-      type: DataTypes.STRING 
+      type: DataTypes.TEXT('LONG') 
     }
  })
+
 
 
 
