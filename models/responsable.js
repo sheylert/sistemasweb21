@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
 
 Responsable.associate = model => {
     Responsable.hasMany(model.Student, {
-        foreignKey: 'responsable',
+        foreignKey: 'id',
         as: 'studentResponsable'
     })
   }
