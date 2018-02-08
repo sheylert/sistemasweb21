@@ -457,7 +457,6 @@ function sendSmsMasive(req, res) {
     });// fin foreach student
 
     Promise.all(arregloConsultas).then(responsePromise => {
-
       let labsmobileResponse = {
         statusResponseApi : null,
         statusMessageApi  : null,
