@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
 		}
 	})
 
+
 	SmsWorker.associate = model => {
     
 	  	SmsWorker.belongsTo(model.User, {

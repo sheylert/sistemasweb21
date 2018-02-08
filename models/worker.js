@@ -38,8 +38,11 @@ lastSms: {
 school: { 
           type: DataTypes.INTEGER,
         },
-
+checked:{
+          type: DataTypes.BOOLEAN,
+        }
   });
+  
     return Worker;
 
 };

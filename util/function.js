@@ -5,7 +5,7 @@
 
 var models = require('../models');
 
-function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
+function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers,rutaPeticion)
 {
 	let word = typeSms === true ? 'el mensaje' : ' la notificación',
 		arrayId     = [],
@@ -93,7 +93,8 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 				          status: lastSend,
 				          quantitySuccess: labsmobileResponse.quantitySuccess,
 				          quantityError: labsmobileResponse.quantityError,
-				          list_sms: arrayId
+				          list_sms: arrayId,
+				          requestRoute: rutaPeticion
 				        }
 
 	        			models.ListSms.create(listsms).then( function(insertar) { 
@@ -144,7 +145,8 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 				          status: lastSend,
 				          quantitySuccess: labsmobileResponse.quantitySuccess,
 				          quantityError: labsmobileResponse.quantityError,
-				          list_sms: arrayId
+				          list_sms: arrayId,
+				          requestRoute: rutaPeticion
 				        }
 
 	        			models.ListSmsWorker.create(listsms).then( function(insertarworkers) { 

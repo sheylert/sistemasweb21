@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     list_sms:{
       type: DataTypes.ARRAY(DataTypes.INTEGER)
+    },
+    requestRoute:{
+      type: DataTypes.STRING 
     }
  })
 

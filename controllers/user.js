@@ -26,7 +26,6 @@ var UtilPrueba     = require('../util/functionPrueba')
 var jwt = require('../services/jwt');
 
 
-
 function saveUser(req, res) {
  
    var user = new Object();
@@ -476,14 +475,14 @@ function sendSmsMasive(req, res) {
             aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos'
             labsmobileResponse.statusResponseApi = response.statusCode
             labsmobileResponse.statusMessageApi  = response.statusMessage
-            Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
+            Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers,urlRequest)
           }
           else 
           {
             aviso = 'Mensajería Enviada con Éxito'
             labsmobileResponse.statusResponseApi = response.statusCode
             labsmobileResponse.statusMessageApi  = response.statusMessage
-            Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers)
+            Util.storedSmsMasive(req,res,responsePromise,idTemplate,typeSms,labsmobileResponse,total_estudiantes,aviso,numbers,urlRequest)
 
           } // fin si no hubo error
         }) // fin funcion request*/
