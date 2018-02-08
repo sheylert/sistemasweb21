@@ -19,12 +19,12 @@ var CourseCodeController = require('../controllers/course-code');
 
 var SettingController = require('../controllers/setting');
 var SettingWorkerController = require('../controllers/settingworker');
+var SubjectController = require('../controllers/subject');
+var CourseManagementController = require('../controllers/courseManagement');
 
 /*
-var SubjectController = require('../controllers/subject');
 
 var StudentExcelController = require('../controllers/studentExcel');
-var CourseManagementController = require('../controllers/courseManagement');
 
 var NotificationController = require('../controllers/notification')
 var ResponsableController = require('../controllers/responsable');
@@ -68,7 +68,7 @@ api.put('/course/:idCourse/student', mdAuth.ensureAuth,CourseController.deleteCo
 
 // Course assign or remove subject to course
 api.post('/course/:idCourse/subject', mdAuth.ensureAuth,CourseController.saveCourseSubject);
-api.delete('/course/:idCourse/subject', mdAuth.ensureAuth,CourseController.deleteCourseSubject);
+api.post('/course/:idCourse/subject/delete', mdAuth.ensureAuth, CourseController.deleteCourseSubject);
 
 
 // Teacher
@@ -124,7 +124,7 @@ api.post('/profile', mdAuth.ensureAuth,ProfileController.saveProfile);
 api.get('/profile', mdAuth.ensureAuth,ProfileController.getProfiles);
 
 
-/*
+
 // Subject
 api.get('/subject', mdAuth.ensureAuth,SubjectController.showAllSubjects)
 api.post('/subject', mdAuth.ensureAuth,SubjectController.saveSubject)
@@ -132,7 +132,7 @@ api.get('/subject/:id', mdAuth.ensureAuth,SubjectController.getSubject)
 api.put('/subject/:id', mdAuth.ensureAuth,SubjectController.updateSubject)
 api.delete('/subject/:id', mdAuth.ensureAuth,SubjectController.deleteSubject)
 
-*/
+
 // Template
 api.get('/template', mdAuth.ensureAuth,TemplateController.getAllTemplates)
 api.post('/template', mdAuth.ensureAuth,TemplateController.saveTemplate)
@@ -173,7 +173,6 @@ api.post('/setting_worker', mdAuth.ensureAuth, images.single('logo'), SettingWor
 api.put('/setting_worker/:id',mdAuth.ensureAuth, images.single('logo'), SettingWorkerController.updateSetting)
 
 
-/*
 // Course Management
 api.get('/courseManagement', mdAuth.ensureAuth,CourseManagementController.getAllCourses) // Ruta para buscar todos los cursos
 api.put('/courseManagement/:id', mdAuth.ensureAuth,CourseManagementController.masiveAssingStudentNote) // Ruta para almacenar masivamente las notas
@@ -190,12 +189,12 @@ api.get('/courseManageDelayStored/:id', mdAuth.ensureAuth,CourseManagementContro
 api.get('/courseManageEvent/:id', mdAuth.ensureAuth,CourseManagementController.listEvents) // Ruta para listar todos los eventos de un curso
 api.post('/courseManageEvent', mdAuth.ensureAuth,CourseManagementController.saveEvent) // Ruta para guardar un evento
 
-api.get('/responsable', mdAuth.ensureAuth,ResponsableController.getResponsables);
-api.post('/responsable', mdAuth.ensureAuth,ResponsableController.saveResponsable);
+//api.get('/responsable', mdAuth.ensureAuth,ResponsableController.getResponsables);
+//api.post('/responsable', mdAuth.ensureAuth,ResponsableController.saveResponsable);
 
 // Notifications 
-api.get('/course_notifications/:id', mdAuth.ensureAuth,NotificationController.getData) // se buscan los estudiantes del curso
-api.get('/get_notifications/:id', mdAuth.ensureAuth,NotificationController.getNotifications) // buscar las notificaciones*/
+//api.get('/course_notifications/:id', mdAuth.ensureAuth,NotificationController.getData) // se buscan los estudiantes del curso
+//api.get('/get_notifications/:id', mdAuth.ensureAuth,NotificationController.getNotifications) // buscar las notificaciones*/
 
 // Sms
 api.get('/countsmsbyschool/:idSchool', mdAuth.ensureAuth,SmsController.countSmsBySchool) 

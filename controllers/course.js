@@ -5,19 +5,10 @@
 var bcrypt = require('bcrypt-nodejs');
 var chalk = require('chalk');
 // modelos
-var Course = require('../models/course');
+
 var models = require('../models');
 
-var Teacher = require('../models/teacher');
-
-
-//var Student = require('../models/student');
-//var Subject = require('../models/subjects');   //ojojojojojo
-//var Note = require('../models/note');
-
-// services
-var jwt = require('../services/jwt');
-
+// funciones de ayuda
 var Util     = require('../util/function')
 
 // Registrar Curso
@@ -132,72 +123,65 @@ function deleteCourseStudent(req, res, next) {
 function saveCourseSubject(req, res) {
     const idCourse = req.params.idCourse;
     const params = req.body;
-
-    // verificar que la asignatura exista
-    Subject.findById(params.idSubject, (err, subjectFound) => {
-        if (err) {
-            res.status(500).send({ message: 'Ha ocurrido un error en la búsqueda', err: err });
-        }
-        if (!subjectFound) {
-            res.status(200).send({ message: 'No se ha encontrado la asignatura' });
-        }
-    });
-
-    // formato de nueva asignatura
-    const newSubject = {
-        "idSubject": new mongoose.mongo.ObjectId(params.idSubject),
-        "entryTime": params.entryTime,
-        "departureTime": params.departureTime,
-        "days": {
-            "0": params.days.sun,
-            "1": params.days.mon,
-            "2": params.days.tue,
-            "3": params.days.wes,
-            "4": params.days.thu,
-            "5": params.days.fri,
-            "6": params.days.sat,
-        }
-    }
+    let promises = []
+    let validate = false
 
     // Validación de parámetros
-    if (params.idSubject && params.entryTime && params.departureTime) {
+    if (params.id) {
         console.log(chalk.yellow('parametro asignatura recibido... '));
 
-        Course.findById(idCourse, function(err, courseFound) {
-            if (err) {
-                res.status(500).send({ message: 'Ha ocurrido un error en la búsqueda', err: err });
-            }
+        models.Course.findById(idCourse).then(courseFound => {
             if (courseFound) {
                 // si ya existe asignatura agregadas al curso
                 if (courseFound.code_subject.length > 0) {
                     // verificar que no este agregado
-                    courseFound.code_subject.forEach(element => {
-                        if (element.idSubject.toString() == params.idSubject.toString()) {
-                            console.log(chalk.red('ya existe la asignatura agregado'));
-                            res.status(200).send({ message: 'Ha ocurrido un error: la asignatura ya se encuentra agregada' });
-                        }
 
-                    });
+                    promises.push(
+                        courseFound.code_subject.forEach(element => {
+                            if (element.toString() === params.id.toString()) {
+                                validate = true         
+                            }
+                        })
+                    )
+
                     // agregando asignatura
-                    courseFound.code_subject.push(newSubject);
-                    courseFound.save();
-                    console.log(chalk.green(`asignatura agregada: ${courseFound}`));
-                    res.status(200).send(courseFound);
+                    Promise.all(promises).then( response => {
+                        if(!validate)
+                        {
+                            courseFound.code_subject.push(params.id);
+                            models.Course.update({ code_subject: courseFound.code_subject},{ where: {id: courseFound.id} }).then(courseUpdate => {
+                                res.status(200).send(courseFound);    
+                            }).catch(err => res.status(500).json({ message: "Error al tratar de modificar el curso"}))
+
+                            console.log(chalk.green(`asignatura agregada en bloque1: ${courseFound}`));
+                            
+                        }
+                        else
+                        {
+                            res.status(500).send({ message: 'La asignatura ya se encuentra agregada y no puede volverse a agregar' })
+                        }
+                            
+                    })
+                    .catch(rejected =>  res.status(500).send({ message: 'Ha ocurrido un error: la asignatura ya se encuentra agregada' }) )
                 }
                 if (courseFound.code_subject.length == 0) {
                     // agregando asignatura
-                    courseFound.code_subject.push(newSubject);
-                    courseFound.save();
-                    console.log(chalk.green(`asignatura agregada: ${courseFound}`));
-                    res.status(200).send(courseFound);
+                    courseFound.code_subject.push(params.id);
+
+                    models.Course.update({ code_subject: courseFound.code_subject},{ where: {id: courseFound.id} }).then(courseUpdate => {
+                        res.status(200).send(courseFound);    
+                        console.log(chalk.green(`asignatura agregada: ${courseFound}`));
+                    }).catch(err => res.status(500).json({ message: "Error al tratar de modificar el curso"}))
                 }
 
-            }
+            } // fin curso encontrado
             if (!courseFound) {
                 res.status(200).send({ message: 'No hay ninguna asignatura con ese id' });
-
             }
-        });
+        }).catch(err => {
+            res.status(500).json({ message: "Error al buscar el curso para agregar asignautra"})
+            console.log(err)
+        })
 
     } else {
         res.status(500).send({ message: 'Parámetro no recibido' });
@@ -210,40 +194,32 @@ function deleteCourseSubject(req, res, next) {
     const idCourse = req.params.idCourse;
     const params = req.body;
 
-    if (params.idSubject) {
+    if (params.id) {
 
-        Course.findById(idCourse, function(err, courseFound) {
-            if (err) {
-                res.status(500).send({ message: 'Ha ocurrido un error en la búsqueda', err: err });
-            }
-            if (!courseFound) {
-                res.status(200).send({});
-            }
+        models.Course.findById(idCourse).then(courseFound => {
             if (courseFound) {
                 // notificar si existe la asignatura o no
                 let subjectExist = false;
                 // verificar este agregado
                 courseFound.code_subject.forEach((element, index) => {
-                    if (element.idSubject.toString() == params.idSubject.toString()) {
+                    if (element.toString() === params.id.toString()) {
                         subjectExist = true;
                         // removiendo curso
                         courseFound.code_subject.splice(index, 1);
                         // actualizar curso
-                        courseFound.save((err, courseSaved) => {
-                            if (err) res.status(500).send({ message: "Ha ocurrido un error", error: err })
-                            if (courseSaved) res.status(200).json({ courseFound });
-                        });
+                        models.Course.update({ code_subject: courseFound.code_subject}, {where: {id: courseFound.id}} ).then(courseUpdate => {
+                            res.status(200).json({ courseFound })
+                        })
                     }
                 });
                 if (subjectExist == false) {
                     res.status(200).json({ message: 'No existe la asignatura asociada al curso' });
                 }
             }
-        });
+        }).catch(err => res.status(500).json({ message: "Error al buscar el curso a modificar"}) )
 
     } else {
-        res.status(500).send({ message: 'Parámetro idSubject no recibido' });
-
+        res.status(500).send({ message: 'Parámetro id no recibido' });
     }
 }
 
@@ -349,46 +325,31 @@ function getCourses(req, res) {
 
 */
 
-// Mostrar todos los Cursos
 // GET http://localhost:3789/course/:id
 function getCourse(req, res) {
 
     // Función para buscar el curso seleccionado
-    models.Course.findAll({ where : { _id: req.params.id } }).populate([{
-            path: 'teacher_chief',
-            model: 'Teacher'
-        },
-        {
-            path: 'code_teaching',
-            model: 'Teaching'
-        },
-        {
-            path: 'code_grade',
-            model: 'CourseCode'
-        },
-        {
-            path: 'code_subject',
-            model: 'Subject'
-        },
-        {
-            path: 'code_student',
-            model: 'Student'
-        },
-        {
-            path: 'code_school',
-            model: 'Client'
-        }
-    ]).exec((err, courses) => {
-        if (err) {
-            res.status(500).send({ message: 'Error en la petición', err: err })
-        } else {
-            if (!courses) {
-                res.status(200).send({ message: 'No existen cursos registrados' })
-            } else {
-                res.status(200).send(courses);
-            }
-        }
-    });
+    models.Course.findAll({ where : { id: req.params.id }, include:[{
+            all: true
+        }] 
+    }).then(result => {
+
+        let subjects = []
+
+        result[0].code_subject.forEach( function(element, index) {
+            
+            models.Subject.findById(element).then(resultSubject => {
+                subjects.push(resultSubject)
+
+                if(index + 1 == result[0].code_subject.length)
+                {
+                    result[0].code_subject = subjects
+                    res.json(result)
+                }
+            })
+        });
+        
+    }).catch(err => res.status(500).json({ message: 'Ha ocurrido un error al buscar los datos del curso'}))
 }
 
 // Mostrar Escuela asociado a Curso

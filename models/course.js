@@ -45,6 +45,11 @@ code_school: {
         as : 'code_grade_course'
       })
 
+      Course.hasMany(model.Student,{
+        foreignKey: 'school',
+        as : 'estudiantes'
+      })
+
       Course.belongsTo(model.Teacher,{
         foreignKey: 'teacher_chief',
         as        : 'profesores'

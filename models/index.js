@@ -10,6 +10,7 @@ const models = {
 	Profile: sequelize.import('./profile'),
 	Course: sequelize.import('./course'),
 	Teacher: sequelize.import('./teacher'),
+	Subject: sequelize.import('./subject'),
 	Student: sequelize.import('./student'),
 	Teaching: sequelize.import('./teaching'),
 	Template: sequelize.import('./template'),
@@ -21,7 +22,9 @@ const models = {
 	ListSms : sequelize.import('./listSms'),
 	Sms     : sequelize.import('./sms'),
 	ListSmsWorker : sequelize.import('./listSmsWorker'),
-	SmsWorker     : sequelize.import('./smsWorker')
+	SmsWorker : sequelize.import('./smsWorker'),
+	Annotation : sequelize.import('./annotation'),
+	Retire  : sequelize.import('./retire')
 }; 
 
 Object.keys(models).forEach((modelName) => {
