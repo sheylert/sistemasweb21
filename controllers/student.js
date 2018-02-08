@@ -1,7 +1,7 @@
 'use strict'
 
 // libreria de cifrado 
-var bcrypt = require('bcrypt-nodejs');
+var bcrypt = require('bcrypt');
 
 // modelos
 var Student = require('../models/student');
@@ -27,18 +27,21 @@ var Util     = require('../util/function')
 var emailValidator = require('email-validator')
 var chalk = require('chalk')
 
+
 function getAllStudent(req, res) {
-    // Función para buscar todos los estudiantes
 
-    // inner con responsable ojooooooo
-
-    models.Student.findAll( { where: { school: 1, state: true }} ).then( function(students) { 
-     
+   // Función para buscar todos los estudiantes
+      models.Student.findAll({ where: { school: req.user.sub, state: true },
+      include: [{
+        model: models.Responsable,
+        as : 'responsableStudent'
+      }]
+}).then( function(students) { 
+   
      if (!students) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
           if (students) {
-
             /*
             students.forEach(function(elemento) {
 
@@ -66,7 +69,12 @@ function getAllStudentClient(req, res) {
     // ojo 
     // inner con responsable
 
-    models.Student.findAll( { where: { school: 1, state: true }} ).then( function(students) { 
+     models.Student.findAll({ where: { school: req.user.sub, state: true },
+      include: [{
+        model: models.Responsable,
+        as : 'responsableStudent'
+      }]
+}).then( function(students) { 
      
      if (!students) {
           res.status(500).send({ message: 'Error en la petición' });
@@ -98,6 +106,141 @@ function getAllStudentWithoutCourse(req, res) {
 function saveStudent(req, res) {
 
     // Función para guardar todos los Estudiantes
+var params = req.body
+
+models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
+    if(result)
+    {     
+      res.status(404).send({ message: `El alumno ${params.name} ${params.lastname} ya se encuentra registrado` })
+    }
+    else
+    {
+              var student={};
+
+                student.name = params.name
+                student.lastname = params.lastname
+                student.rut = params.rut
+                // student.code_grade = params.code_grade
+                // student.code_teaching = params.code_teaching
+                // student.character = params.character
+                student.birth_date = '2018-01-01' //params.birth_date
+                student.age = params.age
+                student.course = null
+                student.state = true
+                student.school = req.user.sub
+
+                models.Responsable.findOne({ where: { rut:  params.rut_res }}).then( responsable => {
+                if(responsable)
+                {
+
+                        console.log("ssssssssssssssssssssss");
+
+                        student.responsable = responsable.id
+                                         
+                        models.Student.create(student).then( function(studentStore) 
+                        { 
+                          if (!studentStore) 
+                              {
+                               res.status(404).send({ message: 'No se ha guardado el estudiante' });
+                              } else {
+                               //studentStore.respon = responStore;
+                               res.status(200).send({ Student: studentStore });
+                              }
+                        });   
+                }
+                else
+                {
+                     var respon={}; 
+
+                            respon.name = params.name_res
+                            respon.lastname = params.lastname_res
+                            respon.rut = params.rut_res
+                            respon.email = params.email_res
+                            respon.phone = params.phone_res
+                            respon.address = params.address_res
+
+                            if (emailValidator.validate(respon.email)) 
+                            { 
+                                 models.Responsable.create(respon).then( function(responStore) { 
+
+                                    if (!responStore) {
+                                     res.status(500).send({ message: 'Error al guardar el responsable' });
+                                    } else {
+
+                                        console.log("guardo");
+
+                                        models.Profile.findOne({ where: { slug:  'RESPONSABLE' }}).then( profile => {
+                                       
+                                        if(profile)
+                                        {
+                                                    student.responsable = responStore.id
+
+                                                    var user={}; 
+
+                                                    user.name = params.name_res +' '+params.lastname_res;
+                                                    user.address = params.address_res;
+                                                    user.phone = params.phone_res;
+                                                    user.school = req.user.sub
+                                                    user.profile_id = profile.id;
+                                                    user.email = params.email_res;
+                                                    user.password = bcrypt.hashSync(params.email_res, 10);
+                                                    user.state = true;
+                                                    user.services = true;
+                                                    user.validatePass = false;
+                    
+                                                    user.responId = responStore.id
+                                                       
+                                                    models.User.create(user).then( function(userStore) { 
+
+                                                    if (!userStore) {
+                                                        
+                                                        res.status(500).send({ message: 'Error al guardar el usuario del responsable' });
+                                                        
+                                                        console.log(" nooooooooo guardo usuario"); 
+
+                                                    } else {
+ 
+                                                            models.Student.create(student).then( function(studentStore) 
+                                                            { 
+
+                                                            if (!studentStore) 
+                                                               {
+                                                                res.status(404).send({ message: 'No se ha guardado el estudiante' });
+                                                               } else {
+                                                                studentStore.respon = responStore;
+                                                                res.status(200).send({ Student: studentStore });
+                                                               }
+                                                              
+                                                              });  
+                                                            }
+                                                 });
+                                                            
+                                        }else
+                                        {
+                                               res.status(404).send({ message: "No tiene registrado el permiso de RESPONSABLE en perfiles" })
+                                        }
+                                    });
+                                   }  // fin del  !responStore   
+                                })    
+
+                            } else 
+                            { res.status(404).send({ message: "formato de email invalido" }) }    
+
+                    }
+                }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el responsable"}) )
+
+    }
+  }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el estudiante"}) )
+
+
+
+
+
+
+
+
+    /*
+
 
     var params = req.body
 
@@ -231,6 +374,12 @@ function saveStudent(req, res) {
 
             } // **fin no se encuetra el alumno registrado**
         }) // ** fin function find student **
+
+
+*/
+
+
+
 }
 
 function getStudent(req, res) {

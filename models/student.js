@@ -26,6 +26,8 @@ character: {
 date: { 
           type: DataTypes.DATE  
           // default: Date.now ojoooooo  
+          // ELIMINAR
+
         },
 
 birth_date: { 

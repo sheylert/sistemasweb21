@@ -155,7 +155,11 @@ api.get('/student/responsable/:idResponsable', mdAuth.ensureAuth,StudentControll
 api.get('/student/allData/:idStudent', mdAuth.ensureAuth,StudentController.showAllDataStudent) // mostrar todos los datos asociados a un estudiante
 api.get('/student_floating', mdAuth.ensureAuth,StudentController.getAllStudentWithoutCourse) // ruta para ver los estudiantes sin cursos
 api.get('/student/:id', mdAuth.ensureAuth,StudentController.getStudent) // Ruta para buscar un estudiante
+
+*/
 api.post('/student', mdAuth.ensureAuth,StudentController.saveStudent) // Ruta para guardar los estudiantes
+
+/*
 api.put('/student/:id', mdAuth.ensureAuth,StudentController.updateStudent) // Ruta para actualizar un estudiante
 api.delete('/student/:id', mdAuth.ensureAuth,StudentController.deleteStudent) // Ruta para eliminar un estudiante
 api.get('/student/countstudentbyschool/:idSchool', mdAuth.ensureAuth,StudentController.countStudentBySchool) //contar estudiantes de una escuela
