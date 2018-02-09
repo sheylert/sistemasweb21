@@ -190,39 +190,60 @@ function listStudent(req,res)
 
     models.Course.findAll({ where: {id: req.params.id},
         include: [{
-            model : models.Student,
-            as    : 'estudiantes',
-            include: [{
-                model: models.Responsable,
-                as   : 'responsableStudent'
-            }]
-        },{
             model : models.Teacher,
             as    : 'profesores' 
         }]
     }).then(result => {
 
-        let subjects = [],
-            promise  = []
+        let subjects = []
+        let students = []
+        let promises = []
 
-        result[0].code_subject.forEach( function(element, index) {
-            
-            promise.push(
-                models.Subject.findById(element).then(subjectFinded => {
-                    subjects.push(subjectFinded)
-                 })
-            )
-        })
+        if(result[0].code_subject.length > 0 || result[0].code_student.length > 0)
+        {
+            result[0].code_subject.forEach( function(element, index) {
+                
+                promises.push(
+                    models.Subject.findById(element).then(resultSubject => {
+                        subjects.push(resultSubject)
 
-        Promise.all(promise).then(response => {
+                        if(index + 1 == result[0].code_subject.length)
+                        {
+                            result[0].code_subject = subjects
+                        }
+                    })
+                )
 
-            result[0].code_subject = subjects 
+            }); // foreach asignaciones
+
+
+            result[0].code_student.forEach( function(element, index) {
+                
+                promises.push(
+                    models.Student.findOne({where: {id : element} }).then(resultStudent => {
+                        students.push(resultStudent)
+
+                        if(index + 1 == result[0].code_student.length)
+                        {
+                            result[0].code_student = students
+                        }
+                    })
+                )
+            }); // foreach Estudiantes
+
+            Promise.all(promises).then(response => {
+                res.json(result)       
+            }).catch(err => res.status(500).json({ message: "Error al buscar los estudiantes o las asignaturas"}))
+
+        }
+        else
+        {
             res.json(result)
-        })
+        }
 
     }).catch( err => {
-        console.log(err,'aquii los errores del curso ==========================================')
         res.status(500).json({ message: "Ha ocurrido un error buscando los datos del curso"})
+        console.log(err)
     })
 }
 
@@ -256,12 +277,11 @@ function listStudentAnnotation(req,res)
        ========================================================================================================= */
     
     
-    models.Annotation.findAll({ where: {course_id : req.params.idCourse, school_id: req.user.sub },
+    models.Annotation.findAll({ where: {course_id : req.params.id, school_id: req.user.sub },
         include: [{ all: true}]
     }).then(result => {
         res.json(result)
     }).catch(err => {
-        console.log(err,'aquii los erroress')
         res.status(500).json({ message: "Ha ocurrido un error buscando las anotaciones registradas"})
     })
 }
@@ -273,13 +293,38 @@ function listStudentRetire(req,res)
         Se debe pasar el id del curso como parametro
        ========================================================================================================= */
 
-    Course.findAll({ where :{ id : req.params.id },
-        include: [{
-            model: models.CourseCode,
-            as   : 'code_grade_course'
-        }]
+    Course.findAll({ where :{ id : req.params.id }
     }).then(result => {
-        res.json(result)
+
+        let students = []
+        let promises = []
+        
+        if(result[0].code_student.length > 0)
+        {
+
+            result[0].code_student.forEach( function(element, index) {
+                
+                promises.push(
+                    models.Student.findOne({where: {id : element} }).then(resultStudent => {
+                        students.push(resultStudent)
+
+                        if(index + 1 == result[0].code_student.length)
+                        {
+                            result[0].code_student = students
+                        }
+                    })
+                )
+            }); // foreach Estudiantes
+
+            Promise.all(promises).then(response => {
+                res.json(result)       
+            }).catch(err => res.status(500).json({ message: "Error al buscar los estudiantes o las asignaturas"}))
+
+        }
+        else
+        {
+            res.json(result)
+        }
     }).catch( err => res.status(500).json({ message: 'Ha ocurrid un error bucando los datos del ccuro'}))
 }
 

@@ -21,10 +21,10 @@ var SettingController = require('../controllers/setting');
 var SettingWorkerController = require('../controllers/settingworker');
 var SubjectController = require('../controllers/subject');
 var CourseManagementController = require('../controllers/courseManagement');
+var StudentExcelController = require('../controllers/studentExcel');
 
 /*
 
-var StudentExcelController = require('../controllers/studentExcel');
 
 var NotificationController = require('../controllers/notification')
 var ResponsableController = require('../controllers/responsable');
@@ -140,20 +140,17 @@ api.get('/template/:id', mdAuth.ensureAuth,TemplateController.getTemplate)
 api.put('/template/:id', mdAuth.ensureAuth,TemplateController.updateTemplate)
 
 
-/*
+
 // Student 
 api.get('/student_download',StudentExcelController.donwloadFile)
 api.post('/student_import',mdAuth.ensureAuth,upload.single('file_excel'),StudentExcelController.masiveAssing)
-
-*/
 api.get('/student', mdAuth.ensureAuth,StudentController.getAllStudent) //Ruta para ver todos los estudiantes
-
 api.get('/student/:client', mdAuth.ensureAuth,StudentController.getAllStudentClient) //Ruta para ver todos los estudiantes filtrados por el id de una escuela
+api.get('/student_floating', mdAuth.ensureAuth,StudentController.getAllStudentWithoutCourse) // ruta para ver los estudiantes sin cursos
 
 /*
 api.get('/student/responsable/:idResponsable', mdAuth.ensureAuth,StudentController.showStudentByResponsable) // mostrar estudiantes asociados a aponderados
 api.get('/student/allData/:idStudent', mdAuth.ensureAuth,StudentController.showAllDataStudent) // mostrar todos los datos asociados a un estudiante
-api.get('/student_floating', mdAuth.ensureAuth,StudentController.getAllStudentWithoutCourse) // ruta para ver los estudiantes sin cursos
 api.get('/student/:id', mdAuth.ensureAuth,StudentController.getStudent) // Ruta para buscar un estudiante
 
 */

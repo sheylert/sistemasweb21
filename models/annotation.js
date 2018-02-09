@@ -1,6 +1,5 @@
 'use strict'
 
-
 module.exports = (sequelize, DataTypes) => {
 
   const Annotation = sequelize.define("annotation", {
