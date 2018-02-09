@@ -293,19 +293,24 @@ function listStudentRetire(req,res)
         Se debe pasar el id del curso como parametro
        ========================================================================================================= */
 
-    Course.findAll({ where :{ id : req.params.id }
+    models.Course.findAll({ where :{ id : req.params.id }
     }).then(result => {
 
         let students = []
         let promises = []
-        
+
         if(result[0].code_student.length > 0)
         {
 
             result[0].code_student.forEach( function(element, index) {
                 
                 promises.push(
-                    models.Student.findOne({where: {id : element} }).then(resultStudent => {
+                    models.Student.findOne({where: {id : element},
+                        include: [{
+                            model: models.Responsable,
+                            as   : 'responsable'
+                        }]
+                    }).then(resultStudent => {
                         students.push(resultStudent)
 
                         if(index + 1 == result[0].code_student.length)
@@ -334,30 +339,18 @@ function saveStudentRetire(req,res)
 
     let params = req.body, 
         saveData   = {
-            studentId: params.student_id,
+            student_id: params.student_id,
             course_id   : params.course_id,
+            school_id   : req.user.sub,
             date     : new Date(params.date),
-            detail   : params.detail,
-            school_id   : req.user.sub
-        },
-        retire = new Retire(saveData)
+            detail   : params.detail
+        }
 
-        retire.save((err,retireStore) => {
-            if(err)
-            {
-                res.status(500).send({ message: "Ha ocurrido un error antes de guardar el retiro" })
-            }
-            else
-            {
-                if(!retireStore)
-                {
-                    res.status(404).send({ message: "No se ha podido guardar el retiro" })
-                }
-                else
-                {
-                    res.status(200).send({ Retire: retireStore })
-                }
-            }
+        models.Retire.create(saveData).then(retiredStored => {    
+            res.status(200).send({ Retire: retiredStored })
+        }).catch(err =>  {
+            console.log(err)
+            res.status(500).json({ message: "Ha ocurrido un error al guardar el retiro"})
         })
 }
 
@@ -367,18 +360,21 @@ function listStudentRetireStored(req,res)
                 Función para listar retiros por alumnos, se filtran los retiros por el id del alumno
        ========================================================================================================= */
 
-    Retire.findAll({ where: {course_id: req.params.idCourse, school_id: req.user.sub },
+    models.Retire.findAll({ where: {course_id: req.params.id, school_id: req.user.sub },
         include: [{
             model: models.Student,
-            as   : 'estudiantes',
+            as   : 'estudiante',
             include:[{
                 model: models.Responsable,
-                as   : 'responsableStudent'
+                as   : 'responsable'
             }] 
         }]
     }).then(retires =>{
         res.status(200).send(retires);
-    }).catch(err => res.status(500).send({ message: 'Error en la ejecución de la busqueda de retiros' }))
+    }).catch(err =>{ 
+        console.log(err)
+        res.status(500).send({ message: 'Error en la ejecución de la busqueda de retiros' })
+    })
 }
 
 function listStudentDelay(req,res)
@@ -389,25 +385,44 @@ function listStudentDelay(req,res)
        ========================================================================================================= */
     
 
-    Course.find({ _id : req.params.id }).populate([
+    models.Course.findAll({ where :{ id : req.params.id }
+    }).then(result => {
+
+        let students = []
+        let promises = []
+
+        if(result[0].code_student.length > 0)
         {
-            path: 'code_student',
-            model: 'Student',
-            populate: {
-                path: 'responsable',
-                model: 'Responsable'
-            }
+
+            result[0].code_student.forEach( function(element, index) {
+                
+                promises.push(
+                    models.Student.findOne({where: {id : element},
+                        include: [{
+                            model: models.Responsable,
+                            as   : 'responsable'
+                        }]
+                    }).then(resultStudent => {
+                        students.push(resultStudent)
+
+                        if(index + 1 == result[0].code_student.length)
+                        {
+                            result[0].code_student = students
+                        }
+                    })
+                )
+            }); // foreach Estudiantes
+
+            Promise.all(promises).then(response => {
+                res.json(result)       
+            }).catch(err => res.status(500).json({ message: "Error al buscar los estudiantes o las asignaturas"}))
+
         }
-        ]).exec((err, course) => {
-        if (err) 
+        else
         {
-          res.status(500).send({ message: 'Error en la petición' })
-        } 
-        else 
-        {
-            res.status(200).send(course);
+            res.json(result)
         }
-    })
+    }).catch( err => res.status(500).json({ message: 'Ha ocurrid un error bucando los datos del ccuro'}))
 }
 
 function saveStudentDelay(req,res)
@@ -416,36 +431,24 @@ function saveStudentDelay(req,res)
 
     let params = req.body,
         saveData   = {
-            studentId: params.studentId,
-            course   : params.course,
+            student_id: params.student_id,
+            course_id   : params.course_id,
+            school_id   : req.user.sub,
             date     : new Date(params.date),
-            detail   : params.detail,
-            school   : req.user.sub
-        },
-        delay = new Delay(saveData)
+            detail   : params.detail
+        }
 
-        if(!params.studentId)
+        if(!params.student_id)
         {
             res.status(500).json({ message: "Debe escoger un estudiante para registrar un atraso" })
         }
         else
         {
-            delay.save((err,delayStore) => {
-                if(err)
-                {
-                    res.status(500).send({ message: "Ha ocurrido un error antes de guardar el retiro" })
-                }
-                else
-                {
-                    if(!delayStore)
-                    {
-                        res.status(404).send({ message: "No se ha podido guardar el retiro" })
-                    }
-                    else
-                    {
-                        res.status(200).send({ delayStored: delayStore })
-                    }
-                }
+            models.Delay.create(saveData).then(delaydStored => {    
+                res.status(200).send({ delay: delaydStored })
+            }).catch(err =>  {
+                console.log(err)
+                res.status(500).json({ message: "Ha ocurrido un error al guardar el retiro"})
             })
         }
             
@@ -457,23 +460,20 @@ function listStudentDelayStored(req,res)
                     Función para listar los atrasos, se filtran por el id del estudiante
        ========================================================================================================= */
 
-    Delay.find({ course: req.params.idCourse }).populate([{
-        path:'studentId',
-        model: 'Student',
-        populate: {
-            path: 'responsable',
-            model: 'Responsable'
-        }
-        }]).exec((err,retires) =>{
-        
-        if (err) 
-        {
-          res.status(500).send({ message: 'Error en la ejecución de la busqueda' })
-        } 
-        else 
-        {
-            res.status(200).send(retires);
-        }
+    models.Delay.findAll({ where: {course_id: req.params.id, school_id: req.user.sub },
+        include: [{
+            model: models.Student,
+            as   : 'estudiante',
+            include:[{
+                model: models.Responsable,
+                as   : 'responsable'
+            }] 
+        }]
+    }).then(delay =>{
+        res.status(200).send(delay);
+    }).catch(err =>{ 
+        console.log(err)
+        res.status(500).send({ message: 'Error en la ejecución de la busqueda de retiros' })
     })
 }
 
@@ -485,23 +485,9 @@ function listEvents(req,res)
             Se debe pasar el id del curso como parametro
        ========================================================================================================= */
 
-    Event.find( { course: req.params.id, school: req.user.sub } ).exec((err, events) =>{
-        if (err) 
-        {
-          res.status(500).send({ message: 'Error en la ejecución de la busqueda' })
-        } 
-        else 
-        {
-          if (events.length == 0) 
-          {
-            res.status(200).send([])
-          } 
-          else 
-          {
-            res.status(200).send(events);
-          }
-        }  
-    })
+    models.Event.findAll({ where:{ course_id: req.params.id, school_id: req.user.sub} }).then(result =>{
+        res.json(result)  
+    }).catch(err => res.status(500).json({ message: "Ha ocurrido un error buscando los eventos registrados"}))
 }
 
 
@@ -512,33 +498,15 @@ function saveEvent(req,res)
     let params = req.body,
         date = new Date(params.date),
         saveData   = {
-            course   : params.course,
+            course_id   : params.course_id,
             date     : date,
             detail   : params.detail,
-            school   : req.user.sub 
-        },
-        event = new Event(saveData)
+            school_id   : req.user.sub 
+        }
 
-        event.save((err,eventStore) => {
-                if(err)
-                {
-                    console.log(err)
-                    res.status(500).send({ message: "Ha ocurrido un error antes de guardar el evento" })
-                }
-                else
-                {
-                    if(!eventStore)
-                    {
-                        res.status(404).send({ message: "No se ha podido guardar el evento" })
-                    }
-                    else
-                    {
-                        res.status(200).send({ eventStored: eventStore })
-                    }
-                }
-        })
-
-    
+        models.Event.create(saveData).then( eventStored => {
+            res.json({event : eventStored})
+        }).catch( err => res.status(500).json({ message: "Ha ocurrido un error al guardar un evento"}) )
 }
 
 module.exports = {

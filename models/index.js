@@ -26,7 +26,9 @@ const models = {
 	ListSmsWorker : sequelize.import('./listSmsWorker'),
 	SmsWorker : sequelize.import('./smsWorker'),
 	Annotation : sequelize.import('./annotation'),
-	Retire  : sequelize.import('./retire')
+	Retire  : sequelize.import('./retire'),
+	Delay  : sequelize.import('./delay'),
+	Event  : sequelize.import('./event')
 }; 
 
 Object.keys(models).forEach((modelName) => {
