@@ -1,5 +1,5 @@
 var Sequelize = require('sequelize');
-const sequelize = new Sequelize("pronota","postgres","123456", { 
+const sequelize = new Sequelize("pronota5000","postgres","123456", { 
 dialect: 'postgres'
 });
 

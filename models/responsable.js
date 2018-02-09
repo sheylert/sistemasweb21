@@ -23,14 +23,6 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING    
         },        
   });
- 
-
-Responsable.associate = model => {
-    Responsable.hasMany(model.Student, {
-        foreignKey: 'id',
-        as: 'studentResponsable'
-    })
-  }
 
     return Responsable;
 };

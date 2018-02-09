@@ -54,7 +54,7 @@ school: {
           type: DataTypes.INTEGER,
         },
 
-responsable: { 
+responsable_id: { 
           type: DataTypes.INTEGER,
         },
 
@@ -64,8 +64,8 @@ responsable: {
     Student.associate = model => {
 
       Student.belongsTo(model.Responsable,{
-        foreignKey: 'responsable',
-        as : 'responsableStudent'
+        foreignKey: 'responsable_id',
+        as : 'responsable'
       })
   }
 

@@ -34,7 +34,7 @@ function getAllStudent(req, res) {
       models.Student.findAll({ where: { school: req.user.sub, state: true },
       include: [{
         model: models.Responsable,
-        as : 'responsableStudent'
+        as : 'responsable'
       }]
 }).then( function(students) { 
    
@@ -133,9 +133,7 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
                 if(responsable)
                 {
 
-                        console.log("ssssssssssssssssssssss");
-
-                        student.responsable = responsable.id
+                         student.responsable_id = responsable.id
                                          
                         models.Student.create(student).then( function(studentStore) 
                         { 
@@ -167,13 +165,11 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
                                      res.status(500).send({ message: 'Error al guardar el responsable' });
                                     } else {
 
-                                        console.log("guardo");
-
                                         models.Profile.findOne({ where: { slug:  'RESPONSABLE' }}).then( profile => {
                                        
                                         if(profile)
                                         {
-                                                    student.responsable = responStore.id
+                                                    student.responsable_id = responStore.id
 
                                                     var user={}; 
 
@@ -195,9 +191,7 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
                                                     if (!userStore) {
                                                         
                                                         res.status(500).send({ message: 'Error al guardar el usuario del responsable' });
-                                                        
-                                                        console.log(" nooooooooo guardo usuario"); 
-
+                                  
                                                     } else {
  
                                                             models.Student.create(student).then( function(studentStore) 
@@ -207,7 +201,7 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
                                                                {
                                                                 res.status(404).send({ message: 'No se ha guardado el estudiante' });
                                                                } else {
-                                                                studentStore.respon = responStore;
+                                                                //studentStore.respon = responStore;
                                                                 res.status(200).send({ Student: studentStore });
                                                                }
                                                               
