@@ -90,17 +90,9 @@ function getAllStudentWithoutCourse(req, res) {
 
     // Función para buscar todos los estudiantes sin curso
 
-    Student.find({ state: true, course: null, school: req.user.sub }).populate('responsable').exec((err, students) => {
-        if (err) {
-            res.status(500).send({ message: 'Error en la petición' })
-        } else {
-            if (students.length == 0) {
-                res.status(200).send([])
-            } else {
-                res.status(200).send(students);
-            }
-        }
-    })
+    models.Student.findAll({ where: { state: true, course: null, school: req.user.sub } }).then(result => {
+        res.status(200).send(result);
+    }).catch(err => res.status(500).json({ message: "Error al buscar los estudiantes sin cursos"}) )
 }
 
 function saveStudent(req, res) {

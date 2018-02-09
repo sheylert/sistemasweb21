@@ -35,36 +35,24 @@ function saveCourse(req, res) {
 
 function saveCourseStudent(req, res) {
     const idCourse = req.params.idCourse;
-    const idStudent = req.body._id;
+    const idStudent = req.body.id;
 
     if (idStudent) {
-        Course.update({ _id: idCourse }, { $push: { code_student: idStudent } }, (err, courseUpdate) => {
-            if (err) {
-                res.status(500).send({ message: 'Ha ocurrido un error al actualizar el curso' });
-            }
-            if (courseUpdate) {
-                Student.update({ _id: idStudent }, { $set : {course: idCourse } }, (err, studentUpdated) => {
-                    if (err) {
-                        res.status(500).send({ message: 'Ha ocurrido un error al actualizar el estudiante' });
-                    }
-                    if (studentUpdated) {
-                        res.status(200).send(studentUpdated);
-                    }
-                    if (!studentUpdated) {
-                        res.status(200).send({ message: 'No se ha podido actualizar el estudiante' });
-                    }
-                })
-            }
-            if (!courseUpdate) {
-                res.status(200).send({ message: 'No se ha podido actualizar el curso' });
-            }
-        });
 
+        models.Course.findById(idCourse).then(courseFounded => {
+            courseFounded.code_student.push(idStudent)
+            models.Course.update({ code_student : courseFounded.code_student}, {where: {id: courseFounded.id} } )
+            .then(result => {
+                models.Student.update({ course: idCourse}, {where: {id: idStudent} } ).then(studentUpdate => {
+                    res.json(courseFounded)
+                }).catch(err => res.status(500).json({ message: "Error al actualizar el estudiante"}) )
+            }).catch(err => res.status(500).json({ message: "Error al insertar el estudiante en el curso"}) )
+        }).catch(err => res.status(500).json({ message: "Error al buscar el curso"}) )
     }
-
-    if (!idStudent) {
+    else
+    {
         res.status(200).send({ message: 'Es necesario el parametro idStudent' });
-    }
+    }   
 }
 
 // Remover estudiante de cursox
@@ -74,41 +62,30 @@ function deleteCourseStudent(req, res, next) {
 
     if (idStudent) {
         
-        Note.find( {course : idCourse, studentId: idStudent} ).exec((err,result) => {
-            if(err)
+        models.Note.findAll({ where: {course_id : idCourse, student_id: idStudent} }).then(notasRespuesta => {
+            
+            if(notasRespuesta.length > 0)
             {
-                res.status(500).send({ message: 'Ha ocurrido un error al buscar las notas del estudiante en el curso' });
+                res.status(500).send({ message: 'No se puede quitar al estudiante porque ya tiene notas asociadas en asignaturas del curso' });       
             }
             else
             {
-                if(result.length > 0)
-                {
-                    res.status(400).send({ message: 'No se puede quitar al estudiante porque ya tiene notas asociadas en asignaturas del curso' });       
-                }
-                else
-                {
-                    Course.update({ _id: idCourse }, { $pull: { code_student: idStudent } }, (err, courseUpdate) => {
-                        if (err) {
-                            res.status(500).send({ message: 'Ha ocurrido un error al actualizar el curso' });
-                        }
-                        if (courseUpdate) {
-                            Student.update({ _id: idStudent }, { course: null }, (err, studentUpdated) => {
-                                if (err) {
-                                    res.status(500).send({ message: 'Ha ocurrido un error al actualizar el estudiante' });
-                                }
-                                if (studentUpdated) {
-                                    res.status(200).send(studentUpdated);
-                                }
-                                if (!studentUpdated) {
-                                    res.status(200).send({ message: 'No se ha podido actualizar el estudiante' });
-                                }
-                            })
-                        }
-                        if (!courseUpdate) {
-                            res.status(200).send({ message: 'No se ha podido actualizar el curso' });
+                models.Course.findById(idCourse).then(courseFound => {
+
+                    courseFound.code_student.forEach( function(element, index) {
+                        if(element.toString() === idStudent.toString())
+                        {
+                            courseFound.code_student.splice(index,1)
+
+                            models.Course.update({ code_student: courseFound.code_student}, {where: {id: courseFound.id} })
+                            .then(courseUpdate => {
+                                models.Student.update({ course: null}, {where: {id: idStudent} } ).then(studentUpdate => {
+                                    res.json(courseFound)
+                                }).catch(err => res.status(500).json({ message: "Error al actualizar el estudiante"}) )
+                            }).catch(err => res.status(500).json({ message: "Error al actualizar el curso intentando borrar el estudiante"}))
                         }
                     });
-                }
+                })
             }
         })
     }
@@ -329,25 +306,57 @@ function getCourses(req, res) {
 function getCourse(req, res) {
 
     // Función para buscar el curso seleccionado
+
     models.Course.findAll({ where : { id: req.params.id }, include:[{
             all: true
         }] 
     }).then(result => {
 
         let subjects = []
+        let students = []
+        let promises = []
 
-        result[0].code_subject.forEach( function(element, index) {
-            
-            models.Subject.findById(element).then(resultSubject => {
-                subjects.push(resultSubject)
+        if(result[0].code_subject.length > 0 || result[0].code_student.length > 0)
+        {
+            result[0].code_subject.forEach( function(element, index) {
+                
+                promises.push(
+                    models.Subject.findById(element).then(resultSubject => {
+                        subjects.push(resultSubject)
 
-                if(index + 1 == result[0].code_subject.length)
-                {
-                    result[0].code_subject = subjects
-                    res.json(result)
-                }
-            })
-        });
+                        if(index + 1 == result[0].code_subject.length)
+                        {
+                            result[0].code_subject = subjects
+                        }
+                    })
+                )
+
+            }); // foreach asignaciones
+
+
+            result[0].code_student.forEach( function(element, index) {
+                
+                promises.push(
+                    models.Student.findById(element).then(resultStudent => {
+                        students.push(resultStudent)
+
+                        if(index + 1 == result[0].code_student.length)
+                        {
+                            result[0].code_student = students
+                        }
+                    })
+                )
+            }); // foreach Estudiantes
+
+            Promise.all(promises).then(response => {
+                res.json(result)       
+            }).catch(err => res.status(500).json({ message: "Error al buscar los estudiantes o las asignaturas"}))
+
+        }
+        else
+        {
+            res.json(result)
+        }
         
     }).catch(err => res.status(500).json({ message: 'Ha ocurrido un error al buscar los datos del curso'}))
 }
