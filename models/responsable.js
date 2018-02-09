@@ -23,16 +23,16 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING    
         },        
   });
- 
 
-Responsable.associate = model => {
-    Responsable.hasMany(model.Student, {
-        foreignKey: 'id',
-        as: 'studentResponsable'
-    })
-  }
 
+    Responsable.associate = model => {
+      Responsable.hasMany(model.Student, {
+        foreignKey: 'responsable_id',
+        as        : 'estudiantes'
+      })
+    }
     return Responsable;
+
 };
 
 
