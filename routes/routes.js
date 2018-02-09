@@ -155,9 +155,9 @@ api.get('/student/:id', mdAuth.ensureAuth,StudentController.getStudent) // Ruta 
 
 */
 api.post('/student', mdAuth.ensureAuth,StudentController.saveStudent) // Ruta para guardar los estudiantes
-
-/*
 api.put('/student/:id', mdAuth.ensureAuth,StudentController.updateStudent) // Ruta para actualizar un estudiante
+/*
+
 api.delete('/student/:id', mdAuth.ensureAuth,StudentController.deleteStudent) // Ruta para eliminar un estudiante
 api.get('/student/countstudentbyschool/:idSchool', mdAuth.ensureAuth,StudentController.countStudentBySchool) //contar estudiantes de una escuela
 */

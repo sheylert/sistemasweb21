@@ -218,13 +218,6 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
     }
   }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el estudiante"}) )
 
-
-
-
-
-
-
-
     /*
 
 
@@ -363,9 +356,6 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
 
 
 */
-
-
-
 }
 
 function getStudent(req, res) {
@@ -388,7 +378,6 @@ function getStudent(req, res) {
 function updateStudent(req, res) {
 
     // Función para modificar el estudiante
-
     const userId = req.params.id;
 
     var b_date = req.body.birth_date.indexOf('-', 0) == -1 ? req.body.birth_date.split("/").reverse().join("/") : req.body.birth_date.split("-").reverse().join("-")
@@ -399,7 +388,6 @@ function updateStudent(req, res) {
     b_date.setMinutes(dateNow.getMinutes())
     b_date.setSeconds(dateNow.getSeconds())
 
-
     const update = {
         name: req.body.name,
         lastname: req.body.lastname,
@@ -407,19 +395,47 @@ function updateStudent(req, res) {
         code_grade: req.body.code_grade,
         code_teaching: req.body.code_teaching,
         character: req.body.character,
-        birth_date: b_date,
+        birth_date: '2018-01-01',
         age: req.body.age,
         course: req.body.course,
         school: req.user.sub
     }
 
     const updateRes = {
+        rut: req.body.rut_res,
         name: req.body.name_res,
         lastname: req.body.lastname_res,
         email: req.body.email_res,
         phone: req.body.phone_res,
         address: req.body.address_res,
     }
+
+        models.Student.update( update, 
+                         {where: { id: userId } }).then( function(updatealumno) { 
+
+        if (!updatealumno) {
+           res.status(404).send({ message: 'No se a podido actualizar el estudiante!' });
+        } else {    
+
+        models.Student.findOne({ where: { id: userId }}).then( idrespon => {
+                                       
+        if(idrespon)
+        {
+           models.Responsable.update( updateRes, 
+                         {where: { id: idrespon.responsable_id } }).then( function(updateresp) { 
+
+                    if (!updateresp) {
+                       res.status(404).send({ message: 'No se a podido actualizar el Responsable!' });
+                    } else {
+                        res.status(200).send({ Student: updateresp });
+                    }
+               })    
+         }
+      }) 
+
+    }
+ })
+ /*
 
     Student.findByIdAndUpdate(userId, update, { new: true }, (err, studentUpdated) => {
         if (err) {
@@ -444,6 +460,8 @@ function updateStudent(req, res) {
         }
 
     })
+
+    */
 
 }
 
