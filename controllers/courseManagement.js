@@ -82,102 +82,100 @@ function getCourse(req, res) {
     })
 }
 
+function getStudentNote(req,res)
+{
+    const school = req.user.sub
+    const course = req.query.course
+    const subject = req.query.subject
+    
+    const filtroNotes = { school_id: school, course_id: course, subject_id: subject }
+    const filtroStudent = {school, course}
+
+    let promises = []
+    let studentsWithoutNotes = []
+
+    models.Notes.findAll({ where : filtroNotes, include : [{
+            model: models.Student,
+            as   : 'estudiantes'
+        }] 
+    }).then(resultNotes => {
+
+
+        models.Student.findAll({ where: filtroStudent }).then(resultStudent => {
+
+            resultStudent.forEach((student,index) => {                
+                
+                let validate = false
+
+                promises.push(
+                    resultNotes.forEach(function(nota,index1) {
+                        
+                        if(student.id === nota.student_id)
+                        {
+                            validate = true
+                        }
+
+                        if(index1 + 1 === resultNotes.length)
+                        {
+                            if(!validate)
+                            {
+                                studentsWithoutNotes.push(student)
+                            }
+                        }
+                    })
+                )
+            })
+
+            Promise.all(promises).then(resultPromise => {
+                
+                
+                if(resultNotes.length > 0)
+                {
+                    res.json([studentsWithoutNotes, resultNotes])
+                }
+                else
+                {
+                    res.json([resultStudent, resultNotes])
+
+                }
+
+            }).catch( err => res.status(500).json({ message: "Error al ejecutar la promesa", err}))
+                
+
+        }).catch(err => res.status(500).json({ message: "Error al buscar los estudiantes", err}) )
+
+    }).catch(err => res.status(500).json({ message: "Error al buscar las notas", err}) )
+}
+
 function masiveAssingStudentNote(req, res)
 {
     // función para asignar notas masivamente por alumno
-    /*var testJson = [
+    const params = req.body
+    const filtroNote = {school_id: req.user.sub, student_id: params.student, course_id: params.course, subject_id: params.subject}
+
+    const arreglo_field = params.field.split('_')
+    const fieldUpdate = arreglo_field[0]+"_"+params.period+"_"+arreglo_field[1]
+
+    models.Notes.findOne({ where : filtroNote }).then(notesResult => {
+        if(notesResult)
         {
-            student: {
-                name : "Alvaro",
-                lastname: "Guedez"
-            },
-            notes : {
-                note_1_1 : 10,
-                note_1_2 : 10,
-                note_1_3 : 10,
-                note_1_4 : 10,
-                note_1_5 : 10,
-                note_1_6 : 10,
-                note_1_7 : 10,
-                note_1_8 : 10,
-                note_1_9 : 10,
-                note_1_10 : 10,
-                note_1_11 : 10,
-                note_1_12 : 10,
-                prom_1   : 10,
-                note_2_1 : 10,
-                note_2_2 : 10,
-                note_2_3 : 10,
-                note_2_4 : 10,
-                note_2_5 : 10,
-                note_2_6 : 10,
-                note_2_7 : 10,
-                note_2_8 : 10,
-                note_2_9 : 10,
-                note_2_10 : 10,
-                note_2_11 : 10,
-                note_2_12 : 10,
-                prom_2   : 10    
-            },
-            subject: {
-                subjectId : '12312asdasdasdqwe1'
-            }
+            models.Notes.update({ [fieldUpdate] : params.note}, {where: filtroNote}).then(noteUpdate => {
+                res.json({})
+            }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al actualizar la notas"}) )
         }
-    ]*/
+        else
+        {
 
-    req.body.forEach((ele,index) => {
-
-        let prom_1_total = ( parseFloat(ele.notes.note_1_1) + parseFloat(ele.notes.note_1_2)
-                           + parseFloat(ele.notes.note_1_3) + parseFloat(ele.notes.note_1_4)
-                           + parseFloat(ele.notes.note_1_5) + parseFloat(ele.notes.note_1_6)
-                           + parseFloat(ele.notes.note_1_7) + parseFloat(ele.notes.note_1_8)
-                           + parseFloat(ele.notes.note_1_8) + parseFloat(ele.notes.note_1_10)
-                           + parseFloat(ele.notes.note_1_11) + parseFloat(ele.notes.note_1_12) ) / 12,
-            prom_2_total = ( parseFloat(ele.notes.note_2_1) + parseFloat(ele.notes.note_2_2)
-                           + parseFloat(ele.notes.note_2_3) + parseFloat(ele.notes.note_2_4)
-                           + parseFloat(ele.notes.note_2_5) + parseFloat(ele.notes.note_2_6)
-                           + parseFloat(ele.notes.note_2_7) + parseFloat(ele.notes.note_2_8)
-                           + parseFloat(ele.notes.note_2_8) + parseFloat(ele.notes.note_2_10)
-                           + parseFloat(ele.notes.note_2_11) + parseFloat(ele.notes.note_2_12) ) / 12
-
-
-        let update = {
-            note_1_1 : ele.notes.note_1_1,
-            note_1_2 : ele.notes.note_1_2,
-            note_1_3 : ele.notes.note_1_3,
-            note_1_4 : ele.notes.note_1_4,
-            note_1_5 : ele.notes.note_1_5,
-            note_1_6 : ele.notes.note_1_6,
-            note_1_7 : ele.notes.note_1_7,
-            note_1_8 : ele.notes.note_1_8,
-            note_1_9 : ele.notes.note_1_9,
-            note_1_10 : ele.notes.note_1_10,
-            note_1_11 : ele.notes.note_1_11,
-            note_1_12 : ele.notes.note_1_12,
-            prom_1   : prom_1_total,
-            note_2_1 : ele.notes.note_2_1,
-            note_2_2 : ele.notes.note_2_2,
-            note_2_3 : ele.notes.note_2_3,
-            note_2_4 : ele.notes.note_2_4,
-            note_2_5 : ele.notes.note_2_5,
-            note_2_6 : ele.notes.note_2_6,
-            note_2_7 : ele.notes.note_2_7,
-            note_2_8 : ele.notes.note_2_8,
-            note_2_9 : ele.notes.note_2_9,
-            note_2_10 : ele.notes.note_2_10,
-            note_2_11 : ele.notes.note_2_11,
-            note_2_12 : ele.notes.note_2_12,
-            prom_2   : prom_2_total
+            models.Notes.create(filtroNote).then(noteCreate => {
+                if(noteCreate)
+                {
+                    models.Notes.update({ [fieldUpdate] : params.note}, {where: {id: noteCreate.id} }).then( noteUpdate => {
+                        res.json({})
+                    }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al actualizar la nota"}) )
+                }
+            }).catch( err => res.status(500).json({ message: "Ha ocurrido un error al crear la nota"}) )
         }
-
-        Note.update( { course: req.params.id, studentId : ele.student.id, subjectId: ele.subject.id },{ $set: update}, (err, numberAffected, rawResponse) =>{
-            if(err)
-            {
-                res.status(500).send({ message: "Error al actualizar las notas"})
-            }
-        })
     })
-        res.status(200).send({ message: "Todas las notas fueron actualizadas" })
 
 }
 
@@ -523,5 +521,6 @@ module.exports = {
     saveStudentDelay,
     listStudentDelayStored,
     listEvents,
-    saveEvent
+    saveEvent,
+    getStudentNote
 }

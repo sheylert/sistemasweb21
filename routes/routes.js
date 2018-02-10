@@ -176,7 +176,8 @@ api.put('/setting_worker/:id',mdAuth.ensureAuth, images.single('logo'), SettingW
 
 // Course Management
 api.get('/courseManagement', mdAuth.ensureAuth,CourseManagementController.getAllCourses) // Ruta para buscar todos los cursos
-api.put('/courseManagement/:id', mdAuth.ensureAuth,CourseManagementController.masiveAssingStudentNote) // Ruta para almacenar masivamente las notas
+api.get('/courseManagementNotes', mdAuth.ensureAuth,CourseManagementController.getStudentNote) // Ruta para almacenar masivamente las notas
+api.post('/courseManagementMassive', mdAuth.ensureAuth,CourseManagementController.masiveAssingStudentNote) // Ruta para almacenar masivamente las notas
 api.get('/courseManagement/:id', mdAuth.ensureAuth,CourseManagementController.getCourse) // Ruta para buscar un curso con todos los populate
 api.get('/courseManageAnnotation/:id', mdAuth.ensureAuth,CourseManagementController.listStudent) // Ruta para listar todos los alumnos del curso para las anotaciones
 api.post('/courseManageAnnotation', mdAuth.ensureAuth,CourseManagementController.saveStudentAnnotation) // Ruta para almacenar una anotación
