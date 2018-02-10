@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
           default: 56,
         },
 
+    lapso: {
+        type: DataTypes.ENUM('1','2')
+    },
+
     school: { 
           type: DataTypes.INTEGER,
         },
