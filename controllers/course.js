@@ -58,15 +58,15 @@ function saveCourseStudent(req, res) {
 // Remover estudiante de cursox
 function deleteCourseStudent(req, res, next) {
     const idCourse = req.params.idCourse;
-    const idStudent = req.body._id;
+    const idStudent = req.body.id;
 
     if (idStudent) {
         
-        models.Note.findAll({ where: {course_id : idCourse, student_id: idStudent} }).then(notasRespuesta => {
+        models.Notes.findOne({ where: {course_id : idCourse, student_id: idStudent, school_id: req.user.sub} }).then(notasRespuesta => {
             
-            if(notasRespuesta.length > 0)
+            if(notasRespuesta)
             {
-                res.status(500).send({ message: 'No se puede quitar al estudiante porque ya tiene notas asociadas en asignaturas del curso' });       
+                res.status(500).send({ message: 'No se puede quitar al estudiante porque ya tiene notas registradas en asignaturas' });       
             }
             else
             {
@@ -173,27 +173,38 @@ function deleteCourseSubject(req, res, next) {
 
     if (params.id) {
 
-        models.Course.findById(idCourse).then(courseFound => {
-            if (courseFound) {
-                // notificar si existe la asignatura o no
-                let subjectExist = false;
-                // verificar este agregado
-                courseFound.code_subject.forEach((element, index) => {
-                    if (element.toString() === params.id.toString()) {
-                        subjectExist = true;
-                        // removiendo curso
-                        courseFound.code_subject.splice(index, 1);
-                        // actualizar curso
-                        models.Course.update({ code_subject: courseFound.code_subject}, {where: {id: courseFound.id}} ).then(courseUpdate => {
-                            res.status(200).json({ courseFound })
-                        })
+        models.Notes.findOne({ where: {subject_id : params.id, school_id: req.user.sub, course_id: idCourse} }).then(noteResult => {
+            if(!noteResult)
+            {
+                models.Course.findById(idCourse).then(courseFound => {
+                    if (courseFound) {
+                        // notificar si existe la asignatura o no
+                        let subjectExist = false;
+                        // verificar este agregado
+                        courseFound.code_subject.forEach((element, index) => {
+                            if (element.toString() === params.id.toString()) {
+                                subjectExist = true;
+                                // removiendo curso
+                                courseFound.code_subject.splice(index, 1);
+                                // actualizar curso
+                                models.Course.update({ code_subject: courseFound.code_subject}, {where: {id: courseFound.id}} ).then(courseUpdate => {
+                                    res.status(200).json({ courseFound })
+                                })
+                            }
+                        });
+                        if (subjectExist == false) {
+                            res.status(200).json({ message: 'No existe la asignatura asociada al curso' });
+                        }
                     }
-                });
-                if (subjectExist == false) {
-                    res.status(200).json({ message: 'No existe la asignatura asociada al curso' });
-                }
+                }).catch(err => res.status(500).json({ message: "Error al buscar el curso a modificar"}) )
             }
-        }).catch(err => res.status(500).json({ message: "Error al buscar el curso a modificar"}) )
+            else
+            {
+                res.status(500).json({ message: "No se puede quitar la asignatura porque tiene notas asociadas"})   
+            }
+
+        }).catch( err => res.status(500).json({ message: "Ha ocurrido un error al buscar las notas del curso para ver si la asignatura tiene notas"}) )
+                
 
     } else {
         res.status(500).send({ message: 'Parámetro id no recibido' });

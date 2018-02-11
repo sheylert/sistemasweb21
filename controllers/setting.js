@@ -17,7 +17,7 @@ const chalk = require('chalk');
 function showAllSettings(req, res) { 
     //school: req.user.sub
 
-  models.Setting.findAll({ where: { school: 1 }}).then( function(settings) { 
+  models.Setting.findAll({ where: { school: req.user.sub }}).then( function(settings) { 
         if (!settings) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
@@ -31,8 +31,7 @@ function showAllSettings(req, res) {
 // POST http://localhost:3789/setting
 function saveSetting(req, res) {
     var params = req.body;
-
-    //console.log(`tipo de archivo ${ req.file.mimetype }`)
+    console.log(params)
 
     // validar tipo de archivo
     
@@ -135,6 +134,7 @@ function save_params (req,res,params, path = null, edit = null)
                 setting.dateEnd1 = params.dateEnd1
                 setting.dateInit2 = params.dateInit2
                 setting.dateEnd2 = params.dateEnd2
+                setting.lapso = params.lapso
                 setting.school = req.user.sub
 
                 if(params.codeNumber)
@@ -181,6 +181,7 @@ function save_params (req,res,params, path = null, edit = null)
                 setting.dateEnd1 = params.dateEnd1
                 setting.dateInit2 = params.dateInit2
                 setting.dateEnd2 = params.dateEnd2
+                setting.lapso = params.lapso
                 setting.school = req.user.sub
 
                 if(params.codeNumber)

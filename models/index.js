@@ -1,6 +1,6 @@
 var Sequelize = require('sequelize');
 
-const sequelize = new Sequelize("pronota_2019","postgres","123456", {  
+const sequelize = new Sequelize("pronota_2019","postgres","admin123", {  
 dialect: 'postgres'
 });
 
@@ -28,7 +28,8 @@ const models = {
 	Annotation : sequelize.import('./annotation'),
 	Retire  : sequelize.import('./retire'),
 	Delay  : sequelize.import('./delay'),
-	Event  : sequelize.import('./event')
+	Event  : sequelize.import('./event'),
+	Notes  : sequelize.import('./notes'),
 }; 
 
 Object.keys(models).forEach((modelName) => {
