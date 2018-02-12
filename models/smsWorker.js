@@ -28,9 +28,6 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		type: {
 			type: DataTypes.BOOLEAN,
-		},
-		student_or_worker: {
-			type: DataTypes.STRING,	
 		}
 	})
 
