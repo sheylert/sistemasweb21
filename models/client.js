@@ -46,6 +46,11 @@ Client.associate = model => {
         foreignKey: 'school',
         as: 'users'
     })
+
+    Client.belongsTo(model.Profile,{
+      foreignKey: 'profile_id',
+      as : 'perfiles'
+    })
   }
 
     return Client; 

@@ -29,10 +29,12 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 	          phone: ele.responsable ? ele.responsable.phone : ele.phone,
 	          envio_id: 0,
 	          status: "DEFAULT",
+	          student_or_worker: 'Estudiante'
 	        }
 		}
 		else
 		{
+
 			sms = {
 	          worker_id: ele.id,
 	          template_id: idTemplate,
@@ -43,6 +45,7 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 	          phone: ele.responsable ? ele.responsable.phone : ele.phone,
 	          envio_id: 0,
 	          status: "DEFAULT",
+	          student_or_worker: 'Trabajador'
 	        }
 		}
 	        

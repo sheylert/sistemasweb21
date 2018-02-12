@@ -103,6 +103,7 @@ api.get('/course-code', mdAuth.ensureAuth,CourseCodeController.getCourseCode);
 // Client
 
 api.get('/client', mdAuth.ensureAuth,ClientController.getClients);
+api.get('/client/:id', mdAuth.ensureAuth,ClientController.getClient);
 api.post('/client', mdAuth.ensureAuth,ClientController.saveClient);
 api.put('/client/:id', mdAuth.ensureAuth,ClientController.updateClient);
 api.put('/client/:id/modifySmsData', mdAuth.ensureAuth, ClientController.updateSmsData);
@@ -176,7 +177,7 @@ api.put('/setting_worker/:id',mdAuth.ensureAuth, images.single('logo'), SettingW
 
 // Course Management
 api.get('/courseManagement', mdAuth.ensureAuth,CourseManagementController.getAllCourses) // Ruta para buscar todos los cursos
-api.get('/courseManagementNotes', mdAuth.ensureAuth,CourseManagementController.getStudentNote) // Ruta para almacenar masivamente las notas
+api.get('/courseManagementNotes', mdAuth.ensureAuth,CourseManagementController.getStudentNote) // Ruta para buscar los estudiantes sin notas y las notas ya almacenadas
 api.post('/courseManagementMassive', mdAuth.ensureAuth,CourseManagementController.masiveAssingStudentNote) // Ruta para almacenar masivamente las notas
 api.get('/courseManagement/:id', mdAuth.ensureAuth,CourseManagementController.getCourse) // Ruta para buscar un curso con todos los populate
 api.get('/courseManageAnnotation/:id', mdAuth.ensureAuth,CourseManagementController.listStudent) // Ruta para listar todos los alumnos del curso para las anotaciones

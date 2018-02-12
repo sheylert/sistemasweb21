@@ -128,14 +128,18 @@ function getStudentNote(req,res)
 
             Promise.all(promises).then(resultPromise => {
                 
-                
+                console.log('paso la promesa')
+
                 if(resultNotes.length > 0)
                 {
-                    res.json([studentsWithoutNotes, resultNotes])
+                    //res.json([studentsWithoutNotes, resultNotes])
+                    res.json([studentsWithoutNotes,resultNotes])
                 }
                 else
                 {
-                    res.json([resultStudent, resultNotes])
+                    //let response = [resultStudent,resultNotes]
+                    //res.json([resultStudent, resultNotes])
+                    res.json([resultStudent,resultNotes])
 
                 }
 

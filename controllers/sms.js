@@ -347,10 +347,46 @@ function recieveStatusSms(req, res) {
 			['createt_at', 'DESC']
 		]
 	}).then(resultSearch => {
+		if(!resultSearch)
+		{
+			models.SmsWorker.findOne({ where: { phone: number },
+				order: [
+					['createt_at', 'DESC']
+				]
+			}).then( resultWorker => {
+				if(resultWorker)
+				{
+					console.log('sms encontrado para modificar')
+					let string = status == "ok" ? "SUCCESS" : "WARNING"
+					string = confirmado == "handset" ? "SUCCESS" : "WARNING"
 
-		console.log('sms encontrado para modificar')
+					models.SmsWorker.update({status : string, envio_id: id_envio}, {
+						where: {id : resultWorker.id}
+					}).then(smsUpdate => {
 
-		if (resultSearch) {
+						if (!smsUpdate) {
+							console.log("error al modificar el sms con status " + string)
+						}
+						else 
+						{
+							console.log('modificado con status ' + string + ' con éxito')
+
+							
+								models.Worker.update({ lastSms: "SUCCESS" }, {where : {id: resultWorker.student_id} }).then(studentUpdated=> {
+									
+									console.log('trabajador modificado status ' + string)
+
+								}).catch(err => console.log('err al guardar respuesta de lasbsmobile', err))
+						}
+
+					})
+				}
+			})
+		}
+		else
+		{
+
+			console.log('sms encontrado para modificar')
 			let string = status == "ok" ? "SUCCESS" : "WARNING"
 			string = confirmado == "handset" ? "SUCCESS" : "WARNING"
 
@@ -372,17 +408,7 @@ function recieveStatusSms(req, res) {
 							console.log('estudiante modificado status ' + string)
 
 						}).catch(err => console.log('err al guardar respuesta de lasbsmobile', err))
-					}
-					else
-					{
-						models.Worker.update({ lastSms: "SUCCESS" }, {where : {id: resultSearch.worker_id} }).then(workerUpdated=> {
-							
-							console.log('trabajador modificado status ' + string)
-
-						}).catch(err => console.log('err al guardar respuesta de lasbsmobile', err))
-					}
-
-						
+					}	
 				}
 
 			})

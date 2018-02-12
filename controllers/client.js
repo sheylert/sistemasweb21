@@ -1,5 +1,6 @@
 'use strict'
 
+
 // modulos
  //var bcrypt = require('bcrypt-nodejs');
 
@@ -93,107 +94,18 @@ function saveClient(req, res) {
          }  
       })
 
-/*
-    // crear objeto profesor
-    var client = new Client();
-
-    // recogemos parametros
-    var params = req.body;
-
-    client.rbd = params.rbd;
-    client.name = params.name;
-    client.address = params.address;
-    client.email = params.email;
-    client.phone = params.phone;
-    client.ree = params.ree;
-    client.membership = params.membership;
-    client.services = false;
-    client.code_setting = null;
-    client.code_school = null;
-
-    if (client) {
-        client.save((err, clientStorage) => {
-            if (err) {
-                res.status(500).send({ message: 'Error al guarda cliente' });
-            } else {
-                if (!clientStorage) {
-                    res.status(404).send({ message: 'No se ha guardado el cliente' });
-                } else {
-
-                    let totalSmsObject = {
-                        school: clientStorage._id
-                    }
-
-                    let totalSmsSave = new TotalSms(totalSmsObject)
-                    totalSmsSave.save((err,result) => {
-                        if(err) console.log(err)
-                    })
-
-                    var user = new User();
-                    user.name = client.name;
-                    user.address = client.address;
-                    user.phone = client.phone;
-                    user.school = clientStorage._id;
-                    user.email = client.email;
-                    user.type = 1;
-                    user.state = true;
-
-                    Profile.findOne({ slug: 'ADMIN_SCHOOL' }, (err, profile) => {
-                        user.profile = profile._id;
-
-                        User.findOne({ email: user.email.toLowerCase() }, (err, issetUser) => {
-                            if (err) {
-                                res.status(500).send({ message: 'Error al comprobar usuario' });
-                            } else {
-                                if (!issetUser) {
-                                    // ciframos contraseña
-                                    bcrypt.hash(client.email, null, null, function(err, hash) {
-                                        user.password = hash;
-
-                                        user.save((err, userStored) => {
-                                            if (err) {
-                                                res.status(500).send({ message: 'Error al guarda usuario' });
-                                            } else {
-                                                if (!userStored) {
-                                                    res.status(404).send({ message: 'No se ha registrado el usuario' });
-                                                } else {
-                                                    console.log('adming');
-                                                    console.log(clientStorage);
-                                                    clientStorage.admin = userStored;
-                                                    console.log(clientStorage);
-                                                    res.status(200).send({ client: clientStorage });
-                                                }
-                                            }
-                                        });
-                                    });
-                                } else {
-                                    res.status(400).send({ message: 'Usuario ya existe!' });
-                                }
-                            }
-                        });
-                    });
-                }
-            }
-        });
-    }
-
-
-
-*/
-
-
-
-
 }
 
 
 function getClients(req, res) {
 
-
     models.Client.findAll( {
       include: [{
         model: models.User,
         as : 'users'
+      },{
+        model: models.Profile,
+        as : 'perfiles'
       }]
 }).then( function(clients) { 
         if (!clients) {
@@ -205,48 +117,13 @@ function getClients(req, res) {
       } 
     });
 
+}
 
-
-
-
-/*    
-  
-    Client.find().populate([{
-        path: 'code_setting',
-        model: 'Setting'
-    }, ]).exec((err, clients) => {
-        if (err) {
-            res.status(500).send({ message: 'Error en la petición', err: err })
-        } else {
-            if (!clients) {
-                res.status(200).send([])
-            } else {
-                var promises = [];
-                clients.forEach((element, _i) => {
-                    promises.push(
-                        User.findOne({ school: element._id })
-                        .then((data) => {
-                            element.admin = data;
-                            return element;
-                        })
-                        .catch((error) => {
-                            res.status(500).send({
-                                message: 'Error al entregar cliente!'
-                            })
-                        })
-                    );
-                });
-
-                Promise.all(promises).then((responses) => {
-                    res.status(200).send(responses);
-                });
-            }
-        }
-    });
-
-*/
-
-
+function getClient(req,res)
+{
+  models.Client.findById(req.params.id).then(result => {
+    res.json(result)
+  }).catch(err => res.status(500).json({ message: "Ha ocurrido un error buscando el cliente a modificar"}) )
 }
 
 function updateClient(req, res) {
@@ -261,43 +138,9 @@ function updateClient(req, res) {
           res.status(500).send({ message: 'No se a podido actualizar Cliente!' });
         } else {
 
-                  /* var user={};
-
-                    user.name = update.name;
-                    user.address = update.address;
-                    user.phone = update.phone;
-                    user.email = update.email;
-
-                    models.User.update(user, 
-                         {where: { admin: clientId } }).then( function(updateuser) {
-
-                    }); */        
-
           res.status(200).send({ client: updateclient });
         }
     }) 
-
-                         
-
-/*
-    const clientId = req.params.id;
-    const update = req.body;
-
-    Client.findByIdAndUpdate(clientId, update, { new: true }, (err, clientUpdated) => {
-        if (err) {
-            res.status(500).send({
-                message: 'Error al actualziar cliente!'
-            })
-        } else {
-            if (!clientUpdated) {
-                res.status(404).send({ message: 'No se a podido actualizar cliente!' });
-            } else {
-                res.status(200).send({ client: clientUpdated });
-            }
-        }
-    });
-*/
-
 
 }
 
@@ -373,5 +216,6 @@ module.exports = {
     saveProfile,
     saveClientSetting,
     saveClientSchool,
-    updateSmsData
+    updateSmsData,
+    getClient
 }

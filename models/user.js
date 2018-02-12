@@ -42,6 +42,9 @@ state: {
         responId: { 
           type: DataTypes.INTEGER    
         }, 
+        curso_id:{
+          type: DataTypes.INTEGER    
+        }
         /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
   }); 
 

@@ -54,7 +54,7 @@ function updateTeacher(req, res) {
 
   params.school = req.user.sub
   // crear objeto profesor
-   models.Teacher.update(params).then( function(updateteachers) { 
+   models.Teacher.update(params,{where : {id: req.params.id}} ).then( function(updateteachers) { 
 
         if (!updateteachers) {
           res.status(500).send({ message: 'No se a podido actualizar profesor!' });
