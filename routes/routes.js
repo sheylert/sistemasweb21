@@ -23,6 +23,8 @@ var SubjectController = require('../controllers/subject');
 var CourseManagementController = require('../controllers/courseManagement');
 var StudentExcelController = require('../controllers/studentExcel');
 
+var HorarioController = require('../controllers/horario');
+
 /*
 
 
@@ -48,6 +50,10 @@ api.put('/user/:id', mdAuth.ensureAuth, UserController.putUser);
 api.post('/overwritePass', mdAuth.ensureAuth,UserController.overwritePass) // ruta para sobreescribir el pass que se le pone al responsable por defecto cuando es creado su user y validar que hizo session por primera vez
 api.post('/recoveryPassword', mdAuth.ensureAuth,UserController.recoveryPassword)
 api.get('/user/:id',mdAuth.ensureAuth,UserController.findUser)
+
+
+//Horario-bloque
+api.get('/horario', mdAuth.ensureAuth,HorarioController.getBloque);
 
 
 // Course
