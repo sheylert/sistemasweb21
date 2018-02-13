@@ -29,7 +29,7 @@ function getSchedule(req, res) {
     //turno: 1 condicional
     //req.query.curso
 
-     models.Horariomanana.findAll( { where: { school: req.user.sub, id_curso: params.course}} ).then( function(horariom) { 
+     models.Horariomanana.findAll( { where: { school: req.user.sub, id_curso: params.id_curso}} ).then( function(horariom) { 
         if (!horariom) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
