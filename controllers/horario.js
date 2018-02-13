@@ -10,9 +10,7 @@ var models = require('../models');
 
 function getBloque(req, res) {
 
-    console.log("--------------")+req.params.turno;
-
-     models.Bloque.findAll( { where: { turno: 1 }} ).then( function(bloquem) { 
+     models.Bloque.findAll( { where: { turno: req.params.turno }} ).then( function(bloquem) { 
         if (!bloquem) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
@@ -23,18 +21,15 @@ function getBloque(req, res) {
     });
 }
 
-function getSchedule(req, res) {
-
-    console.log("..............");
-    
-    var params = req.body;
-
+function getSchedule(req, res) {   
+ 
+    var params = new Object();
     params.school = req.user.sub;
-    params.id_curso = 1;
-
+    params.id_curso = req.query.curso;
     //turno: 1 condicional
+    //req.query.curso
 
-     models.Horariomanana.findAll( { where: { school: params.school, id_curso: params.id_curso }} ).then( function(horariom) { 
+     models.Horariomanana.findAll( { where: { school: req.user.sub, id_curso: params.course}} ).then( function(horariom) { 
         if (!horariom) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
@@ -44,7 +39,6 @@ function getSchedule(req, res) {
       } 
     });
 }
-
 
 function saveSchedule(req, res) 
 {
