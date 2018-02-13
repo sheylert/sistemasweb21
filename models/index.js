@@ -1,6 +1,6 @@
 var Sequelize = require('sequelize');
 
-const sequelize = new Sequelize("pronota_2019","postgres","admin123", {  
+const sequelize = new Sequelize("pronota","postgres","123456", {  
 dialect: 'postgres'
 });
 
@@ -32,6 +32,8 @@ const models = {
 	Notes  : sequelize.import('./notes'),
 	Bloque  : sequelize.import('./bloque'),
 	Horariomanana  : sequelize.import('./horariomanana'),
+	Horariotarde  : sequelize.import('./horariotarde'),
+	Horarionoche  : sequelize.import('./horarionoche'),
 }; 
 
 Object.keys(models).forEach((modelName) => {
@@ -44,6 +46,7 @@ if('associate' in models[modelName]) {
 
 models.sequelize = sequelize;
 models.Sequelize = sequelize;
+
 models.Op = Sequelize.Op
 
 module.exports = models;

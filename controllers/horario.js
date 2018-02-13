@@ -3,6 +3,8 @@
 var Bloque = require('../models/bloque');
 
 var Horariomanana = require('../models/horariomanana');
+var Horariotarde = require('../models/horariotarde');
+var Horarionoche = require('../models/horarionoche');
 
 // services
 var jwt = require('../services/jwt');
@@ -52,6 +54,7 @@ function saveSchedule(req, res)
     horariosobj["I"+params.block] = params.hora_inicio;
     horariosobj["B"+params.block] = params.subject;
 
+    if (params.turno == 1){
     models.Horariomanana.findOne( { where: { school: req.user.sub, id_curso: params.course,
     id_dia: params.dia  }}).then( function(horarios) { 
     
@@ -77,7 +80,71 @@ function saveSchedule(req, res)
           }
         })    
       } //else
-   })// fin one
+    })// fin one
+
+    }// fin turno 1
+
+
+    if (params.turno == 2){
+    models.Horariotarde.findOne( { where: { school: req.user.sub, id_curso: params.course,
+    id_dia: params.dia  }}).then( function(horarios) { 
+    
+      if (horarios) {
+         
+        models.Horariotarde.update( horariosobj, 
+              {where: { id: horarios.id } }).then( function(updatehorarios) { 
+
+        if (!updatehorarios) {
+          res.status(500).send({ message: 'No se a podido actualizar Notas!' });
+        } else {
+          res.status(200).send({ Horariotarde: updatehorarios });
+        }
+    }) 
+      }else
+      {  
+        models.Horariotarde.create(horariosobj).then( function(insertarHorarios) 
+        { 
+          if (!insertarHorarios) {
+            res.status(500).send({ message: 'Error al guardar Notas' });
+          } else { 
+             res.status(200).send({ Horariotarde: insertarHorarios });
+          }
+        })    
+      } //else
+    })// fin one
+
+    }// fin turno 2
+
+
+      if (params.turno == 3){
+    models.Horarionoche.findOne( { where: { school: req.user.sub, id_curso: params.course,
+    id_dia: params.dia  }}).then( function(horarios) { 
+    
+      if (horarios) {
+         
+        models.Horarionoche.update( horariosobj, 
+              {where: { id: horarios.id } }).then( function(updatehorarios) { 
+
+        if (!updatehorarios) {
+          res.status(500).send({ message: 'No se a podido actualizar Notas!' });
+        } else {
+          res.status(200).send({ Horarionoche: updatehorarios });
+        }
+    }) 
+      }else
+      {  
+        models.Horarionoche.create(horariosobj).then( function(insertarHorarios) 
+        { 
+          if (!insertarHorarios) {
+            res.status(500).send({ message: 'Error al guardar Notas' });
+          } else { 
+             res.status(200).send({ Horarionoche: insertarHorarios });
+          }
+        })    
+      } //else
+    })// fin one
+
+    }// fin turno 3
  }
 
 module.exports = {
