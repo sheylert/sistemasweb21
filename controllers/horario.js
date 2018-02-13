@@ -1,6 +1,6 @@
 'use strict'
 // modelos
-var Bloquemanana = require('../models/horariomanana');
+var Bloque = require('../models/bloque');
 
 // services
 var jwt = require('../services/jwt');
@@ -8,7 +8,7 @@ var models = require('../models');
 
 function getBloque(req, res) {
 
-     models.Bloquemanana.findAll().then( function(bloquem) { 
+     models.Bloque.findAll().then( function(bloquem) { 
         if (!bloquem) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
