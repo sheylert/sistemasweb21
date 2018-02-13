@@ -23,13 +23,13 @@ function getBloque(req, res) {
     });
 }
 
-function getSchedule(req, res) {   
- 
+function getSchedule(req, res) {  
+
     var params = new Object();
     params.school = req.user.sub;
     params.id_curso = req.query.curso;
-    //turno: 1 condicional
-    //req.query.curso
+ 
+    if (req.params.turno == 1){
 
      models.Horariomanana.findAll( { where: { school: req.user.sub, id_curso: params.id_curso}} ).then( function(horariom) { 
         if (!horariom) {
@@ -40,6 +40,33 @@ function getSchedule(req, res) {
           } 
       } 
     });
+   }
+
+    if (req.params.turno == 2){
+
+     models.Horariotarde.findAll( { where: { school: req.user.sub, id_curso: params.id_curso}} ).then( function(horariom) { 
+        if (!horariom) {
+          res.status(500).send({ message: 'Error en la petición' });
+        } else {
+          if (horariom) {
+            res.status(200).send(horariom);
+          } 
+      } 
+    });
+   }
+
+    if (req.params.turno == 3){
+
+     models.Horarionoche.findAll( { where: { school: req.user.sub, id_curso: params.id_curso}} ).then( function(horariom) { 
+        if (!horariom) {
+          res.status(500).send({ message: 'Error en la petición' });
+        } else {
+          if (horariom) {
+            res.status(200).send(horariom);
+          } 
+      } 
+    });
+   }
 }
 
 function saveSchedule(req, res) 
