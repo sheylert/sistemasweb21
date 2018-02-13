@@ -53,7 +53,7 @@ api.get('/user/:id',mdAuth.ensureAuth,UserController.findUser)
 
 
 //Horario-bloque
-api.get('/horario', mdAuth.ensureAuth,HorarioController.getBloque);
+api.get('/horario/:turno', mdAuth.ensureAuth,HorarioController.getBloque);
 
 
 // Course
