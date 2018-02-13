@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         },  
  
    yearCurrent: { 
-          type: DataTypes.INTEGER,
+          type: DataTypes.STRING,
 
           //numberico ojooooo
         },
@@ -39,7 +39,6 @@ module.exports = (sequelize, DataTypes) => {
     dateEnd2: { 
           type: DataTypes.DATE    
         },
-
     codeNumber: { 
           type: DataTypes.INTEGER,
           // numeric ojooooooo

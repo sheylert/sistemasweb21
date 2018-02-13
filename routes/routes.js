@@ -174,6 +174,7 @@ api.get('/student/countstudentbyschool/:idSchool', mdAuth.ensureAuth,StudentCont
 
 // Setting
 api.get('/setting', mdAuth.ensureAuth, SettingController.showAllSettings)
+api.get('/setting/:id', mdAuth.ensureAuth, SettingController.getSetting)
 api.post('/setting', mdAuth.ensureAuth, images.single('logo'), SettingController.saveSetting)
 api.put('/setting/:id',mdAuth.ensureAuth, images.single('logo'), SettingController.updateSetting)
 api.get('/setting/onlyDateLimit', mdAuth.ensureAuth, SettingController.getDateLimitConfig) //obtener solo el limite de fecha de configuracion
@@ -185,10 +186,10 @@ api.put('/setting_worker/:id',mdAuth.ensureAuth, images.single('logo'), SettingW
 
 
 // Course Management
-api.get('/courseManagement', mdAuth.ensureAuth,CourseManagementController.getAllCourses) // Ruta para buscar todos los cursos
+api.get('/courseManagement', mdAuth.ensureAuth,CourseController.getCourses) // Ruta para buscar todos los cursos
+api.get('/courseManagement/:id', mdAuth.ensureAuth,CourseController.getCourse) // Ruta para buscar todos los cursos
 api.get('/courseManagementNotes', mdAuth.ensureAuth,CourseManagementController.getStudentNote) // Ruta para buscar los estudiantes sin notas y las notas ya almacenadas
 api.post('/courseManagementMassive', mdAuth.ensureAuth,CourseManagementController.masiveAssingStudentNote) // Ruta para almacenar masivamente las notas
-api.get('/courseManagement/:id', mdAuth.ensureAuth,CourseManagementController.getCourse) // Ruta para buscar un curso con todos los populate
 api.get('/courseManageAnnotation/:id', mdAuth.ensureAuth,CourseManagementController.listStudent) // Ruta para listar todos los alumnos del curso para las anotaciones
 api.post('/courseManageAnnotation', mdAuth.ensureAuth,CourseManagementController.saveStudentAnnotation) // Ruta para almacenar una anotación
 api.get('/courseManageAnnotationStored/:id', mdAuth.ensureAuth,CourseManagementController.listStudentAnnotation) // Ruta para listar todas las anotaciones de un alumno
