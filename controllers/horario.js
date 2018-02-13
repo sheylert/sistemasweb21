@@ -48,21 +48,22 @@ function getSchedule(req, res) {
 
 function saveSchedule(req, res) 
 {
-
     var params = req.body;
 
-    params.school = req.user.sub;
-    params.id_curso = 1;
-    params.id_dia = 2;
-    params.I5 = "12:15:00";
-    params.B5 = 10;
+    var horariosobj = new Object();
 
-    models.Horariomanana.findOne( { where: { school: params.school, id_curso: params.id_curso,
-    id_dia: params.id_dia  }}).then( function(horarios) { 
+    horariosobj.school = req.user.sub;
+    horariosobj.id_curso = params.course;
+    horariosobj.id_dia = params.dia;
+    horariosobj["I"+params.block] = params.hora_inicio;
+    horariosobj["B"+params.block] = params.subject;
+
+    models.Horariomanana.findOne( { where: { school: req.user.sub, id_curso: params.course,
+    id_dia: params.dia  }}).then( function(horarios) { 
     
       if (horarios) {
          
-        models.Horariomanana.update( params, 
+        models.Horariomanana.update( horariosobj, 
               {where: { id: horarios.id } }).then( function(updatehorarios) { 
 
         if (!updatehorarios) {
@@ -73,7 +74,7 @@ function saveSchedule(req, res)
     }) 
       }else
       {  
-        models.Horariomanana.create(params).then( function(insertarHorarios) 
+        models.Horariomanana.create(horariosobj).then( function(insertarHorarios) 
         { 
           if (!insertarHorarios) {
             res.status(500).send({ message: 'Error al guardar Notas' });
