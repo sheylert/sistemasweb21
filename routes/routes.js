@@ -76,6 +76,8 @@ api.put('/course/:idCourse/student', mdAuth.ensureAuth,CourseController.deleteCo
 api.post('/course/:idCourse/subject', mdAuth.ensureAuth,CourseController.saveCourseSubject);
 api.post('/course/:idCourse/subject/delete', mdAuth.ensureAuth, CourseController.deleteCourseSubject);
 
+api.get('/course/assing/:id',mdAuth.ensureAuth,CourseController.assingOfCourse)
+
 
 // Teacher
 api.put('/teacher/:id', mdAuth.ensureAuth,TeacherController.updateTeacher);

@@ -271,47 +271,7 @@ function getCourses(req, res) {
 
 }    
 
-  /*  
 
-    Course.find().populate([{
-
-
-            path: 'teacher_chief',
-            model: 'Teacher'
-        },
-        {
-            path: 'code_teaching',
-            model: 'Teaching'
-        },
-        {
-            path: 'code_grade',
-            model: 'CourseCode'
-        },
-        {
-            path: 'code_subject.idSubject',
-            model: 'Subject'
-        },
-        {
-            path: 'code_student',
-            model: 'Student'
-        },
-        {
-            path: 'code_school',
-            model: 'Client'
-        }
-    ]).exec((err, courses) => {
-        if (err) {
-            res.status(500).send({ message: 'Error en la petición', err: err.errors })
-        } else {
-            if (!courses) {
-                res.status(200).send([])
-            } else {
-                res.status(200).send(courses);
-            }
-        }
-    });
-
-*/
 
 // GET http://localhost:3789/course/:id
 function getCourse(req, res) {
@@ -432,6 +392,46 @@ function removeItemFromArr(arr, item) {
     arr.splice(i, 1);
 }
 
+function assingOfCourse(req,res)
+{
+    // funcion para buscar solo las asignaturas que tenga un curso
+
+    models.Course.findById(req.params.id).then(result => {
+
+        let subjects = []
+        let promises = []
+
+        if(result.code_subject.length > 0)
+        {
+            result.code_subject.forEach( function(element, index) {
+                
+                promises.push(
+                    models.Subject.findById(element).then(resultSubject => {
+                        subjects.push(resultSubject)
+
+                        if(index + 1 == result.code_subject.length)
+                        {
+                            result.code_subject = subjects
+                        }
+                    })
+                )
+
+            }); // foreach asignaciones
+
+            Promise.all(promises).then(response => {
+                res.json(result.code_subject)       
+            }).catch(err => res.status(500).json({ message: "Error al buscar las asignaturas"}))
+
+        }
+        else
+        {
+            res.json([])
+        }
+        
+    }).catch(err => res.status(500).json({ message: 'Ha ocurrido un error al buscar los datos del curso'}))
+
+}
+
 
 module.exports = {
     saveCourse,
@@ -447,5 +447,7 @@ module.exports = {
     deleteCourseSubject,
 
     saveCourseSchool,
-    deleteCourseSchool
+    deleteCourseSchool,
+
+    assingOfCourse
 }
