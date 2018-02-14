@@ -429,7 +429,11 @@ function listSmsShipping(req, res) {
 					models.Sms.findOne({ where : {id : idSms},
 						include : [{
 							model : models.Student,
-							as    : 'estudiante'
+							as    : 'estudiante',
+							include:[{
+								model: models.Responsable,
+								as   : 'responsable'
+							}]
 						}]
 					}).then(smsStored => {
 						return smsStored
