@@ -116,6 +116,12 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
                 // student.code_teaching = params.code_teaching
                 // student.character = params.character
                 student.birth_date = params.birth_date
+
+                var cadena = params.birth_date,
+                    separador = "-", // un espacio en blanco
+                    arregloDeSubCadenas = cadena.split(separador);
+
+                student.birth_date = arregloDeSubCadenas[2]+"/"+ arregloDeSubCadenas[1]+"/"+ arregloDeSubCadenas[0];
                 student.age = params.age
                 student.course = null
                 student.state = true
@@ -381,14 +387,12 @@ function updateStudent(req, res) {
     // Función para modificar el estudiante
     const userId = req.params.id;
 
-    var b_date = req.body.birth_date.indexOf('-', 0) == -1 ? req.body.birth_date.split("/").reverse().join("/") : req.body.birth_date.split("-").reverse().join("-")
-    var dateNow = new Date()
-    b_date = new Date(b_date)
+       var cadena = req.body.birth_date,
+                    separador = "-", // un espacio en blanco
+                    arregloDeSubCadenas = cadena.split(separador);
 
-    b_date.setHours(dateNow.getHours() + 20)
-    b_date.setMinutes(dateNow.getMinutes())
-    b_date.setSeconds(dateNow.getSeconds())
-
+                req.body.birth_date = arregloDeSubCadenas[2]+"/"+ arregloDeSubCadenas[1]+"/"+ arregloDeSubCadenas[0];
+          
     const update = {
         name: req.body.name,
         lastname: req.body.lastname,
@@ -396,7 +400,7 @@ function updateStudent(req, res) {
         code_grade: req.body.code_grade,
         code_teaching: req.body.code_teaching,
         character: req.body.character,
-        birth_date: '2018-01-01',
+        birth_date: req.body.birth_date,
         age: req.body.age,
         course: req.body.course,
         checked: true,
