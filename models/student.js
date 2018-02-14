@@ -1,5 +1,5 @@
 'use strict'
-
+ 
 module.exports = (sequelize, DataTypes) => {
 
   const Student = sequelize.define("student", {
