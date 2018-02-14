@@ -119,6 +119,7 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
                 student.age = params.age
                 student.course = null
                 student.state = true
+                student.checked = true
                 student.school = req.user.sub
 
                 models.Responsable.findOne({ where: { rut:  params.rut_res }}).then( responsable => {
@@ -398,6 +399,7 @@ function updateStudent(req, res) {
         birth_date: '2018-01-01',
         age: req.body.age,
         course: req.body.course,
+        checked: true,
         school: req.user.sub
     }
 
