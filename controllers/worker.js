@@ -18,7 +18,12 @@ function saveWorker(req, res) {
   // recogemos parametros
   var params = req.body;
   params.school = req.user.sub
-  params.birt_date = params.birt_date.setHours(params.birt_date.getHours() + 24)
+
+   var cadena = params.birth_date,
+                    separador = "-", // un espacio en blanco
+                    arregloDeSubCadenas = cadena.split(separador);
+
+               params.birt_date = arregloDeSubCadenas[2]+"/"+ arregloDeSubCadenas[1]+"/"+ arregloDeSubCadenas[0];
   // crear objeto profesor
    var validar =  validator.validate(params.email)
     if (validar) {
@@ -94,6 +99,14 @@ function updateWorker(req, res) {
   var params = req.body;
    var validar =  validator.validate(params.email)
     if (validar) {
+
+
+        var cadena = params.birth_date,
+                    separador = "-", // un espacio en blanco
+                    arregloDeSubCadenas = cadena.split(separador);
+
+                params.birth_date = arregloDeSubCadenas[2]+"/"+ arregloDeSubCadenas[1]+"/"+ arregloDeSubCadenas[0];
+   
       
    models.Worker.update( params, 
                          {where: { id: params.id } }).then( function(updateworkers) { 
