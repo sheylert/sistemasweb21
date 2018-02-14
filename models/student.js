@@ -45,7 +45,9 @@ lastSms: {
           type: DataTypes.STRING,
           // revisar colocar el null default: NULL,
         },
-
+checked : {
+          type: DataTypes.BOOLEAN
+        },
 course: { 
           type: DataTypes.INTEGER,
         },        

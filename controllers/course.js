@@ -308,7 +308,11 @@ function getCourse(req, res) {
             result[0].code_student.forEach( function(element, index) {
                 
                 promises.push(
-                    models.Student.findById(element).then(resultStudent => {
+                    models.Student.findOne({ where : { id: element }, include:[{
+                            model: models.Responsable,
+                            as   : 'responsable'
+                        }]
+                    }).then(resultStudent => {
                         students.push(resultStudent)
 
                         if(index + 1 == result[0].code_student.length)

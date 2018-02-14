@@ -176,7 +176,7 @@ function save_params (req,res,params, path = null, edit = null)
                
                 setting.nameLogo = path ? path+'.jpg' : null;
                 setting.periodo = params.periodo
-                setting.yearCurrent = 2  //params.yearCurrent revisar             
+                setting.yearCurrent =  params.yearCurrent
                 setting.dateInit1 = params.dateInit1
                 setting.dateEnd1 = params.dateEnd1
                 setting.dateInit2 = params.dateInit2
@@ -205,9 +205,18 @@ function save_params (req,res,params, path = null, edit = null)
         
 }
 
+function getSetting (req,res) {
+    const id = req.params.id
+
+    models.Setting.findById(id).then(result =>{
+        res.json(result)
+    }).catch(err => res.status(500).json({ message: 'Ha ocurrido un error al buscar la configuración'}))
+}
+
 module.exports = {
     showAllSettings,
     saveSetting,
     getDateLimitConfig,
-    updateSetting
+    updateSetting,
+    getSetting
 }

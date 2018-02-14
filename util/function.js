@@ -22,14 +22,13 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 	          student_id: ele.id,
 	          template_id: idTemplate,
 	          school_id: req.user.sub,
-	          cursoId: req.body.course,
+	          course_id: req.body.course,
 	          user_id: req.user.userId,
 	          type: typeSms,
 	          smsBody : labsmobileResponse.statusMessageApi,
 	          phone: ele.responsable ? ele.responsable.phone : ele.phone,
 	          envio_id: 0,
-	          status: "DEFAULT",
-	          student_or_worker: 'Estudiante'
+	          status: "DEFAULT"
 	        }
 		}
 		else
@@ -44,8 +43,7 @@ function storedSmsMasive(req,res,estudiantes,idTemplate,typeSms,labsmobileRespon
 	          smsBody : labsmobileResponse.statusMessageApi,
 	          phone: ele.responsable ? ele.responsable.phone : ele.phone,
 	          envio_id: 0,
-	          status: "DEFAULT",
-	          student_or_worker: 'Trabajador'
+	          status: "DEFAULT"
 	        }
 		}
 	        

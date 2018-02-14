@@ -428,15 +428,15 @@ function sendSmsMasive(req, res) {
 
       if(req.user.profile.slug.indexOf('ENTERPRISE') === -1)
       {
-        arregloConsultas.push(models.Student.findOne({ where: { id: ele } }).populate('responsable').exec((err, student) => {
-          models.Settings.findOne( { where :{school: ele.school} }).select('codeNumber').exec((err,setting) => {
+        arregloConsultas.push(models.Student.findOne({ where: { id: ele }, include: [{ model: models.Responsable, as :'responsable'}] }).then(student => {
+
+            numbers = index === 0 ? `${codigoPais}${student.responsable.phone}` : `${numbers},${codigoPais}${student.responsable.phone}`;
+            quantityErrorCount++;
+            quantitySuccessCount++;
+            return student
             
-          })
-          numbers = index === 0 ? `56${student.responsable.phone}` : `${numbers},56${student.responsable.phone}`;
-          quantityErrorCount++;
-          quantitySuccessCount++;
-          
-        })) // fin carga de promesas y función para buscar los estudiantes
+          }).catch(err => console.log('Ha ocurrido un error iterando el array de estudiantes'))
+        ) // fin carga de promesas y función para buscar los estudiantes
       }
       else
       {
@@ -469,7 +469,7 @@ function sendSmsMasive(req, res) {
           url: urlRequest,
           method: 'GET',
         }, function (error, response, body) {
-        if (response) 
+        if (error) 
           {
             // si hubo un error en al enviar la mensajeria
             aviso = 'Ha ocurrido un error al enviar la mensajería, es posible que se haya quedado sin creditos'
@@ -487,7 +487,7 @@ function sendSmsMasive(req, res) {
           } // fin si no hubo error
         }) // fin funcion request*/
       
-      }// aquii
+      }
       else
       {
         aviso = "Notificaciónes guardadas con éxito"

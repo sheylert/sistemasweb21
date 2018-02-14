@@ -15,7 +15,7 @@ function getAllTemplates(req, res) {
   // school: req.user.sub ---------------- ojo  
   var params = req.body;
   //req.user.sub
-  models.Template.findAll( { where: { school: req.user.sub, state: true }} ).then( function(templates) { 
+  models.Template.findAll( { where: { school: req.user.sub}} ).then( function(templates) { 
      
      if (!templates) {
           res.status(500).send({ message: 'Error en la petición' });

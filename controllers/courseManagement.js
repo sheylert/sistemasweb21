@@ -6,81 +6,8 @@ var chalk = require('chalk');
 // modelos
 var models = require('../models');
 
-function getAllCourses(req, res) {
-    
-    Course.find( {code_school: req.user.sub} ).exec((err, courses) => {
-        if (err) 
-        {
-            res.status(500).send({ message: 'Error en la petición' })
-        } 
-        else 
-        {
-            if (courses.length == 0) 
-            {
-                res.status(200).send([])
-            } 
-            else 
-            {
-                res.status(200).send(courses);
-            }
-        }
-    })
-}
 
-function getCourse(req, res) {
 
-    // Función para buscar el curso seleccionado
-
-    Course.findOne( {_id: req.params.id} )
-    .populate([{
-            path: 'code_subject',
-            model: 'Subject'
-        },
-        {
-            path: 'code_student',
-            model: 'Student',
-            populate:{
-                path: 'responsable',
-                model: 'Responsable'
-            }
-        }
-    ])
-    .exec((err, course) => {
-        if (err) 
-        {
-            res.status(500).send({ message: 'Ha ocurrido un error en la busqueda' });
-        } 
-        else 
-        {
-            if (course) 
-            {
-                Note.find( {course: req.params.id} ).exec((err, notess) =>{
-                    if (err) 
-                    {
-                        res.status(500).send({ message: 'Ha ocurrido un error al buscar las notas del curso' });
-                    } 
-                    else 
-                    {
-                        if(notess.length > 0) 
-                        {
-                            course.notes = notess
-                        }
-                        else
-                        {
-                            course.notes = {}
-                        }
-                    }
-
-                })
-                res.status(200).send(course)
-            } 
-            else 
-            {
-                res.status(200).send([])
-            }
-        }
-    })
-}
 
 function getStudentNote(req,res)
 {
@@ -512,8 +439,6 @@ function saveEvent(req,res)
 }
 
 module.exports = {
-    getAllCourses,
-    getCourse,
     masiveAssingStudentNote,
     listStudent,
     saveStudentAnnotation,
