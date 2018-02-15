@@ -5,12 +5,29 @@ var models = require('../models');
 
 
 function showAllSubjects(req, res) {
-  // Función para buscar todas las asignaturas
-  models.Subject.findAll({ where: { school_id: req.user.sub }} ).then(result => {
-      
-      res.status(200).send(result);
 
-  }).catch(err => res.status(500).json({ message: 'Error al buscar todas las asignaturas de un curso'}))
+  // Función para buscar todas las asignaturas
+   const idCourse = req.params.idCourse;
+   let subjects = [];
+
+    models.Course.findOne({ where : { id: 2 } }).then(result => {
+    
+      subjects = result.code_subject
+
+      if(subjects.length > 0)
+        {      
+          models.sequelize.query('SELECT * FROM subjects WHERE id not in (:variable)',
+          { replacements: { variable: result.code_subject }, type: models.sequelize.QueryTypes.SELECT }
+        ).then(result => {
+           res.status(200).send(result);
+        })
+        }else
+        {
+           models.Subject.findAll({ where: { school_id: req.user.sub }} ).then(result => {
+              res.status(200).send(result);
+            }).catch(err => res.status(500).json({ message: 'Error al buscar todas las asignaturas de un curso'}))
+        }
+    });
 }
 
 function saveSubject(req, res) {
