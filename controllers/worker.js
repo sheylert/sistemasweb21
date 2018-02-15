@@ -18,6 +18,12 @@ function saveWorker(req, res) {
   // recogemos parametros
   var params = req.body;
   params.school = req.user.sub
+
+   var cadena = params.birth_date,
+                separador = "-", // un espacio en blanco
+                arregloDeSubCadenas = cadena.split(separador);
+                params.birt_date = arregloDeSubCadenas[2]+"/"+ arregloDeSubCadenas[1]+"/"+ arregloDeSubCadenas[0];
+
   // crear objeto profesor
    var validar =  validator.validate(params.email)
     if (validar) {
@@ -48,38 +54,6 @@ function getWorkers(req, res) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
           if (workers) {
-              
-           /*   teachers = teachers.map((e,i) => {
-                  
-                  console.log(e.dataValues.profile,'aquii')
-                  console.log(e.dataValues,'aquii111')
-
-                  models.Profile.findOne( { where: { id: e.dataValues.profile}}).then( function(profileStoraged) { 
-
-                  if (profileStoraged) {    
-                    e.dataValues.profile = Util.ejecutar_arreglo(profileStoraged);
-                  }
-                  else
-                  {
-                    return e
-                  } 
-              });  
-              
-              })
-
-              */ 
-
-              //.Profile.findOne( { where: { id: teachers.profile}}).then( function(profileStoraged) { 
-
-                  // if (profileStoraged) {
-
-                   //console.log("sssssss");
-
-                 //  teachers.profile = Util.ejecutar_arreglo(profileStoraged);
-             //  } 
-             // });  
-            //teachers.responsable = Util.ejecutar_arreglo(teachers);
-            //console.log(teachers)
             res.status(200).send(workers);
           } 
         }     
@@ -93,6 +67,14 @@ function updateWorker(req, res) {
   var params = req.body;
    var validar =  validator.validate(params.email)
     if (validar) {
+
+
+        var cadena = params.birth_date,
+                    separador = "-", // un espacio en blanco
+                    arregloDeSubCadenas = cadena.split(separador);
+
+                params.birth_date = arregloDeSubCadenas[2]+"/"+ arregloDeSubCadenas[1]+"/"+ arregloDeSubCadenas[0];
+   
       
    models.Worker.update( params, 
                          {where: { id: params.id } }).then( function(updateworkers) { 

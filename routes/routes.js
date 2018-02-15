@@ -139,6 +139,7 @@ api.get('/profile', mdAuth.ensureAuth,ProfileController.getProfiles);
 api.get('/subject', mdAuth.ensureAuth,SubjectController.showAllSubjects)
 api.post('/subject', mdAuth.ensureAuth,SubjectController.saveSubject)
 api.get('/subject/:id', mdAuth.ensureAuth,SubjectController.getSubject)
+api.get('/subject/notCourse/:id', mdAuth.ensureAuth,SubjectController.subjectNotInCourse)
 api.put('/subject/:id', mdAuth.ensureAuth,SubjectController.updateSubject)
 api.delete('/subject/:id', mdAuth.ensureAuth,SubjectController.deleteSubject)
 
