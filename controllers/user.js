@@ -22,6 +22,7 @@ var Template = require('../models/template');
 //var Settings = require('../models/setting');
 var Util     = require('../util/function')
 var UtilPrueba     = require('../util/functionPrueba')
+var emailValidator = require('email-validator')
 // services
 var jwt = require('../services/jwt');
 
@@ -45,35 +46,44 @@ function saveUser(req, res) {
     user.state = params.state == 1 ? true : false;
     user.validatePass = false;
 
-     models.User.findOne( { where: { email: user.email.toLowerCase() }}).then( function(users) { 
-   
-       if (users) {
-          //res.status(500).send({ message: 'Error al comprobar usuario' });
-          res.status(500).send({ message: 'Usuario ya existe!' });
-        } else {
-          if (!users) {
+    const validate_email = emailValidator.validate(updaterecord.email)
+    if(validate_email)
+    {
+        models.User.findOne( { where: { email: user.email.toLowerCase() }}).then( function(users) { 
+     
+         if (users) {
+            //res.status(500).send({ message: 'Error al comprobar usuario' });
+            res.status(500).send({ message: 'Usuario ya existe!' });
+          } else {
+            if (!users) {
 
-            user.password = bcrypt.hashSync(user.password, 10);
+              user.password = bcrypt.hashSync(user.password, 10);
 
-                models.User.create(user).then( function(insertarUser) 
-              { 
+                  models.User.create(user).then( function(insertarUser) 
+                { 
 
-                    if (!insertarUser) {
-                      res.status(404).send({ message: 'No se ha guardado correctamente' });
-                    } else 
-                    {
-                         res.status(200).send({ user: insertarUser });   
-                   }     
+                      if (!insertarUser) {
+                        res.status(404).send({ message: 'No se ha guardado correctamente' });
+                      } else 
+                      {
+                           res.status(200).send({ user: insertarUser });   
+                     }     
 
-            });
-         } //if (!users) 
+              });
+           } //if (!users) 
 
-       }
-      }); 
+         }
+        }); 
+    }
+    else
+    {
+      res.status(500).json({ message: 'Ha ocurrido un error el email tiene formato incorrecto'}) 
+    }  
 
   } else {
     res.status(400).send({ message: 'Ingresa los datos correctos para poder registrar al usuario' });
   }
+    
 }
 
 function putUser(req, res) {
@@ -82,28 +92,52 @@ var userId = req.params.id;
 var updaterecord = req.body;
 var password;
 
-  models.User.findOne( { where: { id: userId }}).then( function(users) { 
-    if (users) {
-         password = users.password;
+const filtro = { [models.Op.ne] : userId }
 
-          bcrypt.compare(password, updaterecord.password, function(err, respuesta) {
-              if (!respuesta) {
-                  updaterecord.password = bcrypt.hashSync(updaterecord.password, 10);
-              }
+const validate_email = emailValidator.validate(updaterecord.email)
+if(validate_email)
+{
+  models.User.findOne({ where: { email : updaterecord.email, id: filtro  } }).then(userRepetido => {
+    if(userRepetido)
+    {
+      res.status(500).send({ message: 'No se a podido actualizar Usuario debido a que el email ya el emai lo posee otro usuario!' });
+    }
+    else
+    {
+        models.User.findOne( { where: { id: userId }}).then( function(users) { 
+          if (users) {
+               password = users.password;
 
-              models.User.update( updaterecord, 
-                                   {where: { id: userId } }).then( function(updateuser) { 
+                bcrypt.compare(password, updaterecord.password, function(err, respuesta) {
+                    if (!respuesta) {
+                        updaterecord.password = bcrypt.hashSync(updaterecord.password, 10);
+                    }
 
-                  if (!updateuser) {
-                    res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
-                  } else {
-                    res.status(200).send({ user: updateuser });
-                  }
-              });          
-          });   
+                    models.User.update( updaterecord, 
+                                         {where: { id: userId } }).then( function(updateuser) { 
 
-    } // fin if users
-  }); // fin funcion encontrar users
+                        if (!updateuser) {
+                          res.status(500).send({ message: 'No se a podido actualizar Usuario!' });
+                        } else {
+                          res.status(200).send({ user: updateuser });
+                        }
+                    });          
+                });   
+          }
+          else
+          {
+            res.status(500).json({ message: 'No se encontro ningún usuario con ese id'})
+          } // fin if users
+        }).catch(err => res.status(500).json({ message: 'Ha ocurrido un error al buscar el usuario a modificar'}) ); // fin funcion encontrar users    
+    }
+  })
+}
+else
+{
+  res.status(500).json({ message: 'Ha ocurrido un error el email tiene formato incorrecto'}) 
+}
+  
+  
 } 
 
 function findUser (req,res) {
@@ -586,8 +620,6 @@ function sendSmsSingle(req, res) {
        // })fin busqueda de numero país en settings
     })// fin find Student function
   }) // fin función buscar template
-
-
 }
 
 function getUsers(req, res) {

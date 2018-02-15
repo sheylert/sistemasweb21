@@ -164,45 +164,47 @@ models.Student.findOne({ where: { rut:  params.rut }}).then( result => {
                                        
                                         if(profile)
                                         {
-                                                    student.responsable_id = responStore.id
+                                                student.responsable_id = responStore.id
 
-                                                    var user={}; 
+                                                var user={}; 
 
-                                                    user.name = params.name_res +' '+params.lastname_res;
-                                                    user.address = params.address_res;
-                                                    user.phone = params.phone_res;
-                                                    user.school = req.user.sub
-                                                    user.profile_id = profile.id;
-                                                    user.email = params.email_res;
-                                                    user.password = bcrypt.hashSync(params.email_res, 10);
-                                                    user.state = true;
-                                                    user.services = true;
-                                                    user.validatePass = false;
-                    
-                                                    user.responId = responStore.id
-                                                       
-                                                    models.User.create(user).then( function(userStore) { 
+                                                user.name = params.name_res +' '+params.lastname_res;
+                                                user.address = params.address_res;
+                                                user.phone = params.phone_res;
+                                                user.school = req.user.sub
+                                                user.profile_id = profile.id;
+                                                user.email = params.email_res;
+                                                user.password = bcrypt.hashSync(params.email_res, 10);
+                                                user.state = true;
+                                                user.services = true;
+                                                user.validatePass = false;
+                
+                                                user.responId = responStore.id
+                                                   
+                                                models.User.create(user).then( function(userStore) { 
 
                                                     if (!userStore) {
                                                         
                                                         res.status(500).send({ message: 'Error al guardar el usuario del responsable' });
                                   
-                                                    } else {
- 
-                                                            models.Student.create(student).then( function(studentStore) 
-                                                            { 
+                                                    } 
+                                                    else 
+                                                    {
 
-                                                            if (!studentStore) 
-                                                               {
-                                                                res.status(404).send({ message: 'No se ha guardado el estudiante' });
-                                                               } else {
-                                                                //studentStore.respon = responStore;
-                                                                res.status(200).send({ Student: studentStore });
-                                                               }
-                                                              
-                                                              });  
-                                                            }
-                                                 });
+                                                        models.Student.create(student).then( function(studentStore) 
+                                                        { 
+
+                                                        if (!studentStore) 
+                                                           {
+                                                            res.status(404).send({ message: 'No se ha guardado el estudiante' });
+                                                           } else {
+                                                            //studentStore.respon = responStore;
+                                                            res.status(200).send({ Student: studentStore });
+                                                           }
+                                                          
+                                                          });  
+                                                    }
+                                                }).catch(err => 'No se a podido crear el usuario porque el correo ya esta en uso');
                                                             
                                         }else
                                         {
@@ -298,33 +300,7 @@ function updateStudent(req, res) {
 
     }
  })
- /*
 
-    Student.findByIdAndUpdate(userId, update, { new: true }, (err, studentUpdated) => {
-        if (err) {
-            res.status(500).send({ message: 'Ha ocurrido un error al tratar de modificar el usuario' });
-        } else {
-            if (!studentUpdated) {
-                res.status(404).send({ message: 'No se a podido actualizar el usuario!' });
-            } else {
-
-                Responsable.findByIdAndUpdate(studentUpdated.responsable, updateRes, { new: true }, (err, responUpdated) => {
-                    if (err) {
-                        res.status(500).send({ message: 'Ha ocurrido un error al tratar de modificar el responsable' });
-                    } else {
-                        if (!responUpdated) {
-                            res.status(404).send({ message: 'No se a podido actualizar el responsable!' });
-                        } else {
-                            res.status(200).send({ Student: studentUpdated, Responsable: responUpdated });
-                        }
-                    }
-                })
-            }
-        }
-
-    })
-
-    */
 
 }
 
