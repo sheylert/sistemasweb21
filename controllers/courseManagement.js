@@ -97,12 +97,11 @@ function masiveAssingStudentNote(req, res)
         else
         {
 
+            filtroNote[fieldUpdate] = params.note
             models.Notes.create(filtroNote).then(noteCreate => {
                 if(noteCreate)
                 {
-                    models.Notes.update({ [fieldUpdate] : params.note}, {where: {id: noteCreate.id} }).then( noteUpdate => {
-                        res.json({})
-                    }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al actualizar la nota"}) )
+                    res.json({})
                 }
             }).catch( err => res.status(500).json({ message: "Ha ocurrido un error al crear la nota"}) )
         }
