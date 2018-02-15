@@ -100,7 +100,7 @@ if(validate_email)
   models.User.findOne({ where: { email : updaterecord.email, id: filtro  } }).then(userRepetido => {
     if(userRepetido)
     {
-      res.status(500).send({ message: 'No se a podido actualizar Usuario debido a que el email ya el emai lo posee otro usuario!' });
+      res.status(500).send({ message: 'No se a podido actualizar Usuario debido a que el email lo posee otro usuario!' });
     }
     else
     {
