@@ -4,12 +4,15 @@
 module.exports = (sequelize, DataTypes) => {
 
   const CourseCode = sequelize.define("coursecode", {
-  name: { 
-          type: DataTypes.STRING    
-        },
-  slug: { 
-          type: DataTypes.STRING    
-        },         
+    name: { 
+            type: DataTypes.STRING    
+          },
+    slug: { 
+            type: DataTypes.STRING    
+          },
+    school_id: {
+            type: DataTypes.INTEGER    
+    }         
   });
     return CourseCode;
 

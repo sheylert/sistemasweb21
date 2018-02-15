@@ -90,33 +90,14 @@ function masiveAssingStudentNote(req, res)
     const prom_1 = "prom_1";
     const prom_2 = "prom_2";
 
-    var pronota = 0;
-
-
     models.Notes.findOne({ where : filtroNote }).then(notesResult => {
         if(notesResult)
         {
-            if (params.period == 1){
-                var paso;
-                for (paso = 1; paso < 13; paso++) {
-                  // Se ejecuta 5 veces, con valores desde paso desde 0 hasta 4.
-                  const fielcampo = arreglo_field[0]+"_"+params.period+"_"+paso
+            let notanota = updateProm(notesResult,params.period,fieldUpdate,params.note)
 
+            let promUpdate = 'prom_'+params.period
 
-                   console.log('----------------'+notesResult.fielcampo);
-                  pronota = pronota + notesResult.fielcampo;
-                  console.log('Dando un paso al Este'+pronota);
-                };
-            }else
-            {
-               var paso;
-                for (paso = 0; paso < 12; paso++) {
-                  // Se ejecuta 5 veces, con valores desde paso desde 0 hasta 4.
-                  console.log('Dando un paso al Este'+paso);
-                };
-            }
-
-            models.Notes.update({ [fieldUpdate] : params.note, prom_1 : pronota }, {where: filtroNote}).then(noteUpdate => {
+            models.Notes.update({ [fieldUpdate] : params.note, [promUpdate]: notanota }, {where: filtroNote}).then(noteUpdate => {
                 res.json({})
             }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al actualizar la notas"}) )
         }
@@ -124,6 +105,7 @@ function masiveAssingStudentNote(req, res)
         {
             filtroNote[fieldUpdate] = params.note
             filtroNote[prom_1] = params.note / 12;
+            filtroNote[prom_1] = filtroNote[prom_1].toFixed(1)
 
             models.Notes.create(filtroNote).then(noteCreate => {
                 if(noteCreate)
@@ -135,6 +117,58 @@ function masiveAssingStudentNote(req, res)
     })
 
 }
+
+function updateProm(notas,periodo, campo,valor)
+{
+    
+    // función para actualizar los promedios de las notas
+    let notanota = 0;
+    let validate = false;
+    valor = parseFloat(valor)
+            
+    if (periodo == 1){
+
+          Object.keys(notas.dataValues).forEach((ele,index) => {
+            
+            if(ele.indexOf('note_1') !== -1)
+            {
+ 
+                if(ele === campo)
+                {
+                    notanota += valor
+                }
+                else
+                {
+                    notanota += notas[ele] ? notas[ele] : 0
+                }
+            }
+
+          })
+    }
+    else
+    {
+        Object.keys(notas).forEach((ele,index) => {
+
+            if(ele.indexOf('note_2') !== -1)
+            {
+                if(ele === campo)
+                {
+                    notanota += valor
+                }
+                else
+                {
+                    notanota += notas[ele] ? notas[ele] : 0
+                }
+            }
+          })   
+    }
+    
+    notanota = notanota / 12
+    notanota = notanota.toFixed(1)
+    
+    return notanota
+}
+
 
 function listStudent(req,res)
 {

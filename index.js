@@ -14,6 +14,55 @@ function runserver(){
 var httpServer = http.createServer(app);
     httpServer.listen(port, function(){
     console.log('Servidor Node y Express está corriendo en el puerto' + port);
-});
 
+      //perfiles por defecto
+      models.Profile.findAll().then( function(profiles) { 
+        if (profiles) {
+           if (profiles.length == 0){
+           models.Profile.create({name : 'SUPER', slug: 'SUPER_ADMIN' });
+           models.Profile.create({name : 'EMPRESA', slug: 'ENTERPRISE' });
+           models.Profile.create({name : 'EMPRESA BASICA', slug: 'ENTERPRISE_BASIC' });
+           models.Profile.create({name : 'ESCUELA', slug: 'ADMIN_SCHOOL' });
+           models.Profile.create({name : 'RESPONSABLE', slug: 'RESPONSABLE' });
+           }
+        } 
+    });
+
+      models.Teaching.findAll().then( function(teachings) { 
+        if (teachings) {
+           if (teachings.length == 0){
+           models.Teaching.create({name : 'PRIMARIA', slug: 'PRIMARIA' });
+           models.Teaching.create({name : 'MEDIA', slug: 'MEDIA' });
+           models.Teaching.create({name : 'PREESCOLAR', slug: 'PREESCOLAR' });
+           }
+        } 
+    });
+
+       models.Client.findAll().then( function(Clients) { 
+        if (Clients) {
+           if (Clients.length == 0){
+           models.Client.create({rbd : 'rbd', name: 'sistema', address: 'address', email: 'pronota@pronota.com',
+                                 phone: '999999999', ree : 'ree', membership: 'membership', services: true, profile_id: 1, admin : 1});
+           }
+        } 
+    });
+
+      models.User.findAll().then( function(users) { 
+        if (users) {
+           if (users.length == 0){
+
+           models.User.create({name : 'USUARIO', address: 'address', email: 'pronota@pronota.com', 
+                               password :'$2a$10$Y8Gx8QjJFFH3zIf8556pSeUieZWus.QfariG3PVg6wPyv90GpFDNy',
+                               state:true, phone: '999999999', services: true, profile_id: 1, admin : 1, 
+                               school: 1, validatePass: false});
+           }
+        } 
+    });
+
+     
+
+
+   
+
+});
 };
