@@ -87,17 +87,44 @@ function masiveAssingStudentNote(req, res)
     const arreglo_field = params.field.split('_')
     const fieldUpdate = arreglo_field[0]+"_"+params.period+"_"+arreglo_field[1]
 
+    const prom_1 = "prom_1";
+    const prom_2 = "prom_2";
+
+    var pronota = 0;
+
+
     models.Notes.findOne({ where : filtroNote }).then(notesResult => {
         if(notesResult)
         {
-            models.Notes.update({ [fieldUpdate] : params.note}, {where: filtroNote}).then(noteUpdate => {
+            if (params.period == 1){
+                var paso;
+                for (paso = 1; paso < 13; paso++) {
+                  // Se ejecuta 5 veces, con valores desde paso desde 0 hasta 4.
+                  const fielcampo = arreglo_field[0]+"_"+params.period+"_"+paso
+
+
+                   console.log('----------------'+notesResult.fielcampo);
+                  pronota = pronota + notesResult.fielcampo;
+                  console.log('Dando un paso al Este'+pronota);
+                };
+            }else
+            {
+               var paso;
+                for (paso = 0; paso < 12; paso++) {
+                  // Se ejecuta 5 veces, con valores desde paso desde 0 hasta 4.
+                  console.log('Dando un paso al Este'+paso);
+                };
+            }
+
+            models.Notes.update({ [fieldUpdate] : params.note, prom_1 : pronota }, {where: filtroNote}).then(noteUpdate => {
                 res.json({})
             }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al actualizar la notas"}) )
         }
         else
         {
-
             filtroNote[fieldUpdate] = params.note
+            filtroNote[prom_1] = params.note / 12;
+
             models.Notes.create(filtroNote).then(noteCreate => {
                 if(noteCreate)
                 {

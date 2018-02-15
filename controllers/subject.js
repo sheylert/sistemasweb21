@@ -24,8 +24,8 @@ function subjectNotInCourse(req,res)
 
       if(subjects.length > 0)
       {
-        models.sequelize.query('SELECT * FROM subjects WHERE id not in (:variable)',
-          { replacements: { variable: result.code_subject }, type: models.sequelize.QueryTypes.SELECT }
+        models.sequelize.query('SELECT * FROM subjects WHERE id not in (:variable) and school_id = :variable2',
+          { replacements: { variable: result.code_subject, variable2: req.user.sub }, type: models.sequelize.QueryTypes.SELECT }
         ).then(result => {
            res.status(200).send(result);
         })
