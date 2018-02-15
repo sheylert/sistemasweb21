@@ -32,28 +32,23 @@ function getAllStudent(req, res) {
 
    // Función para buscar todos los estudiantes
       models.Student.findAll({ where: { school: req.user.sub, state: true },
-      include: [{
-        model: models.Responsable,
-        as : 'responsable'
-      }]
+      include: [{ 
+            model: models.Responsable,
+            as   : 'responsable'  
+        },{
+            model: models.Course,
+            as   : 'curso',
+            include: [{
+                model: models.CourseCode,
+                as: 'code_grade_course'
+            }]
+        }]
 }).then( function(students) { 
    
      if (!students) {
           res.status(500).send({ message: 'Error en la petición' });
         } else {
           if (students) {
-            /*
-            students.forEach(function(elemento) {
-
-             models.Responsable.findOne( { where: { id: 2}}).then( function(responsableStoraged) { 
-
-               if (responsableStoraged) {
-                   students.responsable = Util.ejecutar_arreglo(students);
-               }
-              });    
-
-            });
-            */
             res.status(200).send(students);
           } 
         }     
@@ -72,7 +67,7 @@ function getAllStudentClient(req, res) {
      models.Student.findAll({ where: { school: req.user.sub, state: true },
       include: [{
         model: models.Responsable,
-        as : 'responsableStudent'
+        as : 'responsable'
       }]
 }).then( function(students) { 
      
@@ -94,6 +89,7 @@ function getAllStudentWithoutCourse(req, res) {
         res.status(200).send(result);
     }).catch(err => res.status(500).json({ message: "Error al buscar los estudiantes sin cursos"}) )
 }
+
 
 function saveStudent(req, res) {
 

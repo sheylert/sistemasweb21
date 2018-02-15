@@ -69,11 +69,14 @@ responsable_id: {
         foreignKey: 'responsable_id',
         as : 'responsable'
       })
-  }
+
+      Student.belongsTo(model.Course,{
+        foreignKey: 'course',
+        as : 'curso'
+      })
+    }
 
     return Student;
-
-
 };
 
 
@@ -92,7 +95,6 @@ var StudentSchema = new Schema({
   age: Number,
   state: Boolean,
   lastSms: {type: String, default: null},
-
 
   course: { type: Schema.ObjectId, ref: 'Course' },
   school: { type: Schema.ObjectId, ref: 'Client' },
