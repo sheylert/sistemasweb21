@@ -1,8 +1,15 @@
 var Sequelize = require('sequelize');
 
-const sequelize = new Sequelize("pronota_prueba2","postgres","123456", {   
+/*const sequelize = new Sequelize("pronota_prueba","postgres","123456", {   
 dialect: 'postgres'
+});}*/
+
+const sequelize = new Sequelize("pronota_prueba","postgres","123456", {   
+dialect: 'postgres',
+port: 5434
 });
+
+//const sequelize = new Sequelize('postgres://localhost:5434/pronota_prueba/123456');
 
 
 const models = {
