@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize, DataTypes) => { 
 	const Notes = sequelize.define("notes", {
 		school_id: {
 			type: DataTypes.INTEGER
@@ -95,7 +95,19 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		eximido : {
 			type: DataTypes.BOOLEAN
-		}
+		},
+		estu_act : {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false
+		},
+
+		nota_posic: {
+    	type: DataTypes.STRING	
+        },
+
+		nota_act: {
+    	type: DataTypes.STRING	
+        },
 	})
 
 	Notes.associate = model => {
