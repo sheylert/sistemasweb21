@@ -4,7 +4,7 @@
 var bcrypt = require('bcrypt-nodejs');
 
 // modelos
-//var Departament = require('../models/departament');
+var Departament = require('../models/departament');
 var models = require('../models');
 
 //funcion
@@ -17,10 +17,8 @@ var validator  = require('email-validator');
 
 function getDepartament(req, res) {
 
-console.log("holaaaaa");
-
   let filtro = {
-    school : req.user.sub
+    school_id : req.user.sub
   }
 
   models.Departament.findAll({ where : filtro }).then( result => {
@@ -42,11 +40,25 @@ console.log("holaaaaa");
 
 function updateDepartament(req, res) {
  
-}                   
+}   
+
+*/                
 
 function saveDepartament(req,res){
  
+ var params = req.body;
+     params.school_id = req.user.sub;
+  // crear nuevo perfil
+   models.Departament.create(params).then( function(insertarDepartaments) { 
+        if (!insertarDepartaments) {
+          res.status(500).send({ message: 'Error al guardar departamento' });
+        } else {
+           res.status(200).send( {resu: insertarDepartaments});
+        }
+    })  
 }
+
+/*
 
 function deleteDepartament(req,res){
  
@@ -57,6 +69,6 @@ module.exports = {
   getDepartament,
   //getDepartamentsId,
   //updateDepartament,
-  //saveDepartament,
+  saveDepartament,
   //deleteDepartament
 }

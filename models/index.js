@@ -39,7 +39,7 @@ const models = {
 	Horariomanana  : sequelize.import('./horariomanana'),
 	Horariotarde  : sequelize.import('./horariotarde'),
 	Horarionoche  : sequelize.import('./horarionoche'),
-	Department  : sequelize.import('./department'),	
+	Departament  : sequelize.import('./departament'),	
 }; 
 
 Object.keys(models).forEach((modelName) => {
