@@ -25,6 +25,8 @@ var StudentExcelController = require('../controllers/studentExcel');
 
 var HorarioController = require('../controllers/horario');
 
+var DepartamentController = require('../controllers/departament');
+
 /*
 
 
@@ -51,6 +53,17 @@ api.post('/overwritePass', mdAuth.ensureAuth,UserController.overwritePass) // ru
 api.post('/recoveryPassword', mdAuth.ensureAuth,UserController.recoveryPassword)
 api.get('/user/:id',mdAuth.ensureAuth,UserController.findUser)
 
+
+// departaments
+api.get('/departaments', mdAuth.ensureAuth,DepartamentController.getDepartament);
+
+
+/*
+api.get('/departaments/:id', mdAuth.ensureAuth,DepartamentController.getDepartamentsId);
+api.put('/departaments/:id', mdAuth.ensureAuth,DepartamentController.updateDepartament);
+api.post('/departaments', mdAuth.ensureAuth,DepartamentController.saveDepartament);
+api.delete('/departaments/:id', mdAuth.ensureAuth,DepartamentController.deleteDepartament);
+*/
 
 //Horario-bloque
 api.get('/horario/:turno', mdAuth.ensureAuth,HorarioController.getBloque); //getBloque

@@ -15,6 +15,7 @@ var Util     = require('../util/function')
 // POST http://localhost:3789/course
 function saveCourse(req, res) {
 
+
     var params = req.body;
 
     if (params.character && params.dpyp && params.deval && params.code_grade && params.teacher_chief && params.code_teaching) {

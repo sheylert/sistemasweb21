@@ -9,6 +9,7 @@ dialect: 'postgres',
 port: 5434
 });
 
+
 //const sequelize = new Sequelize('postgres://localhost:5434/pronota_prueba/123456');
 
 
@@ -41,6 +42,7 @@ const models = {
 	Horariomanana  : sequelize.import('./horariomanana'),
 	Horariotarde  : sequelize.import('./horariotarde'),
 	Horarionoche  : sequelize.import('./horarionoche'),
+	Department  : sequelize.import('./department'),	
 }; 
 
 Object.keys(models).forEach((modelName) => {
