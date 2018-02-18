@@ -9,11 +9,14 @@ module.exports = (sequelize, DataTypes) => {
     code: { 
             type: DataTypes.STRING    
           },
+    color: { 
+            type: DataTypes.STRING    
+          },
     school_id: {
       type: DataTypes.INTEGER
     }
   });
-  
+   
     return Subject;
 
 };
