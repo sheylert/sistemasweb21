@@ -1,9 +1,9 @@
 var Sequelize = require('sequelize'); 
 
 
-const sequelize = new Sequelize("pronota_prueba","postgres","123456", {   
+const sequelize = new Sequelize("pronota_caracas","postgres","123456", {   
 dialect: 'postgres',
-port: 5434
+port: 5432
 });
 
 
@@ -39,7 +39,7 @@ const models = {
 	Horariomanana  : sequelize.import('./horariomanana'),
 	Horariotarde  : sequelize.import('./horariotarde'),
 	Horarionoche  : sequelize.import('./horarionoche'),
-	Departament  : sequelize.import('./departament'),	
+	Departament  : sequelize.import('./departament')
 }; 
 
 Object.keys(models).forEach((modelName) => {

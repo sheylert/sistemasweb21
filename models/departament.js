@@ -2,7 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
 
-  const Department = sequelize.define("department", {
+  const Departament = sequelize.define("departament", {
     
   name: { 
           type: DataTypes.STRING    
@@ -20,5 +20,6 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.INTEGER    
         }  
   });
-    return Department;
+    return Departament;
+
 };

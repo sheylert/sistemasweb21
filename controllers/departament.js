@@ -48,14 +48,16 @@ function saveDepartament(req,res){
  
  var params = req.body;
      params.school_id = req.user.sub;
+     params.workers_id = params.workers_id.value
+
   // crear nuevo perfil
    models.Departament.create(params).then( function(insertarDepartaments) { 
         if (!insertarDepartaments) {
           res.status(500).send({ message: 'Error al guardar departamento' });
         } else {
-           res.status(200).send( {resu: insertarDepartaments});
+           res.status(200).send(insertarDepartaments);
         }
-    })  
+    }).catch(err => res.status(500).json({message: 'Ha ocurrido un error grabando el departamento',err}))
 }
 
 /*
