@@ -33,19 +33,45 @@ function getDepartament(req, res) {
   }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el Departamento"}) )
 }
 
-/*function getDepartamentsId(req, res) {
 
+function getDepartamentId(req, res) {
+  const id = req.params.id
+  
+  let filtro = {
+    school_id : req.user.sub,
+    id : 
+  }
+
+  models.Departament.findOne({ where : filtro }).then( result => {
+    if(result)
+    {
+      res.json(result)
+    }
+    else
+    {
+      res.status(500).json({ message:  "No se ha encontrado ningún Departamento"})
+    }
+  }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el Departamento"}) )
 }
 
 
 function updateDepartament(req, res) {
- 
+var params = req.body;
+   models.Departament.update( params, 
+                         {where: { id: params.id } }).then( function(updatedepartaments) { 
+        if (!updatedepartaments) {
+          res.status(500).send({ message: 'No se a podido actualizar Departamento!' });
+        } else {
+          res.status(200).send({ departament: updatedepartaments });
+        }
+    }) 
+
+    } else
+  {
+  res.status(500).send({ message: 'Error Escriba Email con formato correcto' });
 }   
 
-*/                
-
-function saveDepartament(req,res){
- 
+function saveDepartament(req,res){ 
  var params = req.body;
      params.school_id = req.user.sub;
      params.workers_id = params.workers_id.value
@@ -60,17 +86,23 @@ function saveDepartament(req,res){
     }).catch(err => res.status(500).json({message: 'Ha ocurrido un error grabando el departamento',err}))
 }
 
-/*
 
 function deleteDepartament(req,res){
+
+ var departaId = req.params.id;
+        // bulk destroy
+      models.Departament.destroy({ where: { id: departaId } })
+        .then(function(deletedepartaments){
+           res.status(200).send({ departament: deletedepartaments });   
+        })
  
-}*/
+}
 
 
 module.exports = {
   getDepartament,
-  //getDepartamentsId,
-  //updateDepartament,
+  getDepartamentsId,
+  updateDepartament,
   saveDepartament,
-  //deleteDepartament
+  deleteDepartament
 }

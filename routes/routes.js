@@ -56,10 +56,10 @@ api.get('/user/:id',mdAuth.ensureAuth,UserController.findUser)
 
 // departaments
 api.get('/departaments', mdAuth.ensureAuth,DepartamentController.getDepartament);
-//api.get('/departaments/:id', mdAuth.ensureAuth,DepartamentController.getDepartamentsId);
-//api.put('/departaments/:id', mdAuth.ensureAuth,DepartamentController.updateDepartament);
+api.get('/departaments/:id', mdAuth.ensureAuth,DepartamentController.getDepartamentsId);
+api.put('/departaments/:id', mdAuth.ensureAuth,DepartamentController.updateDepartament);
 api.post('/departaments', mdAuth.ensureAuth,DepartamentController.saveDepartament);
-//api.delete('/departaments/:id', mdAuth.ensureAuth,DepartamentController.deleteDepartament);
+api.delete('/departaments/:id', mdAuth.ensureAuth,DepartamentController.deleteDepartament);
 
 
 //Horario-bloque
