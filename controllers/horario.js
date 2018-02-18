@@ -72,7 +72,6 @@ function getSchedule(req, res) {
 function saveSchedule(req, res) 
 {
     var params = req.body;
-
     var horariosobj = new Object();
 
     horariosobj.school = req.user.sub;
@@ -81,7 +80,14 @@ function saveSchedule(req, res)
     horariosobj["I"+params.block] = params.hora_inicio;
     horariosobj["B"+params.block] = params.subject;
 
-    if (params.turno == 1){
+    if (params.remover == true)
+      {
+        horariosobj["I"+params.block] = null;
+        horariosobj["B"+params.block] = null;
+      }
+
+
+    if (params.turno == true){
     models.Horariomanana.findOne( { where: { school: req.user.sub, id_curso: params.course,
     id_dia: params.dia  }}).then( function(horarios) { 
     
