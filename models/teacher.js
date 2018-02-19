@@ -32,13 +32,15 @@ module.exports = (sequelize, DataTypes) => {
          state: { 
           type: DataTypes.BOOLEAN    
         },
-
          gender: { 
           type: DataTypes.STRING    
         }, 
          school: { 
           type: DataTypes.INTEGER,
         },
+        course_id:{
+          type: DataTypes.ARRAY(DataTypes.INTEGER),
+        }
   });
     return Teacher;
 
