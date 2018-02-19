@@ -48,7 +48,6 @@ function saveClient(req, res) {
     models.User.findOne( { where: { email: params.email.toLowerCase() }}).then( function(user) { 
     
       if (user) {
-        console.log("ssss");
       res.status(500).send({ message: 'Error Correo registrado' });
       }else
       {   

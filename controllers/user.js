@@ -46,7 +46,7 @@ function saveUser(req, res) {
     user.state = params.state == 1 ? true : false;
     user.validatePass = false;
 
-    const validate_email = emailValidator.validate(updaterecord.email)
+    const validate_email = emailValidator.validate(params.email)
     if(validate_email)
     {
         models.User.findOne( { where: { email: user.email.toLowerCase() }}).then( function(users) { 

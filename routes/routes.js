@@ -25,6 +25,8 @@ var StudentExcelController = require('../controllers/studentExcel');
 
 var HorarioController = require('../controllers/horario');
 
+var DepartamentController = require('../controllers/departament');
+
 /*
 
 
@@ -52,10 +54,28 @@ api.post('/recoveryPassword', mdAuth.ensureAuth,UserController.recoveryPassword)
 api.get('/user/:id',mdAuth.ensureAuth,UserController.findUser)
 
 
+// departaments
+api.get('/departaments', mdAuth.ensureAuth,DepartamentController.getDepartament);
+api.get('/departaments/:id', mdAuth.ensureAuth,DepartamentController.getDepartamentId);
+api.put('/departaments/:id', mdAuth.ensureAuth,DepartamentController.updateDepartament);
+api.post('/departaments', mdAuth.ensureAuth,DepartamentController.saveDepartament);
+api.delete('/departaments/:id', mdAuth.ensureAuth,DepartamentController.deleteDepartament);
+
+api.get('/departaments/searcworker/:id', mdAuth.ensureAuth,DepartamentController.workerNotInDepartament);
+
+api.get('/departaments/notification/:id', mdAuth.ensureAuth,DepartamentController.workercourseDepartament);
+
+api.get('/departaments/searcworkerall/:id', mdAuth.ensureAuth,DepartamentController.workerYesInDepartament);
+api.post('/departaments/updateworkerall', mdAuth.ensureAuth,DepartamentController.updateDepartamentWorker);
+
+
+
+
 //Horario-bloque
 api.get('/horario/:turno', mdAuth.ensureAuth,HorarioController.getBloque); //getBloque
 api.get('/horario-nota/:turno', mdAuth.ensureAuth,HorarioController.getSchedule);
 api.post('/horario/', mdAuth.ensureAuth,HorarioController.saveSchedule);
+
 
 // Course
 api.get('/course', mdAuth.ensureAuth,CourseController.getCourses);

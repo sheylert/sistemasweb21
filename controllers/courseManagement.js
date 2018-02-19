@@ -21,7 +21,14 @@ function getStudentNote(req,res)
     let promises = []
     let studentsWithoutNotes = []
 
-    models.Notes.findAll({ where : filtroNotes, include : [{
+    models.Notes.findAll({ where : filtroNotes, 
+
+            order: [
+            ['student_id', 'DESC'],
+            ],
+
+
+            include : [{
             model: models.Student,
             as   : 'estudiantes'
         }] 
@@ -82,30 +89,78 @@ function masiveAssingStudentNote(req, res)
 {
     // función para asignar notas masivamente por alumno
     const params = req.body
-    const filtroNote = {school_id: req.user.sub, student_id: params.student, course_id: params.course, subject_id: params.subject}
+    const filtroNote = {school_id: req.user.sub, student_id: params.student, course_id: params.course, 
+        subject_id: params.subject }
+
+    const filtroNoteSinEstudent = {school_id: req.user.sub, course_id: params.course, 
+        subject_id: params.subject}    
 
     const arreglo_field = params.field.split('_')
     const fieldUpdate = arreglo_field[0]+"_"+params.period+"_"+arreglo_field[1]
 
+    const estu_act = 'estu_act';
+    const nota_posic = 'nota_posic';
+    const nota_act = 'nota_act';
+
     const prom_1 = "prom_1";
     const prom_2 = "prom_2";
+
+    if (arreglo_field[1] == 12)
+    {
+        var valortrue = false;
+        var nota_posi_valor = arreglo_field[0]+"_"+arreglo_field[1];
+        var nota_act_valor = arreglo_field[0]+"_"+arreglo_field[1];
+    }else
+    {
+          var valortrue = true;
+          var contador =   parseInt(arreglo_field[1]) + 1;
+          contador = contador.toString();
+          var nota_posi_valor = arreglo_field[0]+"_"+contador; 
+    }
 
     models.Notes.findOne({ where : filtroNote }).then(notesResult => {
         if(notesResult)
         {
             let notanota = updateProm(notesResult,params.period,fieldUpdate,params.note)
-
             let promUpdate = 'prom_'+params.period
 
-            models.Notes.update({ [fieldUpdate] : params.note, [promUpdate]: notanota }, {where: filtroNote}).then(noteUpdate => {
+            const arreglo_activo = notesResult.nota_act.split('_')
+            var numeroactivo = parseInt(arreglo_activo[1]);
+
+            if (contador > numeroactivo){
+                 console.log("mayorrrrrrrrr");
+                 var nota_act_valor = arreglo_field[0]+"_"+contador;
+            }else
+            {
+                console.log("menorrrrr");
+                var nota_act_valor = notesResult.nota_act;
+            }
+
+            //para colocar el student activo y la casilla de la nota
+
+              models.Notes.update({ [estu_act] : false }, {where: filtroNoteSinEstudent}).then(noteUpdates => {
+            }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al actualizar la notas"}) )
+
+
+            models.Notes.update({ [fieldUpdate] : params.note, [promUpdate]: notanota,
+                                   [estu_act] : valortrue, [nota_posic] : nota_posi_valor,
+                                   [nota_act] : nota_act_valor }, {where: filtroNote}).then(noteUpdate => {
                 res.json({})
             }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al actualizar la notas"}) )
         }
         else
         {
             filtroNote[fieldUpdate] = params.note
-            filtroNote[prom_1] = params.note / 12;
+            filtroNote[prom_1] = params.note / 1;
             filtroNote[prom_1] = filtroNote[prom_1].toFixed(1)
+
+            filtroNote[estu_act] = true;
+            filtroNote[nota_posic] = 'note_2';
+            filtroNote[nota_act] = 'note_2';
+
+                models.Notes.update({ [estu_act] : false }, {where: filtroNoteSinEstudent}).then(noteUpdates => {
+            }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al actualizar la notas"}) )
+
 
             models.Notes.create(filtroNote).then(noteCreate => {
                 if(noteCreate)
