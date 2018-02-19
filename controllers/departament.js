@@ -43,16 +43,17 @@ function workercourseDepartament(req, res) {
  let worker =  []
 
 
-   console.log("---------siiiiiiii------------"+req.params.id+",,,,,,,,,,,,,,,,,,,,,");
-
-   if (req.params.id == 'notification')
+  if (req.params.id == 0)
   {
 
-     console.log("---------siiiiiiii------------"+req.params.id);
+     models.sequelize.query('SELECT * FROM workers WHERE school = :variable2',
+          { replacements: { variable2: req.user.sub }, type: models.sequelize.QueryTypes.SELECT }
+        ).then(result => {
+           res.status(200).send(result);
+        }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el Departamento"}) ) 
+  }else
 
-  }
-
-   req.params.id = 1;
+  {
 
   let filtro = {
     school_id : req.user.sub,
@@ -90,6 +91,8 @@ function workercourseDepartament(req, res) {
       res.status(500).json({ message:  "No se ha encontrado ningún Departamento"})
     }
   }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el Departamento"}) )
+
+  }
 
  }
 
