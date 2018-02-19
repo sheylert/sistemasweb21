@@ -18,12 +18,14 @@ var httpServer = http.createServer(app);
       //perfiles por defecto
       models.Profile.findAll().then( function(profiles) { 
         if (profiles) {
-           if (profiles.length == 0){
+           if (profiles.length === 0){
            models.Profile.create({name : 'SUPER', slug: 'SUPER_ADMIN' });
            models.Profile.create({name : 'EMPRESA', slug: 'ENTERPRISE' });
            models.Profile.create({name : 'EMPRESA BASICA', slug: 'ENTERPRISE_BASIC' });
            models.Profile.create({name : 'ESCUELA', slug: 'ADMIN_SCHOOL' });
+           models.Profile.create({name : 'ESCUELA BASICA', slug: 'ADMIN_SCHOOL_BASIC' });
            models.Profile.create({name : 'RESPONSABLE', slug: 'RESPONSABLE' });
+           models.Profile.create({name : 'PROFESOR', slug: 'TEACHER' });
            }
         } 
     });

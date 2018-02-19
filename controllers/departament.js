@@ -34,6 +34,66 @@ function getDepartament(req, res) {
 }
 
 
+
+
+
+function workercourseDepartament(req, res) {
+
+ var params = req.body;
+ let worker =  []
+
+
+   console.log("---------siiiiiiii------------"+req.params.id+",,,,,,,,,,,,,,,,,,,,,");
+
+   if (req.params.id == 'notification')
+  {
+
+     console.log("---------siiiiiiii------------"+req.params.id);
+
+  }
+
+   req.params.id = 1;
+
+  let filtro = {
+    school_id : req.user.sub,
+    id : req.params.id
+  }
+
+  models.Departament.findOne({ where : filtro }).then( result => {
+    if(result)
+    {
+       worker = result.workers_id
+
+        if (worker == null){
+         var longitud = 0;
+        }else
+        {
+          var longitud = worker.length;
+        }
+
+      if(longitud > 0)
+      {
+        models.sequelize.query('SELECT * FROM workers WHERE id in (:variable) and school = :variable2',
+          { replacements: { variable: result.workers_id, variable2: req.user.sub }, type: models.sequelize.QueryTypes.SELECT }
+        ).then(result => {
+           res.status(200).send(result);
+        })
+      }else
+      {
+
+         res.status(200).send([]);
+        // no tiene trabajadores
+      }  
+    }
+    else
+    {
+      res.status(500).json({ message:  "No se ha encontrado ningún Departamento"})
+    }
+  }).catch(err => res.status(500).json({ message:  "Ha ocurrido un error al intentar encontrar el Departamento"}) )
+
+ }
+
+
 function getDepartamentId(req, res) {
  
    let filtro = {
@@ -71,35 +131,38 @@ function updateDepartament(req, res) {
 
 
 function updateDepartamentWorker(req, res) {
+  
+  var params = req.body;
+  const id_departament = req.params.id
+  let worker =  []
 
-var params = req.body;
-
-const id_departament = req.params.id
-let worker =  []
-
-  models.Departament.findOne({ where : { id: id_departament } }).then(result => {
-      
-      worker = result.workers_id
-
-    })
-
-
-if (params.remover == true)
+  models.Departament.findOne({ where : { id: params.departament_id} }).then(result => {      
+        
+        worker = result.workers_id ? result.workers_id : worker
+      if (params.remover)
       {
-        //remover del arreglo
-      }else
+          params.workers_id = worker.filter(f => params.workers.includes(f) ? null : f); 
+      }
+      else
       {
-        //agregar al arreglo
+        params.workers_id = worker.concat(params.workers)
       }
 
-   models.Departament.update( params, 
-                         {where: { id: params.id } }).then( function(updatedepartaments) { 
+      if(params.workers_id.length === 0)
+      {
+        params.workers_id = null 
+      }
+
+    models.Departament.update( params, 
+                         {where: { id: params.departament_id } }).then( function(updatedepartaments) { 
         if (!updatedepartaments) {
           res.status(500).send({ message: 'No se a podido actualizar Departamento!' });
         } else {
           res.status(200).send({ departament: updatedepartaments });
         }
-    }).catch(err => res.status(500).send({ message: 'Ha ocurrido un error al remover del departamento' }) )
+    }).catch(err => res.status(500).send({ message: 'Ha ocurrido un error al remover del departamento', err }) )
+
+ })
 }  
 
 
@@ -134,15 +197,23 @@ function deleteDepartament(req,res){
 function workerNotInDepartament(req,res)
 {
   const id_departament = req.params.id
+
   let worker =  []
 
   models.Departament.findOne({ where : { id: id_departament } }).then(result => {
       
       worker = result.workers_id
 
-      if(worker.length > 0)
+        if (worker == null){
+         var longitud = 0;
+        }else
+        {
+          var longitud = worker.length;
+        }
+
+      if(longitud > 0)
       {
-        models.sequelize.query('SELECT * FROM worker WHERE id not in (:variable) and school = :variable2',
+        models.sequelize.query('SELECT * FROM workers WHERE id not in (:variable) and school = :variable2',
           { replacements: { variable: result.workers_id, variable2: req.user.sub }, type: models.sequelize.QueryTypes.SELECT }
         ).then(result => {
            res.status(200).send(result);
@@ -155,6 +226,43 @@ function workerNotInDepartament(req,res)
           }).catch(err => res.status(500).json({ message: 'Error al buscar todas los trabajadores de un departamento'}) )
       }
   }).catch( err => res.status(500).json({ message: "Ha ocurrido un error al buscar los trabajadores que no están en el departamento"} ))      
+
+
+}
+
+
+
+function workerYesInDepartament(req,res)
+{
+  const id_departament = req.params.id
+
+  let worker =  []
+
+  models.Departament.findOne({ where : { id: req.params.id } }).then(result => {
+      
+      worker = result.workers_id
+
+        if (worker == null){
+         var longitud = 0;
+        }else
+        {
+          var longitud = worker.length;
+        }
+
+      if(longitud > 0)
+      {
+        models.sequelize.query('SELECT * FROM workers WHERE id in (:variable) and school = :variable2',
+          { replacements: { variable: result.workers_id, variable2: req.user.sub }, type: models.sequelize.QueryTypes.SELECT }
+        ).then(result => {
+           res.status(200).send(result);
+        })
+      }else
+      {
+
+         res.status(200).send([]);
+        // no tiene trabajadores
+      }
+  }).catch( err => res.status(500).json({ message: "Ha ocurrido un error al buscar los trabajadores que no están en el departamento"} ))      
 }
 
 module.exports = {
@@ -164,5 +272,7 @@ module.exports = {
   saveDepartament,
   deleteDepartament,
   workerNotInDepartament,
-  updateDepartamentWorker
+  updateDepartamentWorker,
+  workerYesInDepartament,
+  workercourseDepartament
 }
