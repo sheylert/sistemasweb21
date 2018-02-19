@@ -55,7 +55,9 @@ function getDepartamentId(req, res) {
 
 
 function updateDepartament(req, res) {
-var params = req.body;
+  
+  var params = req.body;
+
    models.Departament.update( params, 
                          {where: { id: params.id } }).then( function(updatedepartaments) { 
         if (!updatedepartaments) {
@@ -63,11 +65,8 @@ var params = req.body;
         } else {
           res.status(200).send({ departament: updatedepartaments });
         }
-    }) 
-
-    } else
-  {
-  res.status(500).send({ message: 'Error Escriba Email con formato correcto' });
+    }).catch(err => res.status(500).send({ message: 'Ha ocurrido un error al actualizar el departamento' }))
+  
 } 
 
 
@@ -93,11 +92,7 @@ if (params.remover == true)
         } else {
           res.status(200).send({ departament: updatedepartaments });
         }
-    }) 
-
-    } else
-  {
-  res.status(500).send({ message: 'Error Escriba Email con formato correcto' });
+    }).catch(err => res.status(500).send({ message: 'Ha ocurrido un error al remover del departamento' }) )
 }  
 
 
@@ -124,7 +119,7 @@ function deleteDepartament(req,res){
       models.Departament.destroy({ where: { id: departaId } })
         .then(function(deletedepartaments){
            res.status(200).send({ departament: deletedepartaments });   
-        })
+        }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al borrar el departamento"}) )
  
 }
 
@@ -150,14 +145,14 @@ function workerNotInDepartament(req,res)
       {
           models.Worker.findAll({ where: { school: req.user.sub }} ).then(result => {
             res.status(200).send(result);
-          }).catch(err => res.status(500).json({ message: 'Error al buscar todas los trabajadores de un departamento'}))
+          }).catch(err => res.status(500).json({ message: 'Error al buscar todas los trabajadores de un departamento'}) )
       }
-  })      
+  }).catch( err => res.status(500).json({ message: "Ha ocurrido un error al buscar los trabajadores que no están en el departamento"} ))      
 }
 
 module.exports = {
   getDepartament,
-  getDepartamentsId,
+  getDepartamentId,
   updateDepartament,
   saveDepartament,
   deleteDepartament,
