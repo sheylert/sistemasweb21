@@ -37,9 +37,6 @@ module.exports = (sequelize, DataTypes) => {
         }, 
          school: { 
           type: DataTypes.INTEGER,
-        },
-        course_id:{
-          type: DataTypes.ARRAY(DataTypes.INTEGER),
         }
   });
     return Teacher;
