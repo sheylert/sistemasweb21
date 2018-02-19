@@ -37,22 +37,6 @@ var httpServer = http.createServer(app);
           }
         } 
       })
-
-<<<<<<< HEAD
-
-       models.Profile.findAll().then( function(profiles) { 
-        if (profiles) {
-           if (profiles.length > 0){
-           
-       models.Client.findAll().then( function(Clients) { 
-        if (Clients) {
-           if (Clients.length == 0){
-           models.Client.create({rbd : 'rbd', name: 'sistema', address: 'address', email: 'pronota@pronota.com',
-                                 phone: '999999999', ree : 'ree', membership: 'membership', services: true, profile_id: 1, admin : 1});
-           }
-        } 
-    });
-=======
     })
       
     promise.then(result => {
@@ -100,39 +84,22 @@ var httpServer = http.createServer(app);
 
       }) // fin promsesa
     }).then(result => {
->>>>>>> 4c6551245c44ecdf5a85185980b06b96ac3b5990
+
 
         models.User.findAll().then( function(users) { 
-        if (users) {
-           if (users.length == 0){
+          if (users) {
+             if (users.length == 0){
 
-           models.User.create({name : 'USUARIO', address: 'address', email: 'pronota@pronota.com', 
-                               password :'$2a$10$Y8Gx8QjJFFH3zIf8556pSeUieZWus.QfariG3PVg6wPyv90GpFDNy',
-                               state:true, phone: '999999999', services: true, profile_id: 1, admin : 1, 
-                               school: 1, validatePass: false});
-           }
-        } 
-<<<<<<< HEAD
-    });
+             models.User.create({name : 'USUARIO', address: 'address', email: 'pronota@pronota.com', 
+                                 password :'$2a$10$Y8Gx8QjJFFH3zIf8556pSeUieZWus.QfariG3PVg6wPyv90GpFDNy',
+                                 state:true, phone: '999999999', services: true, profile_id: 1, admin : 1, 
+                                 school: 1, validatePass: false});
+             }
+          } 
+
+        });
        
-           }
-        } 
-    });
-
-
-
-
-
-     
-
-     
-
-
-   
-=======
-      })
->>>>>>> 4c6551245c44ecdf5a85185980b06b96ac3b5990
-
     })
-  });
-};
+        
+  })
+}
