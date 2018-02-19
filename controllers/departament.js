@@ -35,11 +35,10 @@ function getDepartament(req, res) {
 
 
 function getDepartamentId(req, res) {
-  const id = req.params.id
-  
-  let filtro = {
+ 
+   let filtro = {
     school_id : req.user.sub,
-    id : 
+    id : req.params.id
   }
 
   models.Departament.findOne({ where : filtro }).then( result => {
@@ -69,7 +68,38 @@ var params = req.body;
     } else
   {
   res.status(500).send({ message: 'Error Escriba Email con formato correcto' });
-}   
+} 
+
+
+function updateDepartamentWorker(req, res) {
+
+var params = req.body;
+
+
+
+
+if (params.remover == true)
+      {
+        //remover del arreglo
+      }else
+      {
+        //agregar al arreglo
+      }
+
+   models.Departament.update( params, 
+                         {where: { id: params.id } }).then( function(updatedepartaments) { 
+        if (!updatedepartaments) {
+          res.status(500).send({ message: 'No se a podido actualizar Departamento!' });
+        } else {
+          res.status(200).send({ departament: updatedepartaments });
+        }
+    }) 
+
+    } else
+  {
+  res.status(500).send({ message: 'Error Escriba Email con formato correcto' });
+}  
+
 
 function saveDepartament(req,res){ 
  var params = req.body;
