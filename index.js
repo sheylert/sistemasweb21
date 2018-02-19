@@ -16,6 +16,9 @@ var httpServer = http.createServer(app);
     console.log('Servidor Node y Express está corriendo en el puerto' + port);
 
       //perfiles por defecto
+
+    const promise = new Promise((resolve,rejected) => {
+
       models.Profile.findAll().then( function(profiles) { 
         if (profiles) {
            if (profiles.length == 0){
@@ -26,20 +29,16 @@ var httpServer = http.createServer(app);
            models.Profile.create({name : 'ESCUELA BASICA', slug: 'ADMIN_SCHOOL_BASIC' });
            models.Profile.create({name : 'RESPONSABLE', slug: 'RESPONSABLE' });
            models.Profile.create({name : 'PROFESOR', slug: 'TEACHER' });
-           }
+           resolve()
+          }
+          else
+          {
+            resolve() 
+          }
         } 
-    });
+      })
 
-      models.Teaching.findAll().then( function(teachings) { 
-        if (teachings) {
-           if (teachings.length == 0){
-           models.Teaching.create({name : 'PRIMARIA', slug: 'PRIMARIA' });
-           models.Teaching.create({name : 'MEDIA', slug: 'MEDIA' });
-           models.Teaching.create({name : 'PREESCOLAR', slug: 'PREESCOLAR' });
-           }
-        } 
-    });
-
+<<<<<<< HEAD
 
        models.Profile.findAll().then( function(profiles) { 
         if (profiles) {
@@ -53,6 +52,55 @@ var httpServer = http.createServer(app);
            }
         } 
     });
+=======
+    })
+      
+    promise.then(result => {
+
+      return new Promise((resolve,reject) => {
+        
+        models.Teaching.findAll().then( function(teachings) { 
+          if (teachings) 
+          {
+             if (teachings.length == 0){
+               models.Teaching.create({name : 'PRIMARIA', slug: 'PRIMARIA' });
+               models.Teaching.create({name : 'MEDIA', slug: 'MEDIA' });
+               models.Teaching.create({name : 'PREESCOLAR', slug: 'PREESCOLAR' });
+               resolve()
+             }
+             else
+             {
+              resolve()
+             }
+          } 
+        }) // fin operacion
+      
+      }) // fin promesa
+    
+    }).then(result => {
+
+      return new Promise((resolve, reject) => {
+        
+        models.Client.findAll().then( function(Clients) { 
+          if (Clients) {
+             if (Clients.length == 0)
+             {
+
+                models.Client.create({rbd : 'rbd', name: 'sistema', address: 'address', email: 'pronota@pronota.com',
+                      phone: '999999999', ree : 'ree', membership: 'membership', services: true, profile_id: 1, admin : 1}
+                )
+                 resolve()
+             }
+             else
+             {
+              resolve()
+             }
+          } 
+        }) // fin operacion
+
+      }) // fin promsesa
+    }).then(result => {
+>>>>>>> 4c6551245c44ecdf5a85185980b06b96ac3b5990
 
         models.User.findAll().then( function(users) { 
         if (users) {
@@ -64,6 +112,7 @@ var httpServer = http.createServer(app);
                                school: 1, validatePass: false});
            }
         } 
+<<<<<<< HEAD
     });
        
            }
@@ -80,6 +129,10 @@ var httpServer = http.createServer(app);
 
 
    
+=======
+      })
+>>>>>>> 4c6551245c44ecdf5a85185980b06b96ac3b5990
 
-});
+    })
+  });
 };

@@ -18,13 +18,14 @@ function saveTeacher(req, res) {
 
   params.school =  req.user.sub;  //
   // crear objeto profesor
-   models.Teacher.create(params).then( function(insertarteachers) { 
+    models.Teacher.create(params).then( function(insertarteachers) { 
 
              models.Profile.findOne({ where: { slug: 'TEACHER' }}).then( profile => {
 
                if(profile)
                 {                   
                   var user={}; 
+<<<<<<< HEAD
                                                 user.name = params.name +' '+params.secondname;
                                                 user.phone = params.phone;
                                                 user.school = req.user.sub;
@@ -47,12 +48,36 @@ function saveTeacher(req, res) {
                                                     }
                                                     
                               }).catch(err => 'No se a podido crear el usuario porque el correo ya esta en uso');
+=======
+                  user.name = params.name +' '+params.secondname;
+                  user.phone = params.phone;
+                  user.school = req.user.sub;
+                  user.profile_id = profile.id;
+                  user.teacher_id = insertarteachers.id;
+                  user.email = params.email;
+                  user.password = bcrypt.hashSync(params.email, 10);
+                  user.state = true;
+                  user.services = true;
+                  user.validatePass = false;
+                           
+                  models.User.create(user).then( function(userStore) { 
+
+                      if (!userStore) {                              
+                          res.status(500).send({ message: 'Error al guardar el usuario del responsable' });
+                      } 
+                      else 
+                      {
+                          res.status(200).send({ teacher: insertarteachers });  
+                      }
+                                        
+                  }).catch(err => 'No se a podido crear el usuario porque el correo ya esta en uso');
+>>>>>>> 4c6551245c44ecdf5a85185980b06b96ac3b5990
                 
                  }else
                  {
                    res.status(404).send({ message: "No tiene registrado el permiso de TEACHER en perfiles" })
                  }
-             }).catch(err => 'No se a podido revisar el perfiles');                      
+            }).catch(err => 'No se a podido revisar el perfiles');                      
     }).catch(err => res.status(404).send({ message: 'No se ha guardado el profesor' }) )
 }
 
