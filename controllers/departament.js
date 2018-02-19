@@ -99,10 +99,37 @@ function deleteDepartament(req,res){
 }
 
 
+function workerNotInDepartament(req,res)
+{
+  const id_departament = req.params.id
+  let worker =  []
+
+  models.Departament.findOne({ where : { id: id_departament } }).then(result => {
+      
+      worker = result.workers_id
+
+      if(worker.length > 0)
+      {
+        models.sequelize.query('SELECT * FROM worker WHERE id not in (:variable) and school = :variable2',
+          { replacements: { variable: result.workers_id, variable2: req.user.sub }, type: models.sequelize.QueryTypes.SELECT }
+        ).then(result => {
+           res.status(200).send(result);
+        })
+      }
+      else
+      {
+          models.Worker.findAll({ where: { school: req.user.sub }} ).then(result => {
+            res.status(200).send(result);
+          }).catch(err => res.status(500).json({ message: 'Error al buscar todas los trabajadores de un departamento'}))
+      }
+  })      
+}
+
 module.exports = {
   getDepartament,
   getDepartamentsId,
   updateDepartament,
   saveDepartament,
-  deleteDepartament
+  deleteDepartament,
+  workerNotInDepartament
 }
