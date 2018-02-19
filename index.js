@@ -18,7 +18,7 @@ var httpServer = http.createServer(app);
       //perfiles por defecto
       models.Profile.findAll().then( function(profiles) { 
         if (profiles) {
-           if (profiles.length === 0){
+           if (profiles.length == 0){
            models.Profile.create({name : 'SUPER', slug: 'SUPER_ADMIN' });
            models.Profile.create({name : 'EMPRESA', slug: 'ENTERPRISE' });
            models.Profile.create({name : 'EMPRESA BASICA', slug: 'ENTERPRISE_BASIC' });
@@ -40,6 +40,11 @@ var httpServer = http.createServer(app);
         } 
     });
 
+
+       models.Profile.findAll().then( function(profiles) { 
+        if (profiles) {
+           if (profiles.length > 0){
+           
        models.Client.findAll().then( function(Clients) { 
         if (Clients) {
            if (Clients.length == 0){
@@ -49,7 +54,7 @@ var httpServer = http.createServer(app);
         } 
     });
 
-      models.User.findAll().then( function(users) { 
+        models.User.findAll().then( function(users) { 
         if (users) {
            if (users.length == 0){
 
@@ -60,6 +65,16 @@ var httpServer = http.createServer(app);
            }
         } 
     });
+       
+           }
+        } 
+    });
+
+
+
+
+
+     
 
      
 

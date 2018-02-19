@@ -44,6 +44,9 @@ state: {
         }, 
         curso_id:{
           type: DataTypes.INTEGER    
+        },
+         teacher_id:{
+          type: DataTypes.INTEGER    
         }
         /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
   }); 

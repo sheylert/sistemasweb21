@@ -34,6 +34,7 @@ function saveTeacher(req, res) {
                                                 user.state = true;
                                                 user.services = true;
                                                 user.validatePass = false;
+                                                user.teacher_id = insertarteachers.id;
                                                          
                                                 models.User.create(user).then( function(userStore) { 
 
