@@ -74,7 +74,14 @@ function updateDepartamentWorker(req, res) {
 
 var params = req.body;
 
+const id_departament = req.params.id
+let worker =  []
 
+  models.Departament.findOne({ where : { id: id_departament } }).then(result => {
+      
+      worker = result.workers_id
+
+    })
 
 
 if (params.remover == true)
@@ -156,5 +163,6 @@ module.exports = {
   updateDepartament,
   saveDepartament,
   deleteDepartament,
-  workerNotInDepartament
+  workerNotInDepartament,
+  updateDepartamentWorker
 }
