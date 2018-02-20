@@ -285,6 +285,30 @@ function countCourseteacher(req, res) {
 }
 
 
+// Contar estudiantes por profesor
+
+function countStudentTeacher(req, res) {
+
+    // id_Teacher ---- req.params.id
+    models.Course.findAll({ where : { code_school: req.user.sub, teacher_chief: req.params.id },  
+        include : [{ all: true }]
+    }).then( function(courses) { 
+        //cursos
+         courses.forEach((student,index) => { 
+
+            console.log("-----------------"+student.id);
+
+
+          })  
+
+
+
+
+      }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al buscar todos los cursos"} )) 
+  
+}
+
+
 // GET http://localhost:3789/course/:id
 function getCourse(req, res) {
 
@@ -466,5 +490,6 @@ module.exports = {
     deleteCourseSchool,
 
     assingOfCourse,
-    countCourseteacher
+    countCourseteacher,
+    countStudentTeacher
 }

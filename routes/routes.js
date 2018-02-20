@@ -80,6 +80,8 @@ api.post('/horario/', mdAuth.ensureAuth,HorarioController.saveSchedule);
 // Course
 
 api.get('/course/searchtechear/:id', mdAuth.ensureAuth,CourseController.countCourseteacher);
+api.get('/course/teacherstudent/:id', mdAuth.ensureAuth,CourseController.countStudentTeacher);
+
 
 api.get('/course', mdAuth.ensureAuth,CourseController.getCourses);
 api.post('/course', mdAuth.ensureAuth,CourseController.saveCourse);
@@ -107,6 +109,8 @@ api.get('/course/assing/:id',mdAuth.ensureAuth,CourseController.assingOfCourse)
 api.put('/teacher/:id', mdAuth.ensureAuth,TeacherController.updateTeacher);
 api.post('/teacher', mdAuth.ensureAuth,TeacherController.saveTeacher);
 api.get('/teacher', mdAuth.ensureAuth,TeacherController.getTeachers);
+
+api.get('/teacher/:id', mdAuth.ensureAuth,TeacherController.getTeachersId);
 
 // Worker
 api.put('/worker/:id', mdAuth.ensureAuth,WorkerController.updateWorker);

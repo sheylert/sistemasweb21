@@ -72,6 +72,24 @@ function getTeachers(req, res) {
   }).catch(err => res.status(500).json({ message : "Ha ocurrido un error buscando  a los profesores"}))
 }
 
+function getTeachersId(req, res) {
+
+  var params = req.body;
+  //req.user.sub
+  models.Teacher.findOne( { where: { school: req.user.sub, id: req.params.id }} ).then( function(teachers) { 
+     
+     if (!teachers) {
+          res.json([]);
+        } else {
+          if (teachers) {
+              let teacher =  [teachers]
+              res.json(teacher)
+          } 
+        }     
+  }).catch(err => res.status(500).json({ message : "Ha ocurrido un error buscando  a los profesores"}))
+}
+
+
 
 function updateTeacher(req, res) {
 
@@ -96,5 +114,6 @@ function updateTeacher(req, res) {
 module.exports = {
   saveTeacher,
   getTeachers,
-  updateTeacher
+  updateTeacher,
+  getTeachersId
 }
