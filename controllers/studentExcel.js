@@ -43,7 +43,7 @@ function masiveAssing(req,res)
 
 	var ii = 0;
    //if(req.file.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-   if(req.file.mimetype == 'application/octet-stream')	
+   if(req.file.mimetype === 'application/octet-stream' || req.file.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')	
       {      
       	var path = "./excel_import/"+req.file.filename
 
@@ -79,7 +79,7 @@ function masiveAssing(req,res)
 				                // student.code_grade = params.code_grade
 				                // student.code_teaching = params.code_teaching
 				                // student.character = params.character
-				                student.birth_date = '2018-01-01' //element[4]  params.birth_date
+				                student.birth_date = (element[4] - (25567 + 2))*86400*1000 //element[4]  params.birth_date
 				                student.age = element[5];
 				                student.course = null
 				                student.state = true
