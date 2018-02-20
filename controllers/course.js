@@ -272,6 +272,17 @@ function getCourses(req, res) {
 
 }    
 
+// Mostrar todos los Cursos
+// GET http://localhost:3789/course
+function countCourseteacher(req, res) {
+
+    models.Course.findAll({ where : { code_school: req.user.sub, teacher_chief: req.params.id },  
+        include : [{ all: true }]
+    }).then( function(courses) { 
+        res.json(courses)
+      }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al buscar todos los cursos"} )) 
+
+}
 
 
 // GET http://localhost:3789/course/:id
@@ -454,5 +465,6 @@ module.exports = {
     saveCourseSchool,
     deleteCourseSchool,
 
-    assingOfCourse
+    assingOfCourse,
+    countCourseteacher
 }

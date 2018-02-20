@@ -78,6 +78,9 @@ api.post('/horario/', mdAuth.ensureAuth,HorarioController.saveSchedule);
 
 
 // Course
+
+api.get('/course/searchtechear/:id', mdAuth.ensureAuth,CourseController.countCourseteacher);
+
 api.get('/course', mdAuth.ensureAuth,CourseController.getCourses);
 api.post('/course', mdAuth.ensureAuth,CourseController.saveCourse);
 api.put('/course/:id', mdAuth.ensureAuth,CourseController.updateCourse);
