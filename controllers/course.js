@@ -288,26 +288,32 @@ function countCourseteacher(req, res) {
 // Contar estudiantes por profesor
 
 function countStudentTeacher(req, res) {
+    let contadorarreglo =  []
 
-     let contadorarreglo =  []
-
-    // id_Teacher ---- req.params.id
     models.Course.findAll({ where : { code_school: req.user.sub, teacher_chief: req.params.id },  
         include : [{ all: true }]
     }).then( function(courses) { 
         //cursos
          courses.forEach((student,index) => { 
-            console.log("-----------------"+student.id+"------------");
-          // contadorarreglo = worker.concat(student.code_student)
-          // console.log("-----------------"+contadorarreglo+"------------");
+            if (student.code_student.length > 0){
+                contadorarreglo.push(student.code_student); 
+            }
+          })
 
-          })  
-
-          res.json(courses)
-      }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al buscar todos los cursos"} )) 
-  
+      if(contadorarreglo.length > 0)
+      {
+        models.sequelize.query('SELECT * FROM students WHERE id in (:variable) and school = :variable2',
+          { replacements: { variable: contadorarreglo, variable2: req.user.sub }, type: models.sequelize.QueryTypes.SELECT }
+        ).then(result => {
+           res.status(200).send(result);
+        })
+      }
+      else
+      {
+         res.status(200).send([]);
+      }  
+    }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al buscar todos los cursos"} )) 
 }
-
 
 // GET http://localhost:3789/course/:id
 function getCourse(req, res) {

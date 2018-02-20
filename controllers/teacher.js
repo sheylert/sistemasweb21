@@ -104,7 +104,25 @@ function updateTeacher(req, res) {
         if (!updateteachers) {
           res.status(500).send({ message: 'No se a podido actualizar profesor!' });
         } else {
-          res.status(200).send({ teacher: updateteachers });
+
+          var user={}; 
+                  user.name = params.name +' '+params.secondname;
+                  user.phone = params.phone;
+                  user.email = params.email;
+                  user.password = bcrypt.hashSync(params.email, 10);
+                  user.validatePass = false;
+                           
+                      models.User.update(user,{where : {teacher_id: req.params.id}} ).then( function(userStore) { 
+
+                      if (!userStore) {                              
+                          res.status(500).send({ message: 'Error al guardar el usuario del responsable' });
+                      } 
+                      else 
+                      {
+                          res.status(200).send({ teacher: updateteachers });  
+                      }
+                                        
+                  }).catch(err => 'No se a podido crear el usuario porque el correo ya esta en uso');      
         }
 
     }).catch( err => 'Ha ocurrido un error inesperado modificando el profesor')
