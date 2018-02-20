@@ -289,21 +289,21 @@ function countCourseteacher(req, res) {
 
 function countStudentTeacher(req, res) {
 
+     let contadorarreglo =  []
+
     // id_Teacher ---- req.params.id
     models.Course.findAll({ where : { code_school: req.user.sub, teacher_chief: req.params.id },  
         include : [{ all: true }]
     }).then( function(courses) { 
         //cursos
          courses.forEach((student,index) => { 
-
-            console.log("-----------------"+student.id);
-
+            console.log("-----------------"+student.id+"------------");
+          // contadorarreglo = worker.concat(student.code_student)
+          // console.log("-----------------"+contadorarreglo+"------------");
 
           })  
 
-
-
-
+          res.json(courses)
       }).catch(err => res.status(500).json({ message: "Ha ocurrido un error al buscar todos los cursos"} )) 
   
 }
