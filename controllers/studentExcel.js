@@ -44,6 +44,7 @@ function masiveAssing(req,res)
 	var ii = 0;
 	let arrayErr = []
    //if(req.file.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+   console.log(req.file)
    if(req.file.mimetype === 'application/octet-stream' || req.file.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')	
       {      
       	var path = "./excel_import/"+req.file.filename
@@ -97,11 +98,18 @@ function masiveAssing(req,res)
 						                                         
 						                        models.Student.create(student).then( function(studentStore) 
 						                        { 
-						                          if (!studentStore) 
-						                              {
+						                          	if (!studentStore) 
+						                          	{
 						                               res.status(404).send({ message: 'No se ha guardado el estudiante' });
-						                              } 
-						                        });   
+						                            } 
+						                            else
+						                            {
+						                            	if(index + 1 === elementGlobal.data.length)
+												  		{
+															res.status(200).send({ message: 'Ha finalizado con éxito la carga de alumnos', errores: arrayErr } )
+												  		}
+						                            }
+						                        }).catch( err => res.status(500).send({ message: 'Ha ocurrido un error al guardar el estudiante'}))   
 							                }
 							                else
 						                	{
@@ -130,7 +138,6 @@ function masiveAssing(req,res)
 						           					if (emailValidator.validate(respon.email)) 
 						                              { 
 						                              	models.Responsable.create(respon).then( function(responStore) { 
-
 						                                    if (!responStore) {
 						                                     res.status(500).send({ message: 'Error al guardar el responsable' });
 						                                    } 
@@ -189,9 +196,9 @@ function masiveAssing(req,res)
 					                                        		{
 				                                        	 			res.status(404).send({ message: 'No Existe el perfil de RESPONSABLE' });
 				                                        			}
-				                                      			}) 	
+				                                      			}).catch(err => res.status(500).send({ message: 'Ha ocurrido un error al buscar el perfil de responsable'}) ) 	
 				                                    		}   
-				                                   		})     
+				                                   		}).catch(err => res.status(500).send({ message: 'Ha ocurrido un error guardar el responsable '}) )     
 					                              	}
 					                              	else
 					                              	{
@@ -206,7 +213,7 @@ function masiveAssing(req,res)
 					                              	}
 					                              } // fin validar 9 caracteres en el telfono
 						                	}				
-					            		})    	
+					            		}).catch(err => res.status(500).send({ message: 'Ha ocurrido un error al buscar el responsable para ver si ya esta registrado'}) )    	
 
 							    	}
 							    	else
@@ -221,10 +228,10 @@ function masiveAssing(req,res)
 											res.status(200).send({ message: 'Ha finalizado con éxito la carga de alumnos', errores: arrayErr } )
 										}
 							    	}     	 
-	                          	})
+	                          	}).catch(err => res.status(500).send({ message: 'Ha ocurrido un error al buscar el estudiante a ver si esta registrado'}) )
 								
 							}//fin de index
-							
+
 						})	//fin del forEach	
 			    })  //fin del forEach
 			   // res.status(200).send({ message: 'Todos los alumnos han sido importados con éxito', repetidos: con_r, guardados: con_g, total: con_t -1 })
