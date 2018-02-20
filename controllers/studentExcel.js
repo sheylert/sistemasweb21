@@ -114,11 +114,15 @@ function masiveAssing(req,res)
 					                            respon.phone = element[10]
 						                        respon.address = element[11]
 
-
 						                        if(element[10].length !== 9)
 						                        {
-						                        	var correo1 = element[6] +' '+element[7];
-				                              	  	arrayErr.push({"registro": correo1, "motivo":"El telefono debe tener 9 caracteres"})
+						                        	var correo1 = element[0] +' '+element[1]+" rut "+element[2];
+
+				                              	  	arrayErr.push({"registro": correo1, "motivo":"El telefono del responsable debe tener 9 caracteres"})
+				                              	  	if(index + 1 === elementGlobal.data.length)
+												  	{
+														res.status(200).send({ message: 'Ha finalizado con éxito la carga de alumnos', errores: arrayErr } )
+												  	}
 				                              	  	
 						                        }
 						                        else
@@ -192,8 +196,8 @@ function masiveAssing(req,res)
 					                              	else
 					                              	{
 					                              	  //el correo no es valido
-					                              	  var correo1 = element[6] +' '+element[7];
-					                              	  arrayErr.push({"registro": correo1, "motivo":"correo invalido"})
+					                              	  var correo1 = element[0] +' '+element[1]+" rut "+element[2];
+					                              	  arrayErr.push({"registro": correo1, "motivo":"correo del responsable invalido"})
 					                              	  if(index + 1 === elementGlobal.data.length)
 													  {
 														res.status(200).send({ message: 'Ha finalizado con éxito la carga de alumnos', errores: arrayErr } )
@@ -220,7 +224,7 @@ function masiveAssing(req,res)
 	                          	})
 								
 							}//fin de index
-
+							
 						})	//fin del forEach	
 			    })  //fin del forEach
 			   // res.status(200).send({ message: 'Todos los alumnos han sido importados con éxito', repetidos: con_r, guardados: con_g, total: con_t -1 })
